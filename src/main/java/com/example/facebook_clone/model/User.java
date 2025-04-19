@@ -24,7 +24,12 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
-
+    
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('male', 'female', 'other') DEFAULT 'other'")
+    private Gender gender;
+    
+    @Column
     private String profilePicture;
 
     @Enumerated(EnumType.STRING)
@@ -39,6 +44,10 @@ public class User {
     
     public enum Role {
         user, admin
+    }
+    
+    public enum Gender{
+    	male, female, other
     }
 
     public User() {}
@@ -105,7 +114,15 @@ public class User {
         this.email = email;
     }
 
-    public String getProfilePicture() {
+    public Gender getGender() {
+		return gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
+	}
+
+	public String getProfilePicture() {
         return profilePicture;
     }
 

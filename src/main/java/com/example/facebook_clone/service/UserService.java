@@ -48,6 +48,7 @@ public class UserService {
 		user.setPassword(request.getPassword()); // Nên mã hóa password trước khi lưu
 		user.setPhone(request.getPhone());
 		user.setEmail(request.getEmail());
+		user.setGender(request.getGender());
 		user.setProfilePicture(request.getProfilePicture());
 		user.setRole(request.getRole());
 

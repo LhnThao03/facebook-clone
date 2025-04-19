@@ -2,6 +2,8 @@ package com.example.facebook_clone.dto.request;
 
 import java.util.Date;
 import jakarta.persistence.Column;
+
+import com.example.facebook_clone.model.User.Gender;
 import com.example.facebook_clone.model.User.Role;
 
 public class UserCreationRequest {
@@ -10,8 +12,9 @@ public class UserCreationRequest {
 	private String password;
 	private String phone;
 	private String email;
+	@Column(columnDefinition = "ENUM('male', 'female', 'other') DEFAULT 'other'")
+    private Gender gender;
 	private String profilePicture;
-	
 	@Column(columnDefinition = "ENUM('user', 'admin') DEFAULT 'user'")
 	private Role role = Role.user;
 	private Date createdAt = new Date();
@@ -70,6 +73,14 @@ public class UserCreationRequest {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Gender getGender() {
+		return gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	public String getProfilePicture() {

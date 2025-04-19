@@ -2,11 +2,17 @@ package com.example.facebook_clone.dto.request;
 
 import java.util.Date;
 
+import com.example.facebook_clone.model.User.Gender;
+
+import jakarta.persistence.Column;
+
 public class UserUpdateRequest {
     private String firstname;
     private String lastname;
     private String phone;
     private String email;
+    @Column(columnDefinition = "ENUM('male', 'female', 'other') DEFAULT 'other'")
+    private Gender gender;
     private String profilePicture;
     private Date updatedAt = new Date();
     // Không cho phép update role qua API này để bảo mật
@@ -53,7 +59,15 @@ public class UserUpdateRequest {
         this.email = email;
     }
 
-    public String getProfilePicture() {
+    public Gender getGender() {
+		return gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
+	}
+
+	public String getProfilePicture() {
         return profilePicture;
     }
 
