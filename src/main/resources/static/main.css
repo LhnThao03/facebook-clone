@@ -1,0 +1,49 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+:root {
+    --fb-blue: #1877f2;
+    --fb-green: #42b72a;
+    --bg-gray: #f0f2f5;
+}
+
+body {
+    background-color: var(--bg-gray);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: var(--fb-blue);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--fb-green);
+    color: white;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    font-size: 16px;
+} 

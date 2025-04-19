@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Facebook</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Layout chính */
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 250px;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+
+        .admin-menu-item {
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .admin-menu-item:hover {
+            background: #333;
+        }
+
+        .admin-menu-item.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .admin-menu-item i {
+            margin-right: 10px;
+        }
+
+        /* Nội dung chính */
+        .admin-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Bảng dữ liệu */
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<div id="success-alert" th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" style="margin-bottom: 0;" role="alert">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <h2 style="margin-bottom: 20px;">Admin Dashboard</h2>
+            <div class="admin-menu-item active" id="menu-overview" onclick="showContent('overview', this)">
+                <i class="fas fa-home"></i> Tổng quan
+            </div>
+            <div class="admin-menu-item" id="menu-users" onclick="showContent('users', this)">
+                <i class="fas fa-users"></i> Quản lý người dùng
+            </div>
+            <div class="admin-menu-item" id="menu-posts" onclick="showContent('posts', this)">
+                <i class="fas fa-newspaper"></i> Quản lý bài viết
+            </div>
+            <div class="admin-menu-item" id="menu-settings" onclick="showContent('settings', this)">
+                <i class="fas fa-cog"></i> Cài đặt
+            </div>
+        </div>
+
+        <!-- Nội dung động -->
+        <div class="admin-content">
+            <!-- Tổng quan -->
+            <div id="overview" class="content-section">
+                <h1>Tổng quan</h1>
+                <div class="stats-grid">
+                    <div class="stat-card"><h3>Tổng số người dùng</h3><p th:text="${totalUsers}"></p></div>
+                    <div class="stat-card"><h3>Bài viết mới hôm nay</h3><p th:text="${postsToday}">342</p></div>
+                    <div class="stat-card"><h3>Người dùng hoạt động</h3><p>1,234</p></div>
+                </div>
+				<h2>Người dùng mới nhất</h2>
+				                <table class="data-table">
+				                    <thead>
+				                        <tr><th>ID</th><th>Tên</th><th>Email</th><th>Ngày đăng ký</th><th>Hành động</th></tr>
+				                    </thead>
+				                    <tbody>
+				                        <tr th:each="user : ${topUsers}">
+				                            <td th:text="${user.userId}"></td>
+				                            <td th:text="|${user.firstname} ${user.lastname}|"></td>
+				                            <td th:text="${user.email}"></td>
+				                            <td th:text="${#dates.format(user.createdAt, 'dd/MM/yyyy')}"></td>
+				                            <td>
+				                                <a th:href="@{'/users/' + ${user.userId}}" class="btn btn-primary">Xem</a>
+				                                <a th:href="@{'/users/edit/' + ${user.userId}}" class="btn btn-success">Sửa</a>
+											</td>
+				                        </tr>
+				                    </tbody>
+				                </table>
+            </div>
+
+            <!-- Quản lý người dùng -->
+            <div id="users" class="content-section" style="display: none;">
+                <h2>Danh sách người dùng</h2>
+				<table class="data-table">
+				    <thead>
+				        <tr><th>ID</th><th>Tên</th><th>Email</th><th>Ngày đăng ký</th><th>Hành động</th></tr>
+				    </thead>
+				    <tbody>
+				        <tr th:each="user : ${userPage.content}">
+				            <td th:text="${user.userId}"></td>
+				            <td th:text="|${user.firstname} ${user.lastname}|"></td>
+				            <td th:text="${user.email}"></td>
+				            <td th:text="${#dates.format(user.createdAt, 'dd/MM/yyyy')}"></td>
+				            <td>
+				                <a th:href="@{'/users/' + ${user.userId}}" class="btn btn-primary">Xem</a>
+				                <a th:href="@{'/users/edit/' + ${user.userId}}" class="btn btn-success">Sửa</a>
+								<form th:action="@{'/users/delete/' + ${user.userId}}"
+							          method="post"
+							          th:onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này không?')"
+							          style="display:inline;">
+							        <button type="submit" class="btn btn-danger">Xóa</button>
+							    </form>
+				            </td>
+				        </tr>
+				    </tbody>
+				</table>
+				<div>
+				    <a th:if="${userPage.hasPrevious()}" th:href="@{/admin(page=${userPage.number - 1}, section='users')}">« Trước</a>
+				    <span>Trang <span th:text="${userPage.number + 1}"></span> / <span th:text="${userPage.totalPages}"></span></span>
+				    <a th:if="${userPage.hasNext()}" th:href="@{/admin(page=${userPage.number + 1}, section='users')}">Tiếp »</a>
+				</div>
+            </div>
+
+            <!-- Quản lý bài viết -->
+            <div id="posts" class="content-section" style="display: none;">
+                <h2>Quản lý bài viết</h2>
+				<table class="data-table">
+	                <thead>
+	                    <tr>
+	                        <th>ID</th>
+	                        <th>Người đăng</th>
+	                        <th>Email</th>
+	                        <th>Ngày đăng</th>
+	                        <th>Nội dung</th>
+	                        <th>Hình ảnh</th>
+	                        <th>Video</th>
+	                        <th>Hành động</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr th:each="post : ${postPage.content}">
+	                        <td th:text="${post.postId}"></td>
+	                        <td th:text="|${post.user.firstname} ${post.user.lastname}|"></td>
+	                        <td th:text="${post.user.email}"></td>
+	                        <td th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}"></td>
+	                        <td th:text="${post.content}"></td>
+	                        <td>
+	                            <img th:if="${post.imageUrl}" th:src="@{'/' + ${post.imageUrl}}" alt="Hình ảnh bài viết" style="max-width: 100px;" />
+	                        </td>
+	                        <td>
+	                            <video th:if="${post.videoUrl}" th:src="@{'/' + ${post.videoUrl}}" controls style="max-width: 150px;"></video>
+	                        </td>
+	                        <td>
+	                            <a th:href="@{'/posts/' + ${post.postId}}" class="btn btn-primary">Xem</a>
+	                            <a th:href="@{'/posts/' + ${post.postId}}" class="btn btn-success">Sửa</a>
+	                            <form th:action="@{'/posts/delete/' + ${post.postId}}"
+	                                  method="post"
+	                                  th:onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?')"
+	                                  style="display:inline;">
+	                                <button type="submit" class="btn btn-danger">Xóa</button>
+	                            </form>
+	                        </td>
+	                    </tr>
+	                </tbody>
+	            </table>
+	        
+	            <!-- Phân trang -->
+	            <div>
+	                <a th:if="${postPage.hasPrevious()}" th:href="@{/admin(page=${postPage.number - 1}, section='posts')}">« Trước</a>
+	                <span>Trang <span th:text="${postPage.number + 1}"></span> / <span th:text="${postPage.totalPages}"></span></span>
+	                <a th:if="${postPage.hasNext()}" th:href="@{/admin(page=${postPage.number + 1}, section='posts')}">Tiếp »</a>
+	            </div>
+            </div>
+
+            <!-- Cài đặt -->
+            <div id="settings" class="content-section" style="display: none;">
+                <h2>Cài đặt</h2>
+                <p>Các tùy chỉnh hệ thống...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Cách 1: Khi reload trang sẽ bị mất section -->
+	<!-- <script>
+	    function showContent(sectionId, element) {
+	        // Ẩn tất cả các phần nội dung
+	        document.querySelectorAll('.content-section').forEach(section => {
+	            section.style.display = 'none';
+	        });
+
+	        // Hiển thị phần được chọn
+	        document.getElementById(sectionId).style.display = 'block';
+
+	        // Xóa class 'active' khỏi tất cả menu items
+	        document.querySelectorAll('.admin-menu-item').forEach(item => {
+	            item.classList.remove('active');
+	        });
+
+	        // Đánh dấu menu được chọn
+	        if (element) {
+	            element.classList.add('active');
+	        }
+	    }
+
+	    function getQueryParam(param) {
+	        const urlParams = new URLSearchParams(window.location.search);
+	        return urlParams.get(param);
+	    }
+
+	    function removeQueryParam(param) {
+	        const url = new URL(window.location.href);
+	        url.searchParams.delete(param);
+	        window.history.replaceState({}, document.title, url.pathname); // Cập nhật URL mà không reload
+	    }
+
+	    document.addEventListener("DOMContentLoaded", function () {
+	        // Kiểm tra URL có tham số section hay không
+	        const section = getQueryParam('section') || 'overview';
+	        showContent(section, document.getElementById('menu-' + section));
+
+	        // Nếu có tham số 'section' trong URL, xóa nó sau khi tải trang
+	        if (getQueryParam('section')) {
+	            removeQueryParam('section');
+	        }
+	    });
+	</script> -->
+    
+	<!-- Cách 2: Khi reload trang sẽ không bị mất section -->
+	<!-- <script>
+	    function showContent(sectionId, element) {
+	        // Ẩn tất cả các phần nội dung
+	        document.querySelectorAll('.content-section').forEach(section => {
+	            section.style.display = 'none';
+	        });
+
+	        // Hiển thị phần được chọn
+	        document.getElementById(sectionId).style.display = 'block';
+
+	        // Xóa class 'active' khỏi tất cả menu items
+	        document.querySelectorAll('.admin-menu-item').forEach(item => {
+	            item.classList.remove('active');
+	        });
+
+	        // Đánh dấu menu được chọn
+	        if (element) {
+	            element.classList.add('active');
+	        }
+	    }
+
+	    function getQueryParam(param) {
+	        const urlParams = new URLSearchParams(window.location.search);
+	        return urlParams.get(param);
+	    }
+
+	    document.addEventListener("DOMContentLoaded", function () {
+	        // Kiểm tra URL có tham số section hay không
+	        const section = getQueryParam('section') || 'overview';
+	        showContent(section, document.getElementById('menu-' + section));
+	    });
+	</script> -->
+    
+
+    <script>
+        // Hàm lấy giá trị tham số trên URL
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+    
+        // Hàm xóa 1 tham số khỏi URL
+        function removeQueryParam(param) {
+            const url = new URL(window.location);
+            url.searchParams.delete(param);
+            window.history.replaceState({}, '', url);
+        }
+    
+        // Hàm hiển thị section tương ứng
+        function showContent(sectionId, element) {
+            // Ẩn tất cả các phần nội dung
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+    
+            // Hiển thị section được chọn
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+            }
+    
+            // Xóa và set class active cho menu
+            document.querySelectorAll('.admin-menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (element) {
+                element.classList.add('active');
+            }
+    
+            // Cập nhật tiêu đề trang
+            const sectionTitles = {
+                overview: "Tổng quan",
+                users: "Quản lý người dùng",
+                posts: "Quản lý bài viết",
+                reports: "Báo cáo vi phạm",
+                settings: "Cài đặt"
+            };
+            document.title = `Admin Dashboard | ${sectionTitles[sectionId] || "Facebook"}`;
+    
+            // Cập nhật URL mà không reload
+            const url = new URL(window.location);
+            url.searchParams.set("section", sectionId);
+            window.history.pushState({}, "", url);
+        }
+    
+        // Khi tải trang
+        document.addEventListener("DOMContentLoaded", function () {
+            const section = getQueryParam('section') || 'overview';
+            const menuElement = document.getElementById('menu-' + section);
+            showContent(section, menuElement);
+    
+            // Sau khi xử lý xong, xoá ?section khỏi URL
+            if (getQueryParam('section')) {
+                setTimeout(() => removeQueryParam('section'), 100);
+            }
+        });
+		
+		setTimeout(function() {
+		        let alert = document.getElementById("success-alert");
+		        if (alert) {
+		            // Làm mờ dần rồi ẩn hoàn toàn
+		            alert.classList.remove("show");
+		            alert.classList.add("fade");
+		            setTimeout(() => alert.style.display = "none", 500);
+		        }
+		    }, 3000); // 3000 ms = 3 giây
+    </script>
+    
+
+</body>
+
+</html>
