@@ -22,5 +22,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE u.userId <> :currentUserId") // Gợi ý bạn bè đơn giản
     List<User> findFriendSuggestions(@Param("currentUserId") Integer currentUserId);
     
+    User findByEmail(String email); // Spring tự tạo query theo tên hàm
+    
     Page<User> findAll(Pageable pageable);
 }

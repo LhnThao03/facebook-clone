@@ -35,6 +35,10 @@ public class UserService {
 		return userRepository.findById(id)
 			.orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 	}
+	
+	public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 
 	public User createUser(UserCreationRequest request) {
 		// Kiểm tra email đã tồn tại chưa
@@ -84,7 +88,7 @@ public class UserService {
 	    return userRepository.count(); // Tổng số bản ghi
 	}
 	
-	public List<User> getFriendSuggestions(Integer currentUserId) {
-        return userRepository.findFriendSuggestions(currentUserId);
+	public List<User> getFriendSuggestions(User currentUserId) {
+        return userRepository.findFriendSuggestions(currentUserId.getUserId());
     }
 }

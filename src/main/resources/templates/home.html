@@ -43,7 +43,7 @@
     <div class="main-content">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-item"><i class="fas fa-user"></i><span>Tên người dùng</span></div>
+            <div class="sidebar-item"><i class="fas fa-user"></i><span th:text="${currentUser.lastname} + ' ' + ${currentUser.firstname}"></span></div>
             <div class="sidebar-item"><i class="fas fa-user-friends"></i><span>Bạn bè</span></div>
             <div class="sidebar-item"><i class="fas fa-users"></i><span>Nhóm</span></div>
             <div class="sidebar-item"><i class="fas fa-store"></i><span>Marketplace</span></div>

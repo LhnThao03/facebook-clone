@@ -35,14 +35,14 @@ public class UserController {
 //	}
 	
 	//Phân trang
-	@GetMapping
-    public String getUsers(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<User> userPage = userService.getUsers(page, 10); // Lấy 10 user trên mỗi trang
-        List<User> topUsers = userService.getTop10Users();
-        model.addAttribute("userPage", userPage);
-        model.addAttribute("topUsers", topUsers);
-        return "admin/dashboard";
-    }
+//	@GetMapping
+//    public String getUsers(@RequestParam(defaultValue = "0") int page, Model model) {
+//        Page<User> userPage = userService.getUsers(page, 10); // Lấy 10 user trên mỗi trang
+//        List<User> topUsers = userService.getTop10Users();
+//        model.addAttribute("userPage", userPage);
+//        model.addAttribute("topUsers", topUsers);
+//        return "admin/dashboard";
+//    }
 	
 	@GetMapping("/{id}")
 	public String getUserDetail(@PathVariable Integer id, Model model) {
@@ -79,7 +79,7 @@ public class UserController {
 			
 			userService.createUser(request);
 			model.addAttribute("users", userService.getUsers());
-			return "redirect:admin/dashboard";
+			return "redirect:login";
 	}
 
 	@PostMapping("/edit/{id}")
