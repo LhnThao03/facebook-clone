@@ -11,12 +11,15 @@ import org.springframework.stereotype.Service;
 import com.example.facebook_clone.dto.request.UserCreationRequest;
 import com.example.facebook_clone.dto.request.UserUpdateRequest;
 import com.example.facebook_clone.model.User;
+import com.example.facebook_clone.repository.FriendRepository;
 import com.example.facebook_clone.repository.UserRepository;
 
 @Service
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+    private FriendRepository friendRepository;
 	
 	public Page<User> getUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -90,5 +93,11 @@ public class UserService {
 	
 	public List<User> getFriendSuggestions(User currentUserId) {
         return userRepository.findFriendSuggestions(currentUserId.getUserId());
+    }
+	
+	public int countFriends(User user) {
+        int countAsUser1 = friendRepository.countByUser1(user);
+        int countAsUser2 = friendRepository.countByUser2(user);
+        return countAsUser1 + countAsUser2;
     }
 }

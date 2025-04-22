@@ -32,7 +32,9 @@
                 <input type="text" placeholder="Tìm kiếm trên Facebook" style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5;">
             </div>
             <div style="display: flex; gap: 20px;">
-                <i class="fas fa-user"></i>
+				<a th:href="@{'/profile/' + ${currentUser.userId}}">
+				    <i class="fas fa-user" style="cursor: pointer; color: black;"></i>
+				</a>
                 <i class="fas fa-comment"></i>
                 <i class="fas fa-bell"></i>
                 <i class="fas fa-bars"></i>

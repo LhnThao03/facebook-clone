@@ -30,6 +30,10 @@ public class PostService {
         return postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
     }
+    
+    public List<Post> getPostsByUserId(Integer userId) {
+        return postRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
+    }
 
     public Post createPost(Post post) {
         return postRepository.save(post);

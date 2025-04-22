@@ -152,7 +152,7 @@
 				            <td th:text="${user.email}"></td>
 				            <td th:text="${#dates.format(user.createdAt, 'dd/MM/yyyy')}"></td>
 				            <td>
-				                <a th:href="@{'/users/' + ${user.userId}}" class="btn btn-primary">Xem</a>
+				                <a th:href="@{'/profile/' + ${user.userId}}" class="btn btn-primary">Xem</a>
 				                <a th:href="@{'/users/edit/' + ${user.userId}}" class="btn btn-success">Sửa</a>
 								<form th:action="@{'/users/delete/' + ${user.userId}}"
 							          method="post"

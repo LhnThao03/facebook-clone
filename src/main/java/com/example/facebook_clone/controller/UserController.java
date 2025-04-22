@@ -48,7 +48,7 @@ public class UserController {
 	public String getUserDetail(@PathVariable Integer id, Model model) {
 		User user = userService.getUserById(id);
 	    model.addAttribute("user", user);
-	    return "user-details";
+	    return "profile";
 	}
 	
 	@GetMapping("/edit/{id}")

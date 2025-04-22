@@ -20,4 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 	List<Post> findTop10ByOrderByCreatedAtDesc();
 	
 	long countByCreatedAtAfter(LocalDateTime dateTime);
+	
+	List<Post> findByUser_UserIdOrderByCreatedAtDesc(Integer userId);
+
 }
