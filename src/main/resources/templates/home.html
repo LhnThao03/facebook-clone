@@ -54,24 +54,34 @@
         </div>
 
         <!-- Feed -->
-        <div class="feed">
-            <div class="post" th:each="post : ${posts}">
-                <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <img th:src="${post.imageUrl}" style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
-                    <div>
-                        <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
-                        <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
-                    </div>
-                </div>
-                <p th:text="${post.content}"></p>
-                <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
-                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
-                    <button class="btn"><i class="far fa-thumbs-up"></i> Thích</button>
-                    <button class="btn"><i class="far fa-comment"></i> Bình luận</button>
-                    <button class="btn"><i class="far fa-share-square"></i> Chia sẻ</button>
-                </div>
-            </div>
-        </div>
+		<div class="feed">
+		    <div class="post" th:each="post : ${postsWithInteraction}">
+		        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+		            <img th:src="${post.user.profilePicture}" style="border-radius: 50%; width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+		            <div>
+		                <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
+		                <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+		            </div>
+		        </div>
+
+		        <p th:text="${post.content}"></p>
+
+		        <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
+
+		        <div style="font-size: 14px; color: #65676B; margin-bottom: 5px;">
+		            <span th:text="'👍 ' + ${post.likes} + ' lượt thích'"></span> |
+		            <span th:text="'💬 ' + ${post.comments} + ' bình luận'"></span> |
+		            <span th:text="'🔁 ' + ${post.shares} + ' lượt chia sẻ'"></span>
+		        </div>
+
+		        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
+		            <button class="btn"><i class="far fa-thumbs-up"></i> Thích</button>
+		            <button class="btn"><i class="far fa-comment"></i> Bình luận</button>
+		            <button class="btn"><i class="far fa-share-square"></i> Chia sẻ</button>
+		        </div>
+		    </div>
+		</div>
+
 
         <!-- Gợi ý bạn bè -->
         <div class="right-sidebar">

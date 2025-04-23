@@ -13,24 +13,117 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
-        .cover-photo {
-            height: 350px;
-            background-image: url('https://via.placeholder.com/1000x350');
-            background-size: cover;
-            background-position: center;
+		.photo {
             position: relative;
+            height: 350px;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* background-color: white; */
         }
 
+        /* Bọc ảnh bìa trong wrapper để dễ canh giữa và giới hạn chiều rộng */
+		.cover-wrapper {
+		    position: relative;
+		    width: 80%;
+		    margin: 0 auto;
+		    height: 350px;
+		    overflow: hidden;
+		    border-radius: 8px;
+		}
+
+		.cover-photo {
+		    width: 100%;
+		    height: 100%;
+		    object-fit: cover;
+		    display: block;
+		    transition: 0.3s ease;
+		}
+
+        /* Avatar */
         .profile-photo {
             width: 168px;
             height: 168px;
             border-radius: 50%;
             border: 4px solid white;
             position: absolute;
-            bottom: -22px;
+            bottom: -84px;
             left: 50%;
             transform: translateX(-50%);
+            object-fit: cover;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+			z-index: 2;
         }
+		
+		.cover-overlay {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: rgba(0, 0, 0, 0);
+		    transition: background 0.3s ease;
+		    pointer-events: none;
+		    z-index: 1;
+		}
+		
+		.cover-wrapper:hover .cover-overlay {
+		    background: rgba(0, 0, 0, 0.2); /* Lớp phủ đậm khi hover */
+		}
+		
+		.cover-actions {
+			position: absolute;
+		    bottom: 16px;
+		    right: 16px;
+		    z-index: 2;
+		}
+
+		.cover-btn {
+			background: white;
+		    border: none;
+		    border-radius: 6px;
+		    padding: 8px 12px;
+		    font-weight: 600;
+		    cursor: pointer;
+		    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    transition: background 0.2s;
+		}
+
+		.cover-btn:hover {
+		    background: #f0f0f0;
+		}
+
+		.cover-dropdown {
+			display: none;
+		    position: absolute;
+		    bottom: 100%;
+		    right: 0;
+		    margin-bottom: 8px;
+		    background: white;
+		    border-radius: 6px;
+		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		    overflow: hidden;
+		    z-index: 3;
+		}
+
+		.cover-actions.show .cover-dropdown {
+		    display: block;
+		}
+
+		.dropdown-item {
+		    padding: 10px 16px;
+		    cursor: pointer;
+		    white-space: nowrap;
+		}
+
+		.dropdown-item:hover {
+		    background: #f0f0f0;
+		}
 
         .profile-nav {
             display: flex;
@@ -129,12 +222,30 @@
         .post-action-btn i {
             font-size: 20px;
         }
+		@keyframes fadeIn {
+			from { opacity: 0; transform: scale(0.95); }
+			to { opacity: 1; transform: scale(1); }
+		}
     </style>
 </head>
 <body>
     <div class="profile-header">
-        <div class="cover-photo">
-			<img th:src="${user.profilePicture}" class="profile-photo">
+        <div class="photo">
+			<div class="cover-wrapper">
+			    <img th:src="${profile.coverPicture}" class="cover-photo">
+			    <div class="cover-overlay"></div>
+
+			    <div class="cover-actions">
+			        <button class="cover-btn">
+			            <i class="fas fa-camera"></i> Chỉnh sửa ảnh bìa
+			        </button>
+			        <div class="cover-dropdown">
+			            <div class="dropdown-item">Xem ảnh bìa</div>
+			            <div class="dropdown-item">Tải ảnh lên</div>
+			        </div>
+			    </div>
+			</div>
+            <img th:src="${user.profilePicture}" class="profile-photo">
         </div>
         <div class="profile-info">
 			<h1 th:text="${user.firstname + ' ' + user.lastname}"></h1>
@@ -153,12 +264,24 @@
         <div class="profile-left">
 			<div class="info-card">
 			    <h3>Giới thiệu</h3>
-			    <button style="margin: 5px 0; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
-			        Thêm tiểu sử
-			    </button>
+				<!-- Nút thêm tiểu sử -->
+				    <button id="add-bio-btn" onclick="showBioInput()"
+				        style="margin: 5px 0; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
+				        Thêm tiểu sử
+				    </button>
+
+				    <!-- Ô input và các nút điều khiển -->
+				    <div id="bio-input-section" style="display: none; margin-top: 10px;">
+				        <input type="text" id="bio-input" placeholder="Nhập tiểu sử..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+
+				        <div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
+				            <button onclick="hideBioInput()" style="padding: 5px 10px; border: none; background-color: #ccc; border-radius: 5px; cursor: pointer;">Hủy</button>
+				            <button onclick="saveBio()" style="padding: 5px 10px; border: none; background-color: #1877f2; color: white; border-radius: 5px; cursor: pointer;">Lưu</button>
+				        </div>
+				    </div>
 
 			    <!-- Hiển thị bio -->
-			    <p th:text="${profile.bio}">Thông tin giới thiệu về bản thân...</p>
+			    <p id="bio-display" th:text="${profile.bio}">Thông tin giới thiệu về bản thân...</p>
 
 			    <!-- Hiển thị location -->
 			    <div style="margin: 10px 0;">
@@ -172,9 +295,31 @@
 			        <span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}">Sinh ngày: 01/01/2000</span>
 			    </div>
 
-			    <button style="margin-top: 15px; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
+			    <button onclick="openDetailModal()" style="margin-top: 15px; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
 			        Chỉnh sửa chi tiết
 			    </button>
+				<!-- Modal chỉnh sửa chi tiết -->
+				<div id="detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+				    background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; font-family: Arial, sans-serif;">
+				    
+				    <div style="background: #fff; padding: 24px 28px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-in-out;">
+				        
+				        <h3 style="margin-bottom: 16px; font-size: 20px; color: #1c1e21;">Chỉnh sửa chi tiết</h3>
+				        
+				        <form id="detail-form">
+				            <label for="location" style="font-weight: 500; color: #333;">Nơi sống:</label>
+				            <input type="text" id="location" name="location" style="width: 100%; padding: 10px; margin: 6px 0 16px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+
+				            <label for="birthdate" style="font-weight: 500; color: #333;">Ngày sinh:</label>
+				            <input type="date" id="birthdate" name="birthdate" style="width: 100%; padding: 10px; margin: 6px 0 20px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+
+				            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+				                <button type="button" onclick="closeDetailModal()" style="padding: 8px 16px; background: #e4e6eb; border: none; border-radius: 6px; cursor: pointer; color: #050505;">Hủy</button>
+				                <button type="submit" style="padding: 8px 16px; background: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer;">Lưu</button>
+				            </div>
+				        </form>
+				    </div>
+				</div>
 			</div>
             <div class="info-card">
                 <h3>Ảnh</h3>
@@ -219,6 +364,11 @@
 			    </div>
 			    <p th:text="${post.content}">Nội dung bài viết...</p>
 			    <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
+				<div style="font-size: 14px; color: #65676B; margin-bottom: 5px;">
+		            <span th:text="'👍 ' + ${post.likes} + ' lượt thích'"></span> |
+		            <span th:text="'💬 ' + ${post.comments} + ' bình luận'"></span> |
+		            <span th:text="'🔁 ' + ${post.shares} + ' lượt chia sẻ'"></span>
+		        </div>
 			    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
 			        <button class="btn"><i class="far fa-thumbs-up"></i> Thích</button>
 			        <button class="btn"><i class="far fa-comment"></i> Bình luận</button>
@@ -228,4 +378,102 @@
         </div>
     </div>
 </body>
-</html> 
+<script>
+	const userId = [[${user.userId}]];
+    function showBioInput() {
+        document.getElementById("add-bio-btn").style.display = "none";
+        document.getElementById("bio-input-section").style.display = "block";
+    }
+
+    function hideBioInput() {
+        document.getElementById("bio-input-section").style.display = "none";
+        document.getElementById("add-bio-btn").style.display = "block";
+    }
+
+    function saveBio() {
+		const bioText = document.getElementById("bio-input").value;
+        fetch("/profile/" + userId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "bio=" + encodeURIComponent(bioText)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to save bio");
+            return response.text();
+        })
+        .then(result => {
+            const display = document.getElementById("bio-display");
+            if (display) display.textContent = bioText || "Thông tin giới thiệu về bản thân...";
+            hideBioInput();
+        })
+        .catch(error => {
+            alert("Có lỗi xảy ra khi lưu tiểu sử: " + error.message);
+        });
+    }
+	
+	function openDetailModal() {
+		const currentLocation = '[[${profile.location}]]';
+	    const currentBirthdate = '[[${#temporals.format(profile.birthdate, 'yyyy-MM-dd')}]]';
+
+	    // Gán giá trị vào ô input
+	    document.getElementById("location").value = currentLocation;
+	    document.getElementById("birthdate").value = currentBirthdate;
+
+	    // Hiện modal
+	    document.getElementById("detail-modal").style.display = "flex";
+    }
+
+    function closeDetailModal() {
+        document.getElementById("detail-modal").style.display = "none";
+    }
+
+	document.getElementById("detail-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const locationValue = document.getElementById("location").value;
+        const birthdateValue = document.getElementById("birthdate").value;
+
+        // Không dùng new Date(), gửi đúng yyyy-MM-dd như input date
+        const formData = new URLSearchParams();
+        formData.append("location", locationValue);
+        formData.append("birthdate", birthdateValue);
+
+        fetch("/profile/" + userId + "/update-details", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Cập nhật thất bại");
+            return response.text();
+        })
+        .then(() => {
+            alert("Đã cập nhật thông tin!");
+            closeDetailModal();
+            window.location.href = "/profile/" + userId; // Tránh reload nếu route bị cache
+        })
+        .catch(error => alert("Lỗi: " + error.message));
+    });
+		
+	document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.querySelector(".cover-btn");
+        const actionBox = document.querySelector(".cover-actions");
+
+        btn.addEventListener("click", () => {
+            actionBox.classList.toggle("show");
+        });
+
+        // Ẩn dropdown khi click ra ngoài
+        document.addEventListener("click", (e) => {
+            if (!actionBox.contains(e.target)) {
+                actionBox.classList.remove("show");
+            }
+        });
+    });
+	
+</script>
+</html>

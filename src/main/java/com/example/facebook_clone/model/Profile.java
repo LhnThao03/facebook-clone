@@ -17,6 +17,8 @@ public class Profile {
     private String bio;
     private String location;
     private LocalDateTime birthdate;
+    @Column
+    private String coverPicture;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
@@ -24,12 +26,13 @@ public class Profile {
     public Profile() {}
 
     public Profile(int profileId, User user, String bio, String location, LocalDateTime birthdate,
-            LocalDateTime updatedAt) {
+            String coverPicture,LocalDateTime updatedAt) {
         this.profileId = profileId;
         this.user = user;
         this.bio = bio;
         this.location = location;
         this.birthdate = birthdate;
+        this.coverPicture = coverPicture;
         this.updatedAt = updatedAt;
     }
 
@@ -73,7 +76,15 @@ public class Profile {
         this.birthdate = birthdate;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public String getCoverPicture() {
+		return coverPicture;
+	}
+
+	public void setCoverPicture(String coverPicture) {
+		this.coverPicture = coverPicture;
+	}
+
+	public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
