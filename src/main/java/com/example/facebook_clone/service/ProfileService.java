@@ -34,4 +34,9 @@ public class ProfileService {
 	        profileRepository.save(profile);
 	    }
 	}
+	
+	public void updateCoverPicture(Profile profile, String coverUrl) {
+	    profile.setCoverPicture(coverUrl);
+	    profileRepository.save(profile);
+	}
 }

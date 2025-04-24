@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.example.facebook_clone.interceptor.AdminInterceptor;
@@ -21,9 +22,13 @@ public class WebConfig implements WebMvcConfigurer {
     private AdminInterceptor adminInterceptor;
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginInterceptor())
+        /*registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/home/**")   // chặn các đường dẫn cần đăng nhập
-                .excludePathPatterns("/login", "/register", "/css/**", "/js/**", "/images/**"); // cho phép truy cập tự do
+                .excludePathPatterns("/login", "/register", "/css/**", "/js/**", "/images/**"); // cho phép truy cập tự do*/
+        
+        registry.addInterceptor(loginInterceptor)
+		        .addPathPatterns("/home/**", "/profile/**", "/admin/**") 
+		        .excludePathPatterns("/login", "/register", "/css/**", "/js/**", "/images/**");
     
      // Interceptor kiểm tra đăng nhập
         registry.addInterceptor(loginInterceptor)
@@ -33,5 +38,11 @@ public class WebConfig implements WebMvcConfigurer {
         // Interceptor kiểm tra quyền admin
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**");
+    }
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/IMG/**")
+                .addResourceLocations("file:IMG/");
     }
 }

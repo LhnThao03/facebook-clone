@@ -100,4 +100,9 @@ public class UserService {
         int countAsUser2 = friendRepository.countByUser2(user);
         return countAsUser1 + countAsUser2;
     }
+	
+	public void updateProfilePicture(User user, String imagePath) {
+	    user.setProfilePicture(imagePath);
+	    userRepository.save(user);
+	}
 }

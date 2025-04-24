@@ -42,7 +42,18 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt = new Date();
     
-    public enum Role {
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Profile profile;
+    
+    public Profile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(Profile profile) {
+		this.profile = profile;
+	}
+
+	public enum Role {
         user, admin
     }
     

@@ -29,14 +29,14 @@ public String loginUser(@RequestParam String email,
                         @RequestParam String password,
                         HttpSession session,
                         Model model) {
-    User user = userService.findByEmail(email);
-
-    if (user != null && user.getPassword().equals(password)) {
-        session.setAttribute("currentUser", user); // lưu user vào session
-        return "redirect:/home";
-    }
-
-    model.addAttribute("error", "Email hoặc mật khẩu không đúng!");
-    return "login";
-}
+	    User user = userService.findByEmail(email);
+	
+	    if (user != null && user.getPassword().equals(password)) {
+	        session.setAttribute("currentUser", user); // lưu user vào session
+	        return "redirect:/home";
+	    }
+	
+	    model.addAttribute("error", "Email hoặc mật khẩu không đúng!");
+	    return "login";
+	}
 }

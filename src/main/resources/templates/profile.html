@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang cá nhân | Facebook</title>
-    <link rel="stylesheet" href="styles/main.css">
+	<link rel="stylesheet" th:href="@{/main.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .profile-header {
@@ -124,13 +124,38 @@
 		.dropdown-item:hover {
 		    background: #f0f0f0;
 		}
+		
+		.save-cancel-bar {
+		    position: absolute;
+		    top: 15px;
+		    right: 20px;
+		    display: flex;
+		    gap: 10px;
+		    z-index: 2;
+		}
+
+		.save-btn, .cancel-btn {
+		    padding: 8px 14px;
+		    border: none;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    font-weight: bold;
+		}
+
+		.save-btn {
+		    background-color: #1877f2;
+		    color: white;
+		}
+
+		.cancel-btn {
+		    background-color: #e4e6eb;
+		}
 
         .profile-nav {
             display: flex;
             justify-content: center;
             padding: 20px;
             border-top: 1px solid #dadde1;
-            margin-top: 60px;
         }
 
         .profile-nav-item {
@@ -230,25 +255,44 @@
 </head>
 <body>
     <div class="profile-header">
-        <div class="photo">
-			<div class="cover-wrapper">
-			    <img th:src="${profile.coverPicture}" class="cover-photo">
-			    <div class="cover-overlay"></div>
+		<div class="photo">
+		    <div class="cover-wrapper">
+		        <img th:src="${profile.coverPicture}" class="cover-photo" id="coverPhoto">
+		        <div class="cover-overlay"></div>
 
-			    <div class="cover-actions">
-			        <button class="cover-btn">
-			            <i class="fas fa-camera"></i> Chỉnh sửa ảnh bìa
-			        </button>
-			        <div class="cover-dropdown">
-			            <div class="dropdown-item">Xem ảnh bìa</div>
-			            <div class="dropdown-item">Tải ảnh lên</div>
-			        </div>
-			    </div>
+		        <div class="cover-actions">
+		            <button class="cover-btn">
+		                <i class="fas fa-camera"></i> Chỉnh sửa ảnh bìa
+		            </button>
+		            <div class="cover-dropdown">
+						<div class="dropdown-item">Xem ảnh bìa</div>
+		                <div class="dropdown-item" onclick="triggerUpload()">Tải ảnh lên</div>
+		            </div>
+		        </div>
+
+		        <div class="save-cancel-bar" id="saveCancelBar" style="display: none;">
+		            <button onclick="saveCover()" class="save-btn">Lưu</button>
+		            <button onclick="cancelCover()" class="cancel-btn">Hủy</button>
+		        </div>
+
+		        <input type="file" id="coverInput" style="display: none;" accept="image/*" onchange="previewCover(this)">
+		    </div>
+
+			<!-- Ảnh đại diện -->
+			<img th:src="${user.profilePicture}" class="profile-photo" onclick="toggleAvatarOptions()" style="cursor:pointer;">
+
+			<!-- Khung chứa 2 nút -->
+			<div id="avatar-options" style="display:none; margin-top: 10px;">
+			    <button onclick="viewAvatar()">Xem ảnh</button>
+			    
+			    <!-- Form upload ảnh -->
+			    <form id="upload-avatar-form" method="post" enctype="multipart/form-data" action="/profile/upload-avatar">
+			        <input type="file" name="avatarImage" accept="image/*" onchange="document.getElementById('upload-avatar-form').submit()">
+			    </form>
 			</div>
-            <img th:src="${user.profilePicture}" class="profile-photo">
-        </div>
+		</div>
         <div class="profile-info">
-			<h1 th:text="${user.firstname + ' ' + user.lastname}"></h1>
+			<h1 th:text="${user.firstname + ' ' + user.lastname}" style="margin: 80px 0 0 0"></h1>
 			<p th:text="${friendCount} + ' bạn bè'"></p>
         </div>
         <div class="profile-nav">
@@ -286,13 +330,13 @@
 			    <!-- Hiển thị location -->
 			    <div style="margin: 10px 0;">
 			        <i class="fas fa-home"></i> 
-			        <span th:text="'Sống tại ' + ${profile.location}">Sống tại Hà Nội</span>
+			        <span th:text="'Sống tại ' + ${profile.location}"></span>
 			    </div>
 
 			    <!-- Hiển thị birthdate -->
 			    <div style="margin: 10px 0;">
 			        <i class="fas fa-birthday-cake"></i> 
-			        <span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}">Sinh ngày: 01/01/2000</span>
+			        <span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span>
 			    </div>
 
 			    <button onclick="openDetailModal()" style="margin-top: 15px; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
@@ -380,6 +424,7 @@
 </body>
 <script>
 	const userId = [[${user.userId}]];
+	let tempCoverFile = null;
     function showBioInput() {
         document.getElementById("add-bio-btn").style.display = "none";
         document.getElementById("bio-input-section").style.display = "block";
@@ -428,7 +473,77 @@
     function closeDetailModal() {
         document.getElementById("detail-modal").style.display = "none";
     }
+	
+	/*function uploadCover(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
+        const formData = new FormData();
+        formData.append("coverImage", file);
+
+        fetch('upload-cover', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                alert("Tải ảnh thành công!");
+                location.reload();
+            } else {
+                alert("Tải ảnh thất bại!");
+            }
+        });
+    }*/
+	
+	function triggerUpload() {
+	    document.getElementById('coverInput').click();
+	}
+	
+	function previewCover(input) {
+	    const file = input.files[0];
+	    if (file) {
+	        tempCoverFile = file;
+	        const reader = new FileReader();
+	        reader.onload = function(e) {
+	            document.getElementById('coverPhoto').src = e.target.result;
+	            document.getElementById('saveCancelBar').style.display = 'flex';
+	        };
+	        reader.readAsDataURL(file);
+	    }
+	}
+	
+	function cancelCover() {
+	    // Reload trang để khôi phục lại ảnh cũ
+	    location.reload();
+	}
+	
+	function saveCover() {
+	    const formData = new FormData();
+	    formData.append("coverImage", tempCoverFile);
+
+	    fetch("upload-cover", {
+	        method: "POST",
+	        body: formData,
+			credentials: 'include'
+	    })
+	    .then(res => {
+	        if (res.ok) {
+	            location.reload(); // reload để cập nhật ảnh mới
+	        } else {
+	            alert("Lỗi khi lưu ảnh bìa!");
+	        }
+	    });
+	}
+	
+	function toggleAvatarOptions() {
+	    var options = document.getElementById("avatar-options");
+	    options.style.display = options.style.display === "none" ? "block" : "none";
+	}
+
+	function viewAvatar() {
+	    var imgSrc = document.querySelector(".profile-photo").getAttribute("src");
+	    window.open(imgSrc, "_blank");
+	}
+	
 	document.getElementById("detail-form").addEventListener("submit", function(event) {
         event.preventDefault();
 
