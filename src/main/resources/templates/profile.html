@@ -57,6 +57,36 @@
 			z-index: 2;
         }
 		
+		.avatar-dropdown {
+	        position: absolute;
+	        top: calc(100% + 90px); /* 10px cách dưới avatar */
+	        left: 50%;
+			transform: translateX(-50%);
+	        background-color: #fff;
+	        border: 1px solid #ccc;
+	        border-radius: 8px;
+	        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+	        display: none;
+	        flex-direction: column;
+	        z-index: 15;
+	    }
+			
+		.avatar-dropdown .dropdown-item {
+	        padding: 10px 15px;
+	        cursor: pointer;
+	        font-size: 14px;
+	        transition: background 0.2s;
+	    }
+		
+		.avatar-dropdown .dropdown-item:hover {
+	        background-color: #f0f0f0;
+	    }
+		
+		#avatarInput {
+	        display: none;
+	    }
+
+		
 		.cover-overlay {
 		    position: absolute;
 		    top: 0;
@@ -251,6 +281,66 @@
 			from { opacity: 0; transform: scale(0.95); }
 			to { opacity: 1; transform: scale(1); }
 		}
+		
+		/*Model*/
+		.modal {
+		  display: none;
+		  position: fixed;
+		  z-index: 9999;
+		  left: 0;
+		  top: 0;
+		  width: 100%;
+		  height: 100%;
+		  backdrop-filter: blur(3px);
+		  background-color: rgba(0, 0, 0, 0.6);
+		  justify-content: center;
+		  align-items: center;
+		}
+
+		.modal-content {
+		  background-color: #242526;
+		  color: white;
+		  border-radius: 10px;
+		  width: 500px;
+		  padding: 20px;
+		  position: relative;
+		}
+
+		.close {
+		  position: absolute;
+		  right: 15px;
+		  top: 15px;
+		  font-size: 24px;
+		  cursor: pointer;
+		}
+
+		textarea {
+		  width: 100%;
+		  height: 100px;
+		  background: transparent;
+		  border: none;
+		  color: white;
+		  font-size: 20px;
+		  resize: none;
+		  outline: none;
+		  margin-top: 10px;
+		}
+
+		.post-options {
+		  display: flex;
+		  gap: 10px;
+		  margin-top: 10px;
+		}
+
+		.post-btn {
+		  background-color: #3a3b3c;
+		  border: none;
+		  color: white;
+		  padding: 10px;
+		  width: 100%;
+		  border-radius: 8px;
+		  cursor: pointer;
+		}
     </style>
 </head>
 <body>
@@ -279,17 +369,18 @@
 		    </div>
 
 			<!-- Ảnh đại diện -->
-			<img th:src="${user.profilePicture}" class="profile-photo" onclick="toggleAvatarOptions()" style="cursor:pointer;">
+			    <img th:src="${user.profilePicture}" class="profile-photo" onclick="toggleAvatarDropdown()">
 
-			<!-- Khung chứa 2 nút -->
-			<div id="avatar-options" style="display:none; margin-top: 10px;">
-			    <button onclick="viewAvatar()">Xem ảnh</button>
-			    
+			    <!-- Dropdown khi click vào avatar -->
+			    <div class="avatar-dropdown" id="avatarDropdown">
+			        <div class="dropdown-item" onclick="viewAvatar()">Xem ảnh</div>
+			        <div class="dropdown-item" onclick="document.getElementById('avatarInput').click()">Chỉnh sửa ảnh</div>
+			    </div>
+
 			    <!-- Form upload ảnh -->
 			    <form id="upload-avatar-form" method="post" enctype="multipart/form-data" action="/profile/upload-avatar">
-			        <input type="file" name="avatarImage" accept="image/*" onchange="document.getElementById('upload-avatar-form').submit()">
+			        <input type="file" id="avatarInput" name="avatarImage" accept="image/*" onchange="document.getElementById('upload-avatar-form').submit()">
 			    </form>
-			</div>
 		</div>
         <div class="profile-info">
 			<h1 th:text="${user.firstname + ' ' + user.lastname}" style="margin: 80px 0 0 0"></h1>
@@ -380,8 +471,40 @@
         <div class="profile-right">
             <div class="create-post">
                 <div class="create-post-header">
-                    <img src="https://via.placeholder.com/40" style="border-radius: 50%;">
-                    <input type="text" class="post-input" placeholder="Bạn đang nghĩ gì?">
+					<!-- Phần input -->
+                    <img th:src="${user.profilePicture}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                    <input type="text" class="post-input" placeholder="Bạn đang nghĩ gì?" onclick="openModal()">
+					
+					<!-- Modal -->
+					<div id="postModal" class="modal">
+					  <div class="modal-content">
+					    <div class="modal-header">
+					      <h2>Tạo bài viết</h2>
+					      <span class="close" onclick="closeModal()">&times;</span>
+					    </div>
+					    <div class="modal-body">
+					      <div class="user-info">
+					        <img src="avatar.jpg" class="avatar" />
+					        <div class="user-details">
+					          <strong th:text="${user.firstname + ' ' + user.lastname}">Nhat Thao</strong>
+					          <button class="privacy-btn">Bạn bè ▼</button>
+					        </div>
+					      </div>
+					      <textarea placeholder="Bạn đang nghĩ gì?"></textarea>
+					      <!-- Các icon chức năng -->
+					      <div class="post-options">
+					        <button>📷</button>
+					        <button>🏷️</button>
+					        <button>😊</button>
+					        <button>📍</button>
+					        <button>GIF</button>
+					      </div>
+					    </div>
+					    <div class="modal-footer">
+					      <button class="post-btn">Đăng</button>
+					    </div>
+					  </div>
+					</div>
                 </div>
                 <div class="post-actions">
                     <button class="post-action-btn">
@@ -538,10 +661,24 @@
 	    var options = document.getElementById("avatar-options");
 	    options.style.display = options.style.display === "none" ? "block" : "none";
 	}
+	
+	function toggleAvatarDropdown() {
+        const dropdown = document.getElementById('avatarDropdown');
+        dropdown.style.display = (dropdown.style.display === 'flex') ? 'none' : 'flex';
+    }
 
 	function viewAvatar() {
-	    var imgSrc = document.querySelector(".profile-photo").getAttribute("src");
-	    window.open(imgSrc, "_blank");
+        const imgSrc = document.querySelector('.profile-photo').src;
+        window.open(imgSrc, '_blank');
+    }
+	
+	// Model
+	function openModal() {
+	  document.getElementById('postModal').style.display = 'flex';
+	}
+
+	function closeModal() {
+	  document.getElementById('postModal').style.display = 'none';
 	}
 	
 	document.getElementById("detail-form").addEventListener("submit", function(event) {
@@ -582,12 +719,26 @@
             actionBox.classList.toggle("show");
         });
 
-        // Ẩn dropdown khi click ra ngoài
-        document.addEventListener("click", (e) => {
-            if (!actionBox.contains(e.target)) {
-                actionBox.classList.remove("show");
-            }
-        });
+		// Ấn dropdown khi ấn ra ngoài
+		document.addEventListener('click', function(event) {
+		    const actionBox = document.querySelector('.cover-dropdown');
+		    const coverBtn = document.querySelector('.cover-btn');
+
+		    const avatarDropdown = document.getElementById('avatarDropdown');
+		    const avatar = document.querySelector('.profile-photo');
+
+		    // Ẩn dropdown ảnh bìa nếu click ra ngoài
+		    if (actionBox && coverBtn &&
+		        !actionBox.contains(event.target) && !coverBtn.contains(event.target)) {
+		        actionBox.classList.remove("show");
+		    }
+
+		    // Ẩn dropdown ảnh đại diện nếu click ra ngoài
+		    if (avatarDropdown && avatar &&
+		        !avatarDropdown.contains(event.target) && !avatar.contains(event.target)) {
+		        avatarDropdown.style.display = 'none';
+		    }
+		});
     });
 	
 </script>
