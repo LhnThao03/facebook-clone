@@ -31,6 +31,7 @@ import com.example.facebook_clone.dto.PostDTO;
 import com.example.facebook_clone.model.Post;
 import com.example.facebook_clone.model.Profile;
 import com.example.facebook_clone.model.User;
+import com.example.facebook_clone.service.FileStorageService;
 import com.example.facebook_clone.service.PostService;
 import com.example.facebook_clone.service.ProfileService;
 import com.example.facebook_clone.service.UserService;
@@ -48,6 +49,8 @@ public class ProfileController {
 	private ProfileService profileService;
 	@Value("${upload.path}")
 	private String uploadPath;
+	@Autowired
+	private FileStorageService fileStorageService;
 	
 	@GetMapping("{id}")
     public String getUserProfile(@PathVariable Integer id, Model model) {
@@ -63,6 +66,21 @@ public class ProfileController {
 
         return "profile"; // trỏ tới file profile.html
     }
+
+	/*@GetMapping("/view/{id}")
+    public String getViewUserProfile(@PathVariable Integer id, Model model) {
+        User user = userService.getUserById(id);
+        Profile profile = profileService.getProfileByUserId(id);
+        List<PostDTO> posts = postService.getPostsByUserId(id);
+        int friendCount = userService.countFriends(user);
+
+        model.addAttribute("user", user);
+        model.addAttribute("profile",profile);
+        model.addAttribute("posts", posts);
+        model.addAttribute("friendCount", friendCount);
+
+        return "profile-view"; // trỏ tới file profile-view.html
+    }*/
 	
 	@PostMapping("{id}")
 	@ResponseBody
@@ -82,14 +100,9 @@ public class ProfileController {
 	}
 	
 	@PostMapping("/upload-cover")
-	public ResponseEntity<?> uploadCover(@RequestParam("coverImage") MultipartFile file,
-	                                     HttpSession session) throws IOException {
+	public String uploadCover(@RequestParam("coverImage") MultipartFile file, HttpSession session) throws IOException {
 	    // Lấy user từ session
 	    User user = (User) session.getAttribute("currentUser");
-
-	    if (user == null) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Bạn chưa đăng nhập");
-	    }
 
 	    String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 	    Path uploadPath = Paths.get("IMG");
@@ -101,25 +114,18 @@ public class ProfileController {
 	    // Cập nhật ảnh bìa vào DB
 	    profileService.updateCoverPicture(user.getProfile(), "/IMG/" + filename);
 
-	    return ResponseEntity.ok().build();
+	    return "redirect:/profile/" + user.getUserId();
 	}
 	
 	@PostMapping("/upload-avatar")
-	public String uploadAvatar(@RequestParam("avatarImage") MultipartFile file, HttpSession session) throws IOException {
+	public String uploadAvatar(@RequestParam("avatarImage") MultipartFile file, HttpSession session) {
 	    User user = (User) session.getAttribute("currentUser");
 	    if (user == null) {
 	        return "redirect:/login";
 	    }
 
-	    String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-	    Path uploadPath = Paths.get("IMG");
-	    Files.createDirectories(uploadPath);
-
-	    Path filePath = uploadPath.resolve(filename);
-	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-	    // Cập nhật ảnh đại diện trong DB
-	    userService.updateProfilePicture(user, "/IMG/" + filename);
+	    String imageUrl = fileStorageService.saveFile(file, "avatar");
+	    userService.updateProfilePicture(user, imageUrl);
 
 	    return "redirect:/profile/" + user.getUserId();
 	}

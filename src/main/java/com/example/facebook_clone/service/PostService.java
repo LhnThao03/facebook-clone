@@ -1,14 +1,19 @@
 package com.example.facebook_clone.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.facebook_clone.dto.PostDTO;
 import com.example.facebook_clone.model.Post;
@@ -21,6 +26,7 @@ import com.example.facebook_clone.repository.PostRepository;
 public class PostService {
     @Autowired
     private PostRepository postRepository;
+    private final String uploadDir = "facebook-clone/IMG/";
     
     @Autowired
     private InteractionRepository interactionRepository;
@@ -118,4 +124,42 @@ public class PostService {
         return postRepository.findTop10ByOrderByCreatedAtDesc();
     }
     
+
+  
+    // Thư mục lưu file upload, bạn nhớ tạo thư mục này hoặc kiểm tra trước khi lưu
+    public String saveFile(MultipartFile file) {
+        // Nếu không có file
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        // Tạo tên file mới để tránh trùng lặp
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+
+        // Lấy phần đuôi file (.jpg, .png, .mp4,...)
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+
+        // Tạo tên file mới random
+        String filename = UUID.randomUUID().toString() + extension;
+
+        // Tạo file mới ở thư mục uploadDir
+        File destFile = new File(uploadDir + filename);
+
+        // Nếu thư mục chưa tồn tại, tạo mới
+        destFile.getParentFile().mkdirs();
+
+        // Lưu file vào server
+        try {
+			file.transferTo(destFile);
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        // Trả về đường dẫn (hoặc tên file tuỳ cách bạn lưu DB)
+        return "/IMG/" + filename;  // Giả sử khi show ra sẽ lấy từ /IMG/...
+    }
 }

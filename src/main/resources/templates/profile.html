@@ -328,8 +328,28 @@
 
 		.post-options {
 		  display: flex;
-		  gap: 10px;
-		  margin-top: 10px;
+		  gap: 12px;
+		  margin: 12px 0;
+		  justify-content: space-around;
+		  border: 1px solid;
+		  border-top-left-radius: 8px;
+		  border-top-right-radius: 8px;
+		  border-bottom-left-radius: 8px;
+		  border-bottom-right-radius: 8px;
+		}
+
+		.post-options button {
+		  font-size: 22px; /* Icon to hơn */
+		  background: none;
+		  border: none;
+		  cursor: pointer;
+		  padding: 8px;
+		  border-radius: 8px;
+		  transition: background-color 0.3s;
+		}
+
+		.post-options button:hover {
+		  background-color: #f0f0f0; /* Hover nhẹ nhàng */
 		}
 
 		.post-btn {
@@ -341,6 +361,34 @@
 		  border-radius: 8px;
 		  cursor: pointer;
 		}
+		
+		.mini-avatar{
+			width: 40px; 
+			height: 40px; 
+			object-fit: cover; 
+			border-radius: 50%;
+		}
+		
+		#cancelBtn {
+		    position: absolute;
+		    top: 5px;
+		    right: 5px;
+		    background: rgba(0, 0, 0, 0.5);
+		    border: none;
+		    color: white;
+		    font-size: 18px;
+		    border-radius: 50%;
+		    width: 30px;
+		    height: 30px;
+		    cursor: pointer;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		  }
+
+		  #cancelBtn:hover {
+		    background: rgba(255, 0, 0, 0.7);
+		  }
     </style>
 </head>
 <body>
@@ -374,7 +422,7 @@
 			    <!-- Dropdown khi click vào avatar -->
 			    <div class="avatar-dropdown" id="avatarDropdown">
 			        <div class="dropdown-item" onclick="viewAvatar()">Xem ảnh</div>
-			        <div class="dropdown-item" onclick="document.getElementById('avatarInput').click()">Chỉnh sửa ảnh</div>
+			        <div class="dropdown-item" onclick="document.getElementById('avatarInput').click()">Cập nhật ảnh đại diện</div>
 			    </div>
 
 			    <!-- Form upload ảnh -->
@@ -472,7 +520,7 @@
             <div class="create-post">
                 <div class="create-post-header">
 					<!-- Phần input -->
-                    <img th:src="${user.profilePicture}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                    <img th:src="${user.profilePicture}" class="mini-avatar">
                     <input type="text" class="post-input" placeholder="Bạn đang nghĩ gì?" onclick="openModal()">
 					
 					<!-- Modal -->
@@ -484,28 +532,35 @@
 					    </div>
 					    <div class="modal-body">
 					      <div class="user-info">
-					        <img src="avatar.jpg" class="avatar" />
-					        <div class="user-details">
-					          <strong th:text="${user.firstname + ' ' + user.lastname}">Nhat Thao</strong>
-					          <button class="privacy-btn">Bạn bè ▼</button>
+					        <div class="user-details" style="display: flex; align-items: center;">
+								<img th:src="${user.profilePicture}" class="mini-avatar"/>
+						        <strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px;margin-bottom: 12px;font-size: 16px;">Nhat Thao</strong>
 					        </div>
 					      </div>
 					      <textarea placeholder="Bạn đang nghĩ gì?"></textarea>
+						  
+						  <div id="preview" style="position: relative; margin-top: 10px;">
+						    <!-- Preview ảnh/video sẽ nằm ở đây -->
+						  </div>
 					      <!-- Các icon chức năng -->
 					      <div class="post-options">
-					        <button>📷</button>
+					        <button onclick="triggerFileInput()">📷</button>
 					        <button>🏷️</button>
 					        <button>😊</button>
 					        <button>📍</button>
 					        <button>GIF</button>
 					      </div>
+						  <!-- input file ẩn đi -->
+						    <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" onchange="previewFile()">
 					    </div>
 					    <div class="modal-footer">
-					      <button class="post-btn">Đăng</button>
+					      <button class="post-btn" onclick="createPost()">Đăng</button>
 					    </div>
 					  </div>
 					</div>
+					
                 </div>
+				
                 <div class="post-actions">
                     <button class="post-action-btn">
                         <i class="fas fa-video" style="color: #F3425F;"></i>
@@ -523,25 +578,34 @@
             </div>
 			<div class="post" th:each="post : ${posts}">
 			    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-			        <img th:src="${user.profilePicture}" style="border-radius: 50%; margin-right: 10px; width: 40px; height: 40px;">
+			        <img th:src="${post.user.profilePicture}" class="mini-avatar">
 			        <div>
-			            <strong th:text="${user.firstname + ' ' + user.lastname}">Tên người dùng</strong>
-			            <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}">1 giờ trước</div>
+			            <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
+			            <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
 			        </div>
 			    </div>
-			    <p th:text="${post.content}">Nội dung bài viết...</p>
+
+			    <p th:text="${post.content}"></p>
+
+			    <!-- Nếu có hình ảnh -->
 			    <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
-				<div style="font-size: 14px; color: #65676B; margin-bottom: 5px;">
-		            <span th:text="'👍 ' + ${post.likes} + ' lượt thích'"></span> |
-		            <span th:text="'💬 ' + ${post.comments} + ' bình luận'"></span> |
-		            <span th:text="'🔁 ' + ${post.shares} + ' lượt chia sẻ'"></span>
-		        </div>
+
+			    <!-- Nếu có video -->
+			    <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;"></video>
+
+			    <div style="font-size: 14px; color: #65676B; margin-bottom: 5px;">
+			        <span th:text="'👍 ' + ${post.likes} + ' lượt thích'"></span> |
+			        <span th:text="'💬 ' + ${post.comments} + ' bình luận'"></span> |
+			        <span th:text="'🔁 ' + ${post.shares} + ' lượt chia sẻ'"></span>
+			    </div>
+
 			    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
 			        <button class="btn"><i class="far fa-thumbs-up"></i> Thích</button>
 			        <button class="btn"><i class="far fa-comment"></i> Bình luận</button>
 			        <button class="btn"><i class="far fa-share-square"></i> Chia sẻ</button>
 			    </div>
 			</div>
+
         </div>
     </div>
 </body>
@@ -596,26 +660,6 @@
     function closeDetailModal() {
         document.getElementById("detail-modal").style.display = "none";
     }
-	
-	/*function uploadCover(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append("coverImage", file);
-
-        fetch('upload-cover', {
-            method: 'POST',
-            body: formData
-        }).then(response => {
-            if (response.ok) {
-                alert("Tải ảnh thành công!");
-                location.reload();
-            } else {
-                alert("Tải ảnh thất bại!");
-            }
-        });
-    }*/
 	
 	function triggerUpload() {
 	    document.getElementById('coverInput').click();
@@ -681,6 +725,104 @@
 	  document.getElementById('postModal').style.display = 'none';
 	}
 	
+	// Tạo bài viết
+	function createPost() {
+		const content = document.querySelector('textarea').value;
+		const fileInput = document.getElementById('fileInput');
+		const file = fileInput.files[0]; // Lấy file thực sự từ input
+		const formData = new FormData();
+
+		formData.append("userId", userId);
+		formData.append("content", content);
+
+		if (file) {
+			formData.append("file", file); // Gửi file (có thể là ảnh hoặc video)
+		}
+
+		fetch("/posts", {
+			method: "POST",
+			body: formData,
+			credentials: "include"
+		})
+		.then(res => {
+			if (res.ok) {
+				location.reload();
+				alert("Đăng bài thành công!");
+			} else {
+				alert("Lỗi khi đăng bài!");
+			}
+		});
+	}
+	
+	function previewFile() {
+	  const fileInput = document.getElementById('fileInput');
+	  const preview = document.getElementById('preview');
+	  const file = fileInput.files[0];
+
+	  preview.innerHTML = ""; // Clear cũ
+
+	  if (file) {
+	    const fileURL = URL.createObjectURL(file);
+
+	    // Tạo wrapper
+	    const wrapper = document.createElement('div');
+	    wrapper.style.position = "relative";
+	    wrapper.style.display = "inline-block";
+
+	    if (file.type.startsWith('image/')) {
+	      const img = document.createElement('img');
+	      img.src = fileURL;
+	      img.style.maxWidth = "100%";
+	      img.style.maxHeight = "300px";
+	      wrapper.appendChild(img);
+	    } else if (file.type.startsWith('video/')) {
+	      const video = document.createElement('video');
+	      video.src = fileURL;
+	      video.controls = true;
+	      video.style.maxWidth = "100%";
+	      video.style.maxHeight = "300px";
+	      wrapper.appendChild(video);
+	    }
+
+	    // Tạo nút ❌
+	    const cancelBtn = document.createElement('button');
+	    cancelBtn.innerText = '❌';
+	    cancelBtn.onclick = function() {
+	      fileInput.value = "";
+	      preview.innerHTML = "";
+	    };
+	    cancelBtn.style.position = "absolute";
+	    cancelBtn.style.top = "5px";
+	    cancelBtn.style.right = "5px";
+	    cancelBtn.style.background = "rgba(0,0,0,0.5)";
+	    cancelBtn.style.color = "white";
+	    cancelBtn.style.border = "none";
+	    cancelBtn.style.borderRadius = "50%";
+	    cancelBtn.style.width = "30px";
+	    cancelBtn.style.height = "30px";
+	    cancelBtn.style.cursor = "pointer";
+	    cancelBtn.style.fontSize = "16px";
+
+	    wrapper.appendChild(cancelBtn);
+	    preview.appendChild(wrapper);
+	  }
+	}
+
+	function cancelPreview() {
+	  const preview = document.getElementById('preview');
+	  const fileInput = document.getElementById('fileInput');
+	  const cancelBtn = document.getElementById('cancelBtn');
+
+	  preview.innerHTML = ""; // Clear preview
+	  fileInput.value = ""; // Reset file
+	  cancelBtn.style.display = "none"; // Ẩn nút ❌
+	}
+	
+	function triggerFileInput() {
+	  document.getElementById('fileInput').click();
+	}
+
+	
 	document.getElementById("detail-form").addEventListener("submit", function(event) {
         event.preventDefault();
 
@@ -740,6 +882,7 @@
 		    }
 		});
     });
+	
 	
 </script>
 </html>
