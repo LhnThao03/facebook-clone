@@ -108,13 +108,23 @@ public class PostController {
     @PostMapping("/{postId}/like")
     @ResponseBody
     public ResponseEntity<?> toggleLike(@PathVariable Integer postId, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
-        int likeCount = interactionService.toggleLike(postId, currentUser.getUserId());
-        return ResponseEntity.ok(likeCount);
+            boolean isLiked = interactionService.toggleLike(postId, currentUser.getUserId());
+            int likeCount = interactionService.getLikeCount(postId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("likeCount", likeCount);
+            response.put("isLiked", isLiked);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/{postId}/comment")

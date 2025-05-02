@@ -19,4 +19,5 @@ public interface InteractionRepository extends JpaRepository<Interaction, Intege
 	int countByPost_PostIdAndType(int postId, Interaction.InteractionType type);
 	Optional<Interaction> findByPost_PostIdAndUser_UserIdAndType(Integer postId, Integer userId, Interaction.InteractionType type);
 	List<Interaction> findByPost_PostIdAndTypeOrderByCreatedAtDesc(Integer postId, Interaction.InteractionType type);
+	boolean existsByPost_PostIdAndUser_UserIdAndType(Integer postId, Integer userId, Interaction.InteractionType type);
 }

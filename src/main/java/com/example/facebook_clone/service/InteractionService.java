@@ -26,12 +26,13 @@ public class InteractionService {
     private UserRepository userRepository;
 
     @Transactional
-    public int toggleLike(int postId, int userId) {
-        Optional<Interaction> existing = interactionRepository.findByPost_PostIdAndUser_UserIdAndType(
-            postId, userId, Interaction.InteractionType.like);
+    public boolean toggleLike(int postId, int userId) {
+        Optional<Interaction> existing = interactionRepository
+            .findByPost_PostIdAndUser_UserIdAndType(postId, userId, Interaction.InteractionType.like);
         
         if (existing.isPresent()) {
             interactionRepository.delete(existing.get());
+            return false;
         } else {
             Post post = postRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("Post not found"));
@@ -44,9 +45,8 @@ public class InteractionService {
             like.setType(Interaction.InteractionType.like);
 
             interactionRepository.save(like);
+            return true;
         }
-
-        return interactionRepository.countByPost_PostIdAndType(postId, Interaction.InteractionType.like);
     }
 
     @Transactional
@@ -84,6 +84,10 @@ public class InteractionService {
 
     public int getCommentCount(int postId) {
         return interactionRepository.countByPost_PostIdAndType(postId, Interaction.InteractionType.comment);
+    }
+
+    public int getLikeCount(int postId) {
+        return interactionRepository.countByPost_PostIdAndType(postId, Interaction.InteractionType.like);
     }
 }
 

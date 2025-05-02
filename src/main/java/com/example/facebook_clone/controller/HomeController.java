@@ -26,7 +26,7 @@ public class HomeController {
 	public String home(HttpSession session, Model model) {
 	    User currentUser = (User) session.getAttribute("currentUser");
 	    
-	    List<PostDTO> postsWithInteraction = postService.getAllPostsWithInteractions();
+	    List<PostDTO> postsWithInteraction = postService.getAllPostsWithInteractions(currentUser.getUserId());
 	    model.addAttribute("postsWithInteraction", postsWithInteraction);
 
 	    model.addAttribute("posts", postService.getLatestPosts());

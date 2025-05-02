@@ -53,6 +53,18 @@ public class PostService {
     }
     
 
+    public List<PostDTO> getAllPostsWithInteractions(Integer currentUserId) {
+        List<Post> posts = postRepository.findAll();
+        List<PostDTO> postDTOs = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostDTO dto = convertToDTO(post, currentUserId);
+            postDTOs.add(dto);
+        }
+
+        return postDTOs;
+    }
+    
     public List<PostDTO> getAllPostsWithInteractions() {
         List<Post> posts = postRepository.findAll();
         List<PostDTO> postDTOs = new ArrayList<>();
@@ -91,6 +103,46 @@ public class PostService {
         }
 
         return postDTOs;
+    }
+
+    private PostDTO convertToDTO(Post post, Integer currentUserId) {
+        int likes = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.like);
+        int comments = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.comment);
+        int shares = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.share);
+
+        // Kiểm tra xem người dùng hiện tại đã like bài viết chưa
+        boolean isLiked = false;
+        if (currentUserId != null) {
+            isLiked = interactionRepository.existsByPost_PostIdAndUser_UserIdAndType(post.getPostId(), currentUserId, Interaction.InteractionType.like);
+        }
+
+        // Lấy danh sách comments
+        List<Interaction> commentInteractions = interactionRepository
+            .findByPost_PostIdAndTypeOrderByCreatedAtDesc(post.getPostId(), Interaction.InteractionType.comment);
+        
+        List<CommentDTO> commentDTOs = commentInteractions.stream()
+            .map(interaction -> new CommentDTO(
+                interaction.getInteractionId(),
+                interaction.getContent(),
+                interaction.getUser(),
+                interaction.getCreatedAt()
+            ))
+            .collect(Collectors.toList());
+
+        PostDTO dto = new PostDTO();
+        dto.setPostId(post.getPostId());
+        dto.setContent(post.getContent());
+        dto.setImageUrl(post.getImageUrl());
+        dto.setVideoUrl(post.getVideoUrl());
+        dto.setUser(post.getUser());
+        dto.setCreatedAt(post.getCreatedAt());
+        dto.setLikes(likes);
+        dto.setComments(comments);
+        dto.setShares(shares);
+        dto.setIsLiked(isLiked);
+        dto.setCommentList(commentDTOs);
+
+        return dto;
     }
     
     public List<PostDTO> getPostsByUserId(Integer userId) {

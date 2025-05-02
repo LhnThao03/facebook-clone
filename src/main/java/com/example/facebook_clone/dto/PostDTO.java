@@ -17,6 +17,7 @@ public class PostDTO {
     private int comments;
     private int shares;
     private List<CommentDTO> commentList;
+    private boolean isLiked;
     
     public PostDTO() {}
     
@@ -92,5 +93,11 @@ public class PostDTO {
 	}
 	public void setCommentList(List<CommentDTO> commentList) {
 		this.commentList = commentList;
+	}
+	public boolean getIsLiked() {
+		return isLiked;
+	}
+	public void setIsLiked(boolean isLiked) {
+		this.isLiked = isLiked;
 	}
 }

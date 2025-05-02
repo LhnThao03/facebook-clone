@@ -34,15 +34,14 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s ease-in-out;
         }
 
         .modal-content {
             background-color: white;
             border-radius: 8px;
             width: 400px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            animation: slideIn 0.3s ease-in-out;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
         }
 
         .modal-header {
@@ -63,11 +62,13 @@
             font-size: 24px;
             color: #65676B;
             cursor: pointer;
-            padding: 4px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
         }
 
         .close-modal:hover {
-            color: #1B1B1B;
+            background-color: #f0f2f5;
         }
 
         .modal-body {
@@ -108,12 +109,7 @@
             background-color: #d8dadf;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideIn {
+        @keyframes modalFadeIn {
             from {
                 opacity: 0;
                 transform: translateY(-20px);
@@ -180,6 +176,39 @@
         .comment-controls {
             margin-top: 8px;
         }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .like-btn .like-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .like-btn:hover .like-icon {
+            transform: scale(1.2);
+        }
+
+        .like-btn.liked {
+            color: #1877f2;
+        }
+
+        .like-btn.liked .like-icon {
+            font-weight: 900; /* Solid icon when liked */
+        }
+
+        @keyframes likeAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+
+        .like-btn.animating .like-icon {
+            animation: likeAnimation 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -235,12 +264,15 @@
 		                    <span class="comment-count" th:data-post-id="${post.postId}" th:text="|💬 ${post.comments}|"></span>
 		                    <span class="share-count" th:data-post-id="${post.postId}" th:text="|🔁 ${post.shares}|"></span>
 		                </div>
-		            </div>
+		        </div>
 
 		            <!-- Nút tương tác -->
-		            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
-		                <button class="btn like-btn" th:data-post-id="${post.postId}">
-		                    <i class="far fa-thumbs-up"></i> Thích
+		        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
+		                <button class="btn like-btn" th:data-post-id="${post.postId}" 
+		                        th:classappend="${post.isLiked ? 'liked' : ''}"
+		                        th:data-liked="${post.isLiked}">
+		                    <i class="far fa-thumbs-up like-icon"></i> 
+		                    <span class="like-text">Thích</span>
 		                </button>
 		                <button class="btn comment-btn" th:data-post-id="${post.postId}">
 		                    <i class="far fa-comment"></i> Bình luận
@@ -396,18 +428,50 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', function() {
             const postId = this.getAttribute('data-post-id');
+            const isLiked = this.getAttribute('data-liked') === 'true';
+            const likeIcon = this.querySelector('.like-icon');
+            const likeText = this.querySelector('.like-text');
+
+            // Thêm class animation
+            likeIcon.classList.add('animating');
+            
             fetch(`/posts/${postId}/like`, {
                 method: 'POST',
                 credentials: 'include'
             })
-            .then(response => response.json())
-            .then(likeCount => {
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // Cập nhật số lượt like
                 const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
                 if (likeCountElement) {
-                    likeCountElement.textContent = `👍 ${likeCount}`;
+                    likeCountElement.textContent = `👍 ${data.likeCount}`;
                 }
+
+                // Toggle trạng thái like
+                if (data.isLiked) {
+                    this.classList.add('liked');
+                    this.setAttribute('data-liked', 'true');
+                    likeIcon.classList.remove('far');
+                    likeIcon.classList.add('fas');
+                } else {
+                    this.classList.remove('liked');
+                    this.setAttribute('data-liked', 'false');
+                    likeIcon.classList.remove('fas');
+                    likeIcon.classList.add('far');
+                }
+
+                // Xóa class animation sau khi hoàn thành
+                setTimeout(() => {
+                    likeIcon.classList.remove('animating');
+                }, 400);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Có lỗi xảy ra khi thích bài viết', 'error');
+            });
         });
     });
 
@@ -568,6 +632,22 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             showNotification('Có lỗi xảy ra khi chia sẻ bài viết!', 'error');
         });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const shareDialog = document.getElementById("shareDialog");
+        const closeModalBtn = document.querySelector(".close-modal");
+        const cancelShareBtn = document.querySelector(".cancel-share");
+
+        function closeShareModal() {
+            shareDialog.style.display = "none";
+            currentPostIdForShare = null;
+            // Cho phép scroll lại
+            document.body.style.overflow = 'auto';
+        }
+
+        closeModalBtn.addEventListener("click", closeShareModal);
+        cancelShareBtn.addEventListener("click", closeShareModal);
     });
 
     // Thêm CSS cho animation
