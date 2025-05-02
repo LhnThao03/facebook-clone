@@ -177,4 +177,48 @@ public class PostController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @DeleteMapping("/comment/{commentId}")
+    @ResponseBody
+    public ResponseEntity<?> deleteComment(@PathVariable Integer commentId, HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Vui lòng đăng nhập để thực hiện chức năng này!"));
+            }
+
+            // Lấy thông tin comment trước khi xóa để biết postId
+            Interaction comment = interactionService.getCommentById(commentId);
+            int postId = comment.getPost().getPostId();
+
+            // Xóa comment
+            boolean deleted = interactionService.deleteComment(commentId, currentUser.getUserId());
+            
+            if (deleted) {
+                // Lấy số lượng comment mới
+                int newCommentCount = interactionService.getCommentCount(postId);
+                
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("message", "Đã xóa bình luận thành công!");
+                response.put("totalComments", newCommentCount);
+                response.put("postId", postId);
+                
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Không thể xóa bình luận!"));
+            }
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Có lỗi xảy ra khi xóa bình luận!"));
+        }
+    }
 } 

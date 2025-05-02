@@ -82,6 +82,37 @@ public class InteractionService {
         return interactionRepository.countByPost_PostIdAndType(postId, Interaction.InteractionType.share);
     }
 
+    @Transactional
+    public boolean deleteComment(int commentId, int userId) {
+        Interaction comment = interactionRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bình luận!"));
+        
+        if (comment.getType() != Interaction.InteractionType.comment) {
+            throw new IllegalArgumentException("Đây không phải là bình luận!");
+        }
+
+        if (comment.getUser().getUserId() != userId) {
+            throw new SecurityException("Bạn không có quyền xóa bình luận này!");
+        }
+
+        try {
+            interactionRepository.delete(comment);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Có lỗi xảy ra khi xóa bình luận!", e);
+        }
+    }
+
+    public Interaction getCommentById(int commentId) {
+        return interactionRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy bình luận!"));
+    }
+
+    public boolean canDeleteComment(int commentId, int userId) {
+        Interaction comment = getCommentById(commentId);
+        return comment.getUser().getUserId() == userId;
+    }
+
     public int getCommentCount(int postId) {
         return interactionRepository.countByPost_PostIdAndType(postId, Interaction.InteractionType.comment);
     }
