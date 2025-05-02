@@ -23,6 +23,163 @@
         .add-friend-btn { background-color: #1877f2; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .add-friend-btn:hover { background-color: #166fe5; }
 		.mini-avatar{width: 40px;height: 40px;object-fit: cover;border-radius: 50%;}
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #dadde1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            color: #65676B;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .close-modal:hover {
+            color: #1B1B1B;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .modal-footer {
+            padding: 16px;
+            border-top: 1px solid #dadde1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: #1877f2;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #166fe5;
+        }
+
+        .cancel-share {
+            background-color: #e4e6eb;
+            color: #050505;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+        }
+
+        .cancel-share:hover {
+            background-color: #d8dadf;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .comment-input {
+            background: #f0f2f5;
+            border: none;
+            outline: none;
+        }
+
+        .comment-input:focus {
+            background: white;
+            border: 1px solid #1877f2;
+        }
+
+        .comment-item {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .comment-bubble {
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .comment-bubble strong {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 13px;
+        }
+
+        .comment-bubble p {
+            font-size: 14px;
+        }
+
+        .mini-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .view-more-btn,
+        .hide-comments-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        .view-more-btn:hover,
+        .hide-comments-btn:hover {
+            background-color: #f0f2f5;
+            border-radius: 4px;
+        }
+
+        .comment-controls {
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -69,18 +226,92 @@
 
 		        <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
 
-		        <div style="font-size: 14px; color: #65676B; margin-bottom: 5px;">
-		            <span th:text="'👍 ' + ${post.likes} + ' lượt thích'"></span> |
-		            <span th:text="'💬 ' + ${post.comments} + ' bình luận'"></span> |
-		            <span th:text="'🔁 ' + ${post.shares} + ' lượt chia sẻ'"></span>
+		        <!-- Phần hiển thị số lượt tương tác và nút -->
+		        <div style="margin-bottom: 10px;">
+		            <!-- Số lượt tương tác -->
+		            <div style="display: flex; justify-content: flex-end; font-size: 14px; color: #65676B; margin-bottom: 5px;">
+		                <div style="display: flex; gap: 10px;">
+		                    <span class="like-count" th:data-post-id="${post.postId}" th:text="|👍 ${post.likes}|"></span>
+		                    <span class="comment-count" th:data-post-id="${post.postId}" th:text="|💬 ${post.comments}|"></span>
+		                    <span class="share-count" th:data-post-id="${post.postId}" th:text="|🔁 ${post.shares}|"></span>
+		                </div>
+		            </div>
+
+		            <!-- Nút tương tác -->
+		            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
+		                <button class="btn like-btn" th:data-post-id="${post.postId}">
+		                    <i class="far fa-thumbs-up"></i> Thích
+		                </button>
+		                <button class="btn comment-btn" th:data-post-id="${post.postId}">
+		                    <i class="far fa-comment"></i> Bình luận
+		                </button>
+		                <button class="btn share-btn" th:data-post-id="${post.postId}">
+		                    <i class="far fa-share-square"></i> Chia sẻ
+		                </button>
+		            </div>
 		        </div>
 
-		        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
-					<!-- <button class="btn" onclick="toggleLike([[${post.postId}]])"> -->
-					    <i class="far fa-thumbs-up"></i> Thích
-					<!-- </button> -->
-		            <button class="btn"><i class="far fa-comment"></i> Bình luận</button>
-		            <button class="btn"><i class="far fa-share-square"></i> Chia sẻ</button>
+		        <!-- Comment section -->
+		        <div class="comment-section" th:data-post-id="${post.postId}" style="margin-top: 10px;">
+		            <!-- Comment input -->
+		            <div class="comment-input-container" style="display: flex; gap: 10px; margin-bottom: 10px;">
+		                <img th:src="${currentUser.profilePicture}" class="mini-avatar">
+		                <input type="text" class="comment-input" th:data-post-id="${post.postId}"
+		                       placeholder="Viết bình luận..." 
+		                       style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc;">
+		                <button class="btn submit-comment" th:data-post-id="${post.postId}">Gửi</button>
+		            </div>
+
+		            <!-- Comments list -->
+		            <div class="comments-list" th:data-post-id="${post.postId}">
+		                <!-- Container for initial comments (3 comments) -->
+		                <div class="initial-comments">
+		                    <div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
+		                         th:if="${commentStat.index < 3}"
+		                         style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+		                        <img th:src="${comment.user.profilePicture}" class="mini-avatar">
+		                        <div class="comment-content" style="flex: 1;">
+		                            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+		                                <strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+		                                <p th:text="${comment.content}" style="margin: 0;"></p>
+		                            </div>
+		                            <div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px;">
+		                                <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+
+		                <!-- Container for hidden comments -->
+		                <div class="hidden-comments" style="display: none;">
+		                    <div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
+		                         th:if="${commentStat.index >= 3}"
+		                         style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+		                        <img th:src="${comment.user.profilePicture}" class="mini-avatar">
+		                        <div class="comment-content" style="flex: 1;">
+		                            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+		                                <strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+		                                <p th:text="${comment.content}" style="margin: 0;"></p>
+		                            </div>
+		                            <div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px;">
+		                                <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+
+		                <!-- Comment control buttons -->
+		                <div class="comment-controls" th:if="${post.commentList.size() > 3}">
+		                    <button class="btn view-more-btn" th:data-post-id="${post.postId}"
+		                            style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left;">
+		                        Xem thêm bình luận...
+		                    </button>
+		                    <button class="btn hide-comments-btn" th:data-post-id="${post.postId}"
+		                            style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left; display: none;">
+		                        Ẩn bớt bình luận
+		                    </button>
+		                </div>
+		            </div>
 		        </div>
 		    </div>
 		</div>
@@ -104,22 +335,268 @@
             </div>
         </div>
     </div>
+
+    <!-- Share Dialog -->
+    <div id="shareDialog" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chia sẻ bài viết</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có muốn chia sẻ bài viết này về trang cá nhân?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn cancel-share">Hủy</button>
+                <button class="btn btn-primary confirm-share">Chia sẻ</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // Thêm hàm showNotification
+    function showNotification(message, type = 'success') {
+        // Xóa notification cũ nếu có
+        const existingNotification = document.querySelector('.notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        // Style cho notification
+        Object.assign(notification.style, {
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            color: 'white',
+            zIndex: '1001',
+            animation: 'slideInRight 0.3s ease-in-out',
+            backgroundColor: type === 'success' ? '#4BB543' : '#ff3333'
+        });
+
+        document.body.appendChild(notification);
+
+        // Tự động xóa notification sau 3 giây
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-in-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    let currentPostIdForShare = null;
+
+    // Xử lý nút Like
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            fetch(`/posts/${postId}/like`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(likeCount => {
+                const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
+                if (likeCountElement) {
+                    likeCountElement.textContent = `👍 ${likeCount}`;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+
+    // Xử lý nút Comment
+    document.querySelectorAll('.comment-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const commentSection = document.querySelector(`.comment-section[data-post-id="${postId}"]`);
+            if (commentSection) {
+                commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    });
+
+    // Xử lý nút xem thêm và ẩn bớt comment
+    document.querySelectorAll('.view-more-btn, .hide-comments-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const commentsSection = this.closest('.comments-list');
+            const hiddenComments = commentsSection.querySelector('.hidden-comments');
+            const viewMoreBtn = commentsSection.querySelector('.view-more-btn');
+            const hideCommentsBtn = commentsSection.querySelector('.hide-comments-btn');
+
+            if (this.classList.contains('view-more-btn')) {
+                // Hiển thị comments ẩn
+                hiddenComments.style.display = 'block';
+                // Ẩn nút xem thêm
+                viewMoreBtn.style.display = 'none';
+                // Hiện nút ẩn bớt
+                hideCommentsBtn.style.display = 'block';
+            } else {
+                // Ẩn comments
+                hiddenComments.style.display = 'none';
+                // Hiện nút xem thêm
+                viewMoreBtn.style.display = 'block';
+                // Ẩn nút ẩn bớt
+                hideCommentsBtn.style.display = 'none';
+            }
+        });
+    });
+
+    // Xử lý submit comment
+    document.querySelectorAll('.submit-comment').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
+            if (!input || !input.value.trim()) return;
+
+            const formData = new URLSearchParams();
+            formData.append('content', input.value.trim());
+
+            fetch(`/posts/${postId}/comment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData,
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Cập nhật số lượng comment
+                const commentCountElement = document.querySelector(`.comment-count[data-post-id="${postId}"]`);
+                if (commentCountElement) {
+                    commentCountElement.textContent = `💬 ${data.totalComments}`;
+                }
+
+                // Thêm comment mới vào danh sách
+                const commentsList = document.querySelector(`.comments-list[data-post-id="${postId}"]`);
+                if (commentsList) {
+                    const initialComments = commentsList.querySelector('.initial-comments');
+                    const hiddenComments = commentsList.querySelector('.hidden-comments');
+                    
+                    const newCommentHtml = `
+                        <div class="comment-item" style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+                            <img src="${data.user.profilePicture}" class="mini-avatar">
+                            <div class="comment-content" style="flex: 1;">
+                                <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+                                    <strong>${data.user.firstname} ${data.user.lastname}</strong>
+                                    <p style="margin: 0;">${data.content}</p>
+                                </div>
+                                <div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px;">
+                                    <span>Vừa xong</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Nếu có ít hơn 3 comment, thêm vào initial-comments
+                    if (initialComments.children.length < 3) {
+                        initialComments.insertAdjacentHTML('afterbegin', newCommentHtml);
+                    } else {
+                        // Nếu đã có 3 comment trở lên, thêm vào hidden-comments
+                        hiddenComments.insertAdjacentHTML('afterbegin', newCommentHtml);
+                        
+                        // Hiển thị nút "Xem thêm" nếu chưa có
+                        const viewMoreBtn = commentsList.querySelector('.view-more-btn');
+                        if (viewMoreBtn) {
+                            viewMoreBtn.style.display = 'block';
+                        }
+                    }
+                }
+
+                // Xóa nội dung input
+                input.value = '';
+                
+                // Hiển thị thông báo thành công
+                showNotification('Đã thêm bình luận thành công!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Có lỗi xảy ra khi thêm bình luận', 'error');
+            });
+        });
+    });
+
+    // Xử lý nút chia sẻ
+    document.querySelectorAll('.share-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            currentPostIdForShare = this.getAttribute('data-post-id');
+            document.getElementById('shareDialog').style.display = 'flex';
+        });
+    });
+
+    // Xử lý nút xác nhận chia sẻ
+    document.querySelector('.confirm-share').addEventListener('click', function() {
+        if (!currentPostIdForShare) return;
+
+        fetch(`/posts/${currentPostIdForShare}/share`, {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Cập nhật số lượt chia sẻ
+            const shareCountElement = document.querySelector(`.share-count[data-post-id="${currentPostIdForShare}"]`);
+            if (shareCountElement) {
+                shareCountElement.textContent = `🔁 ${data.shareCount}`;
+            }
+
+            // Hiển thị thông báo thành công
+            showNotification('Đã chia sẻ bài viết thành công!');
+            
+            // Đóng modal
+            document.getElementById('shareDialog').style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Có lỗi xảy ra khi chia sẻ bài viết!', 'error');
+        });
+    });
+
+    // Thêm CSS cho animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
 </body>
 </html>
-
-<script>
-// function toggleLike(postId) {
-//     fetch("/posts/" + postId + "/toggle-like", {
-//         method: "POST",
-//         credentials: "include"
-//     })
-//     .then(response => {
-//         if (response.ok) {
-//             location.reload(); // Reload lại để cập nhật lượt thích
-//         } else {
-//             alert("Có lỗi xảy ra khi thích/bỏ thích bài viết!");
-//         }
-//     });
-// }
-</script>
-

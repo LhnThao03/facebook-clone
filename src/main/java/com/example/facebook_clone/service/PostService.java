@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,13 +15,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.facebook_clone.dto.PostDTO;
+import com.example.facebook_clone.dto.CommentDTO;
 import com.example.facebook_clone.model.Post;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.model.Interaction;
 import com.example.facebook_clone.repository.InteractionRepository;
 import com.example.facebook_clone.repository.PostRepository;
+import com.example.facebook_clone.repository.UserRepository;
 
 @Service
 public class PostService {
@@ -30,6 +34,9 @@ public class PostService {
     
     @Autowired
     private InteractionRepository interactionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public Page<Post> getPosts(int page, int size) {
     	Pageable pageable = PageRequest.of(page, size);
@@ -55,6 +62,19 @@ public class PostService {
             int comments = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.comment);
             int shares = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.share);
 
+            // Lấy danh sách comments
+            List<Interaction> commentInteractions = interactionRepository
+                .findByPost_PostIdAndTypeOrderByCreatedAtDesc(post.getPostId(), Interaction.InteractionType.comment);
+            
+            List<CommentDTO> commentDTOs = commentInteractions.stream()
+                .map(interaction -> new CommentDTO(
+                    interaction.getInteractionId(),
+                    interaction.getContent(),
+                    interaction.getUser(),
+                    interaction.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
             PostDTO dto = new PostDTO();
             dto.setPostId(post.getPostId());
             dto.setContent(post.getContent());
@@ -65,6 +85,7 @@ public class PostService {
             dto.setLikes(likes);
             dto.setComments(comments);
             dto.setShares(shares);
+            dto.setCommentList(commentDTOs); // Thêm danh sách comments
 
             postDTOs.add(dto);
         }
@@ -161,5 +182,25 @@ public class PostService {
 
         // Trả về đường dẫn (hoặc tên file tuỳ cách bạn lưu DB)
         return "/IMG/" + filename;  // Giả sử khi show ra sẽ lấy từ /IMG/...
+    }
+
+    @Transactional
+    public Post sharePost(int originalPostId, int userId) {
+        // Lấy bài viết gốc
+        Post originalPost = getPostById(originalPostId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Tạo bài viết mới (shared post)
+        Post sharedPost = new Post();
+        sharedPost.setUser(user);
+        sharedPost.setContent("Đã chia sẻ bài viết của " + originalPost.getUser().getFirstname() + " " + 
+                             originalPost.getUser().getLastname() + "\n\n" + originalPost.getContent());
+        sharedPost.setImageUrl(originalPost.getImageUrl());
+        sharedPost.setVideoUrl(originalPost.getVideoUrl());
+        sharedPost.setCreatedAt(LocalDateTime.now());
+        sharedPost.setUpdatedAt(LocalDateTime.now());
+
+        return postRepository.save(sharedPost);
     }
 }

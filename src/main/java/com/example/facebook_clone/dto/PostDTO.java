@@ -1,6 +1,7 @@
 package com.example.facebook_clone.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.facebook_clone.model.Post;
 import com.example.facebook_clone.model.User;
@@ -15,6 +16,7 @@ public class PostDTO {
     private int likes;
     private int comments;
     private int shares;
+    private List<CommentDTO> commentList;
     
     public PostDTO() {}
     
@@ -84,5 +86,11 @@ public class PostDTO {
 	}
 	public void setShares(int shares) {
 		this.shares = shares;
+	}
+	public List<CommentDTO> getCommentList() {
+		return commentList;
+	}
+	public void setCommentList(List<CommentDTO> commentList) {
+		this.commentList = commentList;
 	}
 }

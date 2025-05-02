@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "Interactions")
 public class Interaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int interactionId;
@@ -24,25 +25,22 @@ public class Interaction {
 
     private String content;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
+    // Enum xác định loại interaction
     public enum InteractionType {
         like, comment, share
     }
 
     public Interaction() {}
 
-    public Interaction(int interactionId, Post post, User user, InteractionType type, String content,
-            LocalDateTime createdAt) {
-        this.interactionId = interactionId;
-        this.post = post;
-        this.user = user;
-        this.type = type;
-        this.content = content;
-        this.createdAt = createdAt;
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 
+    // Getters và Setters
     public int getInteractionId() {
         return interactionId;
     }
@@ -86,8 +84,5 @@ public class Interaction {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
+

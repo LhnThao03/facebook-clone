@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.facebook_clone.model.Interaction;
 import com.example.facebook_clone.model.Post;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.service.FileStorageService;
@@ -102,15 +105,66 @@ public class PostController {
         return "redirect:/admin?section=posts";
     }
     
-    // @PostMapping("/posts/{postId}/toggle-like")
-    // @ResponseBody
-    // public ResponseEntity<?> toggleLike(@PathVariable Integer postId, HttpSession session) {
-    //     User user = (User) session.getAttribute("currentUser");
-    //     if (user == null) {
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    //     }
+    @PostMapping("/{postId}/like")
+    @ResponseBody
+    public ResponseEntity<?> toggleLike(@PathVariable Integer postId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-    //     boolean liked = interactionService.toggleLike(postId, user.getUserId());
-    //     return ResponseEntity.ok(liked ? "Liked" : "Unliked");
-    // }
+        int likeCount = interactionService.toggleLike(postId, currentUser.getUserId());
+        return ResponseEntity.ok(likeCount);
+    }
+
+    @PostMapping("/{postId}/comment")
+    @ResponseBody
+    public ResponseEntity<?> addComment(@PathVariable Integer postId, 
+                                      @RequestParam String content,
+                                      HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            Interaction comment = interactionService.addComment(postId, currentUser.getUserId(), content);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("interactionId", comment.getInteractionId());
+            response.put("content", comment.getContent());
+            response.put("user", Map.of(
+                "firstname", comment.getUser().getFirstname(),
+                "lastname", comment.getUser().getLastname(),
+                "profilePicture", comment.getUser().getProfilePicture()
+            ));
+            response.put("createdAt", comment.getCreatedAt());
+            response.put("totalComments", interactionService.getCommentCount(postId));
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{postId}/share")
+    @ResponseBody
+    public ResponseEntity<?> sharePost(@PathVariable Integer postId, HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            Post sharedPost = postService.sharePost(postId, currentUser.getUserId());
+            int shareCount = interactionService.addShare(postId, currentUser.getUserId());
+
+            return ResponseEntity.ok(Map.of(
+                "shareCount", shareCount,
+                "sharedPostId", sharedPost.getPostId()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 } 
