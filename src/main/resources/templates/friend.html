@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lời mời kết bạn</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<link rel="stylesheet" th:href="@{/main.css}">
+</head>
+<body>
+	<h2>Lời mời kết bạn</h2>
+	<div th:each="request : ${requests}">
+	    <div>
+	        <img th:src="${request.user1.profilePicture}" style="width: 50px; height: 50px; border-radius: 50%;">
+	        <span th:text="${request.user1.firstname + ' ' + request.user1.lastname}"></span>
+	        <form th:action="@{/friends/accept-friend-request/{id}(id=${request.friendshipId})}" method="post">
+	            <button type="submit">Chấp nhận</button>
+	        </form>
+	        <form th:action="@{/friends/decline-friend-request/{id}(id=${request.friendshipId})}" method="post">
+	            <button type="submit">Từ chối</button>
+	        </form>
+	    </div>
+	</div>
+</body>

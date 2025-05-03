@@ -1,6 +1,7 @@
 package com.example.facebook_clone.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,11 @@ public class UserService {
 			.orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 	}
 	
-	public User findByEmail(String email) {
+	//public User findByEmail(String email) {
+     //   return userRepository.findByEmail(email);
+    //}
+	
+	public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -91,8 +96,26 @@ public class UserService {
 	    return userRepository.count(); // Tổng số bản ghi
 	}
 	
+	//public List<User> getFriendSuggestions(User currentUserId) {
+    //    return userRepository.findFriendSuggestions(currentUserId.getUserId());
+    //}
+	
 	public List<User> getFriendSuggestions(User currentUserId) {
-        return userRepository.findFriendSuggestions(currentUserId.getUserId());
+		List<User> allUsers = userRepository.findAll();
+
+	    // Lấy danh sách người đã gửi lời mời hoặc đã là bạn
+	    List<User> excludedUsers = friendRepository.findAllRelations(currentUserId)
+	        .stream()
+	        .map(friend -> friend.getUser1().equals(currentUserId) ? friend.getUser2() : friend.getUser1())
+	        .collect(Collectors.toList());
+
+	    // Thêm chính bản thân để loại khỏi danh sách
+	    excludedUsers.add(currentUserId);
+
+	    // Lọc những người chưa liên hệ gì
+	    return allUsers.stream()
+	        .filter(user -> !excludedUsers.contains(user))
+	        .collect(Collectors.toList());
     }
 	
 	public int countFriends(User user) {

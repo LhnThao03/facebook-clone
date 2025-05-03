@@ -145,7 +145,7 @@ public class PostService {
         return dto;
     }
     
-    public List<PostDTO> getPostsByUserId(Integer userId) {
+    /*public List<PostDTO> getPostsByUserId(Integer userId) {
         List<Post> posts = postRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
         List<PostDTO> postDTOs = new ArrayList<>();
 
@@ -165,6 +165,18 @@ public class PostService {
             dto.setComments(comments);
             dto.setShares(shares);
 
+            postDTOs.add(dto);
+        }
+
+        return postDTOs;
+    }*/
+    
+    public List<PostDTO> getPostsByUserId(Integer currentUserId) {
+    	List<Post> posts = postRepository.findByUser_UserIdOrderByCreatedAtDesc(currentUserId);
+        List<PostDTO> postDTOs = new ArrayList<>();
+
+        for (Post post : posts) {
+            PostDTO dto = convertToDTO(post, currentUserId);
             postDTOs.add(dto);
         }
 

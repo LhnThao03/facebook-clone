@@ -24,12 +24,12 @@ public class LoginController {
 	}
 	
 
-@PostMapping
-public String loginUser(@RequestParam String email,
-                        @RequestParam String password,
-                        HttpSession session,
-                        Model model) {
-	    User user = userService.findByEmail(email);
+	@PostMapping
+	public String loginUser(@RequestParam String email,
+	                        @RequestParam String password,
+	                        HttpSession session,
+	                        Model model) {
+	    User user = userService.getUserByEmail(email);
 	
 	    if (user != null && user.getPassword().equals(password)) {
 	        session.setAttribute("currentUser", user); // lưu user vào session

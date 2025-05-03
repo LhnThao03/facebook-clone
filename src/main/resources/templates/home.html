@@ -376,9 +376,10 @@
                         <div class="friend-name" th:text="${user.firstname + ' ' + user.lastname}"></div>
                         <div class="mutual-friends">Bạn chung: 5</div> <!-- Có thể tính sau -->
                     </div>
-                    <button class="add-friend-btn">
-                        <i class="fas fa-user-plus"></i> Thêm bạn
-                    </button>
+					<button class="add-friend-btn" th:attr="data-user-id=${user.userId}">
+					    <i class="fas fa-user-plus"></i> Thêm bạn
+					</button>
+					<span class="request-sent-message" style="display:none; color: green;">Đã gửi lời mời</span>
                 </div>
             </div>
         </div>
@@ -709,6 +710,27 @@
             .catch(() => showNotification('Có lỗi xảy ra khi xóa bình luận!', 'error'));
         });
     });
+	
+	document.querySelectorAll('.add-friend-btn').forEach(button => {
+	    button.addEventListener('click', () => {
+	        const receiverId = button.getAttribute('data-user-id');
+
+	        fetch(`friends/send-friend-request/${receiverId}`, {
+	            method: 'POST',
+	        })
+	        .then(response => {
+	            if (response.ok) {
+	                button.style.display = 'none';
+	                button.nextElementSibling.style.display = 'inline'; // hiện "Đã gửi lời mời"
+	            } else {
+	                alert("Gửi lời mời thất bại!");
+	            }
+	        })
+	        .catch(error => {
+	            console.error("Error:", error);
+	        });
+	    });
+	});
 });
 </script>
 </body>

@@ -25,12 +25,12 @@ public class HomeController {
 	@GetMapping
 	public String home(HttpSession session, Model model) {
 	    User currentUser = (User) session.getAttribute("currentUser");
-	    
+	    List<User> suggestions = userService.getFriendSuggestions(currentUser);
 	    List<PostDTO> postsWithInteraction = postService.getAllPostsWithInteractions(currentUser.getUserId());
 	    model.addAttribute("postsWithInteraction", postsWithInteraction);
 
 	    model.addAttribute("posts", postService.getLatestPosts());
-	    model.addAttribute("suggestions", userService.getFriendSuggestions(currentUser));
+	    model.addAttribute("suggestions", suggestions);
 	    model.addAttribute("currentUser", currentUser);
 
 	    return "home";
