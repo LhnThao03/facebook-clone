@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.facebook_clone.dto.request.UserCreationRequest;
+import com.example.facebook_clone.model.Profile;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.model.User.Gender;
 import com.example.facebook_clone.model.User.Role;
+import com.example.facebook_clone.service.ProfileService;
 import com.example.facebook_clone.service.UserService;
 
 @Controller
@@ -19,6 +21,8 @@ import com.example.facebook_clone.service.UserService;
 public class AuthController {
 	@Autowired
     private UserService userService;
+	@Autowired
+    private ProfileService profileService;
 
 	@PostMapping
 	public String createUser(
@@ -39,7 +43,18 @@ public class AuthController {
 			request.setGender(gender);
 			request.setRole(role);
 			
-			userService.createUser(request);
+			
+			// Tạo user
+		    User user = userService.createUser(request);
+			// Tạo Profile cho user vừa tạo
+		    Profile profile = new Profile();
+		    profile.setUser(user);  // Liên kết profile với user
+		    profile.setBio(""); // Hoặc bạn có thể để trống hoặc thêm thông tin mặc định
+		    profile.setLocation(""); // Thêm location mặc định nếu cần
+		    profile.setBirthdate(null); // Hoặc gán giá trị ngày sinh mặc định
+		    profile.setCoverPicture(""); // Thêm ảnh bìa mặc định nếu cần
+		    // Lưu profile vào database
+		    profileService.createProfile(profile); // Giả sử bạn có một service để lưu Profile
 			model.addAttribute("users", userService.getUsers());
 			return "redirect:/login";
 	}

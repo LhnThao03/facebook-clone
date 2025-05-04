@@ -25,14 +25,10 @@ public class WebConfig implements WebMvcConfigurer {
         /*registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/home/**")   // chặn các đường dẫn cần đăng nhập
                 .excludePathPatterns("/login", "/register", "/css/**", "/js/**", "/images/**"); // cho phép truy cập tự do*/
-        
-        registry.addInterceptor(loginInterceptor)
-		        .addPathPatterns("/home/**", "/profile/**", "/admin/**") 
-		        .excludePathPatterns("/login", "/register", "/css/**", "/js/**", "/images/**");
-    
+    	
      // Interceptor kiểm tra đăng nhập
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/home/**", "/profile/**", "/admin/**") 
+                .addPathPatterns("/home/**", "/profile/**", "/admin/**")
                 .excludePathPatterns("/login", "/register", "/css/**", "/js/**");
 
         // Interceptor kiểm tra quyền admin

@@ -16,6 +16,8 @@ import com.example.facebook_clone.model.User;
 public interface PostRepository extends JpaRepository<Post, Integer> {
 	@Query("SELECT p FROM Post p ORDER BY p.createdAt DESC")
     Page<Post> findAll(Pageable pageable);
+	@Query("SELECT p FROM Post p ORDER BY p.createdAt DESC")
+	List<Post> findAll();
 	
 	List<Post> findTop10ByOrderByCreatedAtDesc();
 	

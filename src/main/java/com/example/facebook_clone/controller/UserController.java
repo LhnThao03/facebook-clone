@@ -25,25 +25,6 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-//	@GetMapping
-//	public String getUsers(Model model){
-//		List<User> allUsers = userService.getUsers();
-//		List<User> topUsers = userService.getTop10Users();
-//		model.addAttribute("allUsers", allUsers);
-//		model.addAttribute("topUsers", topUsers);
-//		return "admin/dashboard";
-//	}
-	
-	//Phân trang
-//	@GetMapping
-//    public String getUsers(@RequestParam(defaultValue = "0") int page, Model model) {
-//        Page<User> userPage = userService.getUsers(page, 10); // Lấy 10 user trên mỗi trang
-//        List<User> topUsers = userService.getTop10Users();
-//        model.addAttribute("userPage", userPage);
-//        model.addAttribute("topUsers", topUsers);
-//        return "admin/dashboard";
-//    }
-	
 	@GetMapping("/{id}")
 	public String getUserDetail(@PathVariable Integer id, Model model) {
 		User user = userService.getUserById(id);
@@ -121,6 +102,6 @@ public class UserController {
 	public String deleteUser(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
 	    userService.deleteUser(id);
 	    redirectAttributes.addFlashAttribute("successMessage", "Xóa người dùng thành công!");
-	    return "redirect:/users?section=users"; // Chuyển hướng lại trang danh sách người dùng
+	    return "redirect:/admin?section=users"; // Chuyển hướng lại trang danh sách người dùng
 	}
 }

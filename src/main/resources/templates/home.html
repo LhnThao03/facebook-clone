@@ -236,12 +236,18 @@
     <div class="main-content">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-item"><i class="fas fa-user"></i><span th:text="${currentUser.lastname} + ' ' + ${currentUser.firstname}"></span></div>
-            <div class="sidebar-item"><i class="fas fa-user-friends"></i><span>Bạn bè</span></div>
-            <div class="sidebar-item"><i class="fas fa-users"></i><span>Nhóm</span></div>
-            <div class="sidebar-item"><i class="fas fa-store"></i><span>Marketplace</span></div>
-            <div class="sidebar-item"><i class="fas fa-play-circle"></i><span>Watch</span></div>
-            <div class="sidebar-item"><i class="fas fa-history"></i><span>Kỷ niệm</span></div>
+            <div class="sidebar-item">
+                <a th:href="@{'/profile/' + ${currentUser.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
+                    <i class="fas fa-user"></i>
+                    <span th:text="${currentUser.lastname} + ' ' + ${currentUser.firstname}"></span>
+                </a>
+            </div>
+            <div class="sidebar-item">
+                <a href="/friends/friend-requests" style="cursor: pointer; text-decoration: none; color: black;">
+                  <i class="fas fa-user-friends"></i>
+                  <span>Bạn bè</span>
+                </a>
+            </div>
         </div>
 
         <!-- Feed -->
@@ -268,7 +274,7 @@
 		                    <span class="comment-count" th:data-post-id="${post.postId}" th:text="|💬 ${post.comments}|"></span>
 		                    <span class="share-count" th:data-post-id="${post.postId}" th:text="|🔁 ${post.shares}|"></span>
 		                </div>
-		        </div>
+		        	</div>
 
 		            <!-- Nút tương tác -->
 		        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #dadde1;">
@@ -308,18 +314,19 @@
 		                        <img th:src="${comment.user.profilePicture}" class="mini-avatar">
 		                        <div class="comment-content" style="flex: 1;">
 		                            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
-		                                <strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+										<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
+		                                	<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+										</a>
 		                                <p th:text="${comment.content}" style="margin: 0;"></p>
-		                                <!-- Nút xóa chỉ hiển thị nếu là chủ comment -->
-		                                <button class="delete-comment-btn" th:if="${comment.user.userId == currentUser.userId}"
-		                                        th:data-comment-id="${comment.interactionId}"
-		                                        style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-left:8px;">
-		                                    Xóa
-		                                </button>
 		                            </div>
-		                            <div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px;">
-		                                <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
-		                            </div>
+									<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+									    <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+									    <button class="delete-comment-btn" th:if="${comment.user.userId == currentUser.userId}"
+									            th:data-comment-id="${comment.interactionId}"
+									            style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; margin-right:10px">
+									        Xóa
+									    </button>
+									</div>
 		                        </div>
 		                    </div>
 		                </div>
@@ -332,18 +339,19 @@
 		                        <img th:src="${comment.user.profilePicture}" class="mini-avatar">
 		                        <div class="comment-content" style="flex: 1;">
 		                            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
-		                                <strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+										<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
+		                                	<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+										</a>
 		                                <p th:text="${comment.content}" style="margin: 0;"></p>
-		                                <!-- Nút xóa chỉ hiển thị nếu là chủ comment -->
-		                                <button class="delete-comment-btn" th:if="${comment.user.userId == currentUser.userId}"
-		                                        th:data-comment-id="${comment.interactionId}"
-		                                        style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-left:8px;">
-		                                    Xóa
-		                                </button>
 		                            </div>
-		                            <div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px;">
-		                                <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
-		                            </div>
+									<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+									    <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+									    <button class="delete-comment-btn" th:if="${comment.user.userId == currentUser.userId}"
+									            th:data-comment-id="${comment.interactionId}"
+									            style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; margin-right:10px">
+									        Xóa
+									    </button>
+									</div>
 		                        </div>
 		                    </div>
 		                </div>
@@ -582,23 +590,37 @@
                             <img src="${data.user.profilePicture}" class="mini-avatar">
                             <div class="comment-content" style="flex: 1;">
                                 <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
-                                    <strong>${data.user.firstname} ${data.user.lastname}</strong>
+									<a href="/profile/${data.user.userId}" style="font-weight: bold; text-decoration: none; color: #050505;">
+					                    <strong>${data.user.firstname} ${data.user.lastname}</strong>
+					                </a>
                                     <p style="margin: 0;">${data.content}</p>
                                 </div>
-                                <div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px;">
-                                    <span>Vừa xong</span>
-                                </div>
+								<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+								    <span>Vừa xong</span>
+								    <button class="delete-comment-btn"
+								            th:data-comment-id="${data.interactionId}"
+								            style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; margin-right:10px">
+								        Xóa
+								    </button>
+								</div>
                             </div>
                         </div>
                     `;
 
                     // Nếu có ít hơn 3 comment, thêm vào initial-comments
-                    if (initialComments.children.length < 3) {
+                    if (initialComments && hiddenComments) {
+                        // Chèn bình luận mới vào đầu initial-comments
                         initialComments.insertAdjacentHTML('afterbegin', newCommentHtml);
-                    } else {
-                        // Nếu đã có 3 comment trở lên, thêm vào hidden-comments
-                        hiddenComments.insertAdjacentHTML('afterbegin', newCommentHtml);
-                        
+
+                        // Nếu initial-comments đã có hơn 3 comment, đẩy comment cuối xuống hidden
+                        if (initialComments.children.length > 3) {
+                            const lastComment = initialComments.lastElementChild;
+                            if (lastComment) {
+                                // Di chuyển comment cuối xuống đầu hidden-comments
+                                hiddenComments.insertBefore(lastComment, hiddenComments.firstChild);
+                            }
+                        }
+
                         // Hiển thị nút "Xem thêm" nếu chưa có
                         const viewMoreBtn = commentsList.querySelector('.view-more-btn');
                         if (viewMoreBtn) {

@@ -8,8 +8,17 @@ public class CommentDTO {
     private String content;
     private User user;
     private LocalDateTime createdAt;
+    private Long commentId;
 
-    public CommentDTO() {}
+    public Long getCommentId() {
+		return commentId;
+	}
+
+	public void setCommentId(Long commentId) {
+		this.commentId = commentId;
+	}
+
+	public CommentDTO() {}
 
     public CommentDTO(int interactionId, String content, User user, LocalDateTime createdAt) {
         this.interactionId = interactionId;

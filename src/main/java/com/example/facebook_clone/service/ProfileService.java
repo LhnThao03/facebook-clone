@@ -14,6 +14,11 @@ public class ProfileService {
 	@Autowired 
 	private ProfileRepository profileRepository;
 	
+	public Profile createProfile(Profile profile) {
+        // Lưu profile vào cơ sở dữ liệu
+        return profileRepository.save(profile);
+    }
+	
 	public Profile getProfileByUserId(Integer userId) {
         return profileRepository.findByUser_UserId(userId);
     }

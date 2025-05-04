@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.ui.Model;
 
@@ -19,6 +21,7 @@ import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.service.FriendService;
 import com.example.facebook_clone.service.UserService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -44,27 +47,34 @@ public class FriendController {
     }
     
     @GetMapping("/friend-requests")
-    public String viewFriendRequests(Model model, HttpSession session) {
+    public String viewFriendRequests(HttpSession session, Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
 
-        if (currentUser == null) {
-            return "redirect:/login"; // hoặc trang lỗi nếu chưa đăng nhập
-        }
-
         List<Friend> pendingRequests = friendService.getPendingRequests(currentUser);
+        List<Friend> acceptedFriends = friendService.getAcceptedFriends(currentUser);
+
         model.addAttribute("requests", pendingRequests);
-        return "friend"; // Tên file .html
+        model.addAttribute("friends", acceptedFriends); // friends bây giờ là List<Friend>
+        model.addAttribute("currentUser", currentUser);
+        return "friend";
     }
     
     @PostMapping("/accept-friend-request/{id}")
     public String acceptRequest(@PathVariable int id) {
         friendService.acceptRequest(id);
-        return "redirect:/friend";
+        return "redirect:/friends/friend-requests";
     }
 
     @PostMapping("/decline-friend-request/{id}")
     public String declineRequest(@PathVariable int id) {
         friendService.declineRequest(id);
-        return "redirect:/friend";
+        return "redirect:/friends/friend-requests";
+    }
+    
+    @GetMapping("/remove-friend/{id}")
+    public String removeFriend(@PathVariable("id") int friendshipId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        friendService.removeFriend(currentUser, friendshipId);
+        return "redirect:/friends/friend-requests";
     }
 }

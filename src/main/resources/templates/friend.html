@@ -4,20 +4,75 @@
     <meta charset="UTF-8">
     <title>Lời mời kết bạn</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<link rel="stylesheet" th:href="@{/main.css}">
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <style>
+        .friend-card {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .friend-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .friend-card a {
+            text-decoration: none;
+            color: #000;
+        }
+        .friend-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
-	<h2>Lời mời kết bạn</h2>
-	<div th:each="request : ${requests}">
-	    <div>
-	        <img th:src="${request.user1.profilePicture}" style="width: 50px; height: 50px; border-radius: 50%;">
-	        <span th:text="${request.user1.firstname + ' ' + request.user1.lastname}"></span>
-	        <form th:action="@{/friends/accept-friend-request/{id}(id=${request.friendshipId})}" method="post">
-	            <button type="submit">Chấp nhận</button>
-	        </form>
-	        <form th:action="@{/friends/decline-friend-request/{id}(id=${request.friendshipId})}" method="post">
-	            <button type="submit">Từ chối</button>
-	        </form>
-	    </div>
-	</div>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Cột trái: Lời mời kết bạn -->
+        <div class="col-md-3">
+            <h4>Lời mời kết bạn</h4>
+            <div th:if="${requests.size() == 0}">Không có lời mời nào.</div>
+            <div th:each="request : ${requests}" class="d-flex align-items-center mb-3 p-2 border rounded">
+                <img th:src="${request.user1.profilePicture}" class="rounded-circle mr-2" style="width: 50px; height: 50px; object-fit: cover;">
+                <div>
+                    <div th:text="${request.user1.firstname + ' ' + request.user1.lastname}"></div>
+                    <div class="d-flex mt-1">
+                        <form th:action="@{/friends/accept-friend-request/{id}(id=${request.friendshipId})}" method="post" class="mr-2">
+                            <button type="submit" class="btn btn-success btn-sm">Chấp nhận</button>
+                        </form>
+                        <form th:action="@{/friends/decline-friend-request/{id}(id=${request.friendshipId})}" method="post">
+                            <button type="submit" class="btn btn-danger btn-sm">Từ chối</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Danh sách bạn bè -->
+        <div class="col-md-9">
+            <h4>Danh sách bạn bè</h4>
+            <div th:if="${friends.size() == 0}">Chưa có bạn bè nào.</div>
+            <div class="friend-list">
+                <div th:each="friend : ${friends}" class="friend-card">
+                    <a th:href="@{/profile/{id}(id=${friend.user1.userId == currentUser.userId ? friend.user2.userId : friend.user1.userId})}">
+                        <img th:src="${friend.user1.userId == currentUser.userId ? friend.user2.profilePicture : friend.user1.profilePicture}">
+                        <div th:text="${friend.user1.userId == currentUser.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}"></div>
+                    </a>
+                    <a th:href="@{/friends/remove-friend/{id}(id=${friend.friendshipId})}" class="btn btn-danger btn-sm mt-2">Hủy kết bạn</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+</html>

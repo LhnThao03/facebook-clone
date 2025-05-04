@@ -1,6 +1,7 @@
 package com.example.facebook_clone.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +58,25 @@ public class FriendService {
 
 	public void declineRequest(int friendshipId) {
 	    Friend friend = friendRepository.findById(friendshipId).orElseThrow();
-	    friend.setStatus(Friend.FriendshipStatus.declined);
-	    friendRepository.save(friend);
+	    friendRepository.delete(friend);
+	}
+	
+	public List<Friend> getAcceptedFriends(User currentUser) {
+	    return friendRepository.findAcceptedFriends(currentUser);
+	}
+	
+	public void removeFriend(User currentUser, int friendshipId) {
+	    // Tìm mối quan hệ kết bạn theo friendshipId
+	    Friend friend = friendRepository.findById(friendshipId)
+	        .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kết bạn"));
+
+	    // Kiểm tra nếu người dùng hiện tại là một trong hai người trong mối quan hệ
+	    //if (friend.getUser1().equals(currentUser) || friend.getUser2().equals(currentUser)) {
+	        // Xóa kết bạn
+	        friendRepository.delete(friend);
+	    //} else {
+	        // Nếu người dùng không phải là một trong hai người trong mối quan hệ
+	    //    throw new IllegalStateException("Không thể xóa kết bạn này");
+	    //}
 	}
 }
