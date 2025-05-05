@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.facebook_clone.model.User;
+import com.example.facebook_clone.model.User.Role;
 import com.example.facebook_clone.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -30,12 +31,18 @@ public class LoginController {
 	                        HttpSession session,
 	                        Model model) {
 	    User user = userService.getUserByEmail(email);
-	
+
 	    if (user != null && user.getPassword().equals(password)) {
 	        session.setAttribute("currentUser", user); // lưu user vào session
-	        return "redirect:/home";
+
+	        // Kiểm tra vai trò
+	        if (user.getRole() == Role.admin) {
+	            return "redirect:/admin";
+	        } else {
+	            return "redirect:/home";
+	        }
 	    }
-	
+
 	    model.addAttribute("error", "Email hoặc mật khẩu không đúng!");
 	    return "login";
 	}

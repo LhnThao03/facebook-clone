@@ -52,6 +52,13 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found with id: " + id));
     }
     
+    public PostDTO getPostById(Integer postId, Integer currentUserId) {
+        Post post = postRepository.findById(postId)
+                       .orElseThrow(() -> new RuntimeException("Không tìm thấy bài viết"));
+
+        return convertToDTO(post, currentUserId);
+    }
+    
 
     public List<PostDTO> getAllPostsWithInteractions(Integer currentUserId) {
         List<Post> posts = postRepository.findAll();
@@ -144,32 +151,6 @@ public class PostService {
 
         return dto;
     }
-    
-    /*public List<PostDTO> getPostsByUserId(Integer userId) {
-        List<Post> posts = postRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
-        List<PostDTO> postDTOs = new ArrayList<>();
-
-        for (Post post : posts) {
-            int likes = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.like);
-            int comments = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.comment);
-            int shares = interactionRepository.countByPost_PostIdAndType(post.getPostId(), Interaction.InteractionType.share);
-
-            PostDTO dto = new PostDTO();
-            dto.setPostId(post.getPostId());
-            dto.setContent(post.getContent());
-            dto.setImageUrl(post.getImageUrl());
-            dto.setVideoUrl(post.getVideoUrl());
-            dto.setUser(post.getUser());
-            dto.setCreatedAt(post.getCreatedAt());
-            dto.setLikes(likes);
-            dto.setComments(comments);
-            dto.setShares(shares);
-
-            postDTOs.add(dto);
-        }
-
-        return postDTOs;
-    }*/
     
     public List<PostDTO> getPostsByUserId(Integer currentUserId) {
     	List<Post> posts = postRepository.findByUser_UserIdOrderByCreatedAtDesc(currentUserId);

@@ -67,7 +67,7 @@ public class ProfileController {
         return "profile"; // trỏ tới file profile.html
     }
 
-	/*@GetMapping("/view/{id}")
+	@GetMapping("/view/{id}")
     public String getViewUserProfile(@PathVariable Integer id, Model model) {
         User user = userService.getUserById(id);
         Profile profile = profileService.getProfileByUserId(id);
@@ -80,7 +80,7 @@ public class ProfileController {
         model.addAttribute("friendCount", friendCount);
 
         return "profile-view"; // trỏ tới file profile-view.html
-    }*/
+    }
 	
 	@PostMapping("{id}")
 	@ResponseBody

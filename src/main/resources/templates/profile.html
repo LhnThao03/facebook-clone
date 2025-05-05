@@ -22,6 +22,7 @@
             justify-content: center;
             align-items: flex-start;
             /* background-color: white; */
+			margin-top: 60px;
         }
 
         /* Bọc ảnh bìa trong wrapper để dễ canh giữa và giới hạn chiều rộng */
@@ -531,9 +532,29 @@
 		          .like-btn.animating .like-icon {
 		              animation: likeAnimation 0.4s ease;
 		          }
+				  .navbar { background: white; padding: 8px 16px; position: fixed; width: 100%; top: 0; z-index: 100; }
+		          .navbar-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
     </style>
 </head>
 <body>
+	<nav class="navbar">
+        <div class="navbar-content">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="/home"><img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" style="width: 40px;"></a>
+                <input type="text" placeholder="Tìm kiếm trên Facebook" style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5;">
+            </div>
+			<div style="display: flex; gap: 20px; align-items: center;">
+			    <a th:href="@{'/profile/' + ${user.userId}}">
+			        <i class="fas fa-user" style="cursor: pointer; color: black; font-size: 20px;"></i>
+			    </a>
+			    <i class="fas fa-comment" style="font-size: 20px;"></i>
+			    <i class="fas fa-bell" style="font-size: 20px;"></i>
+			    <a href="/login" style="cursor:pointer; color:black">
+			        <i class="fas fa-sign-out-alt" style="font-size: 20px;"></i>
+			    </a>
+			</div>
+        </div>
+    </nav>
     <div class="profile-header">
 		<div class="photo">
 		    <div class="cover-wrapper">
@@ -667,38 +688,38 @@
 					
 					<!-- Modal -->
 					<div id="postModal" class="modal">
-					  <div class="modal-content">
-					    <div class="modal-header">
-					      <h2>Tạo bài viết</h2>
-					      <span class="close" onclick="closeModal()">&times;</span>
-					    </div>
-					    <div class="modal-body">
-					      <div class="user-info">
-					        <div class="user-details" style="display: flex; align-items: center;">
-								<img th:src="${user.profilePicture}" class="mini-avatar"/>
-						        <strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px;margin-bottom: 12px;font-size: 16px;">Nhat Thao</strong>
-					        </div>
-					      </div>
-					      <textarea placeholder="Bạn đang nghĩ gì?"></textarea>
-						  
-						  <div id="preview" style="position: relative; margin-top: 10px;">
-						    <!-- Preview ảnh/video sẽ nằm ở đây -->
-						  </div>
-					      <!-- Các icon chức năng -->
-					      <div class="post-options">
-					        <button onclick="triggerFileInput()">📷</button>
-					        <button>🏷️</button>
-					        <button>😊</button>
-					        <button>📍</button>
-					        <button>GIF</button>
-					      </div>
-						  <!-- input file ẩn đi -->
-						    <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" onchange="previewFile()">
-					    </div>
-					    <div class="modal-footer">
-					      <button class="post-btn" onclick="createPost()">Đăng</button>
-					    </div>
-					  </div>
+						<div class="modal-content">
+							<div class="modal-header">
+								<h2>Tạo bài viết</h2>
+								<span class="close" onclick="closeModal()">&times;</span>
+							</div>
+							<div class="modal-body">
+								<div class="user-info">
+									<div class="user-details" style="display: flex; align-items: center;">
+										<img th:src="${user.profilePicture}" class="mini-avatar"/>
+										<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px;margin-bottom: 12px;font-size: 16px;">Nhat Thao</strong>
+									</div>
+								</div>
+								<textarea placeholder="Bạn đang nghĩ gì?"></textarea>
+								
+								<div id="preview" style="position: relative; margin-top: 10px;">
+									<!-- Preview ảnh/video sẽ nằm ở đây -->
+								</div>
+								<!-- Các icon chức năng -->
+								<div class="post-options">
+									<button onclick="triggerFileInput()">📷</button>
+									<button>🏷️</button>
+									<button>😊</button>
+									<button>📍</button>
+									<button>GIF</button>
+								</div>
+							<!-- input file ẩn đi -->
+								<input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" onchange="previewFile()">
+							</div>
+							<div class="modal-footer">
+								<button class="post-btn" onclick="createPost()">Đăng</button>
+							</div>
+						</div>
 					</div>
 					
                 </div>
@@ -719,24 +740,85 @@
                 </div>
             </div>
 
+			<!-- Modal Chỉnh sửa Bài viết -->
+			<div id="editPostModal" class="modal" style="display: none;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2>Chỉnh sửa bài viết</h2>
+						<span class="close" onclick="closeEditPostModal()">&times;</span>
+					</div>
+					<div class="modal-body">
+						<div class="user-info">
+							<div class="user-details" style="display: flex; align-items: center;">
+								<img th:src="${user.profilePicture}" class="mini-avatar" />
+								<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px; margin-bottom: 12px; font-size: 16px;">Tên người dùng</strong>
+							</div>
+						</div>
+
+						<!-- textarea gán nội dung bài viết -->
+						<textarea id="edit-post-content" placeholder="Bạn đang nghĩ gì?" rows="5" style="width: 100%; padding: 10px; margin-top: 10px;"></textarea>
+
+						<!-- Preview ảnh (chưa xử lý image edit trong JS) -->
+						<div id="previewEdit" style="position: relative; margin-top: 10px;">
+							<!-- Preview ảnh/video nếu có -->
+						</div>
+
+						<!-- Các icon -->
+						<div class="post-options">
+							<button onclick="triggerFileInputEdit()">📷</button>
+							<button>🏷️</button>
+							<button>😊</button>
+							<button>📍</button>
+							<button>GIF</button>
+						</div>
+
+						<!-- Input file -->
+						<input type="file" id="fileInputEdit" style="display: none;" accept="image/*,video/*" onchange="previewFileEdit()">
+
+						<!-- Hidden input lưu postId -->
+						<input type="hidden" id="edit-post-id" name="postId" />
+					</div>
+
+					<div class="modal-footer">
+						<form id="editPostForm" style="width: 100%;">
+							<button type="submit" class="post-btn" style="width: 100%;">Lưu chỉnh sửa</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
 			<div class="post" th:each="post : ${posts}">
-			    <!-- Phần tiêu đề bài viết -->
-			    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-			        <img th:src="${post.user.profilePicture}" class="mini-avatar">
-			        <div>
-			            <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
-			            <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
-			        </div>
-			    </div>
+				<!-- Phần tiêu đề bài viết -->
+				<div style="display: flex; align-items: center; margin-bottom: 10px;">
+				    <img th:src="${post.user.profilePicture}" class="mini-avatar">
+				    <div>
+				        <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
+				        <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+				    </div>
+
+					<div class="post-options" style="position: relative; margin-left: auto; border: none;">
+						<i class="fas fa-ellipsis-h" style="cursor: pointer; padding: 8px;" 
+						   th:data-post-id="${post.postId}" 
+						   onclick="toggleDropdown(this)"></i>
+					
+						<!-- Dropdown Menu -->
+						<div class="dropdown-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;">
+							<button onclick="openEditPostModalFromDropdown(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">✏️ Chỉnh sửa</button>
+							<button onclick="deletePost(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">🗑️ Xóa</button>
+						</div>
+					</div>
+				</div>
 
 			    <!-- Nội dung -->
 			    <p th:text="${post.content}"></p>
 
+				<div class="media">
 			    <!-- Hình ảnh nếu có -->
-			    <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
-			    
-			    <!-- Video nếu có -->
-			    <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;"></video>
+				    <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media">
+				    
+				    <!-- Video nếu có -->
+				    <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media"></video>
+				</div>
 
 			    <!-- Thống kê lượt tương tác -->
 				<div style="display: flex; justify-content: flex-end; font-size: 14px; color: #65676B; margin-bottom: 5px;">
@@ -1037,6 +1119,60 @@
 	  }
 	}
 
+	function previewFileEdit() {
+	  const fileInput = document.getElementById('fileInputEdit');
+	  const preview = document.getElementById('previewEdit');
+	  const file = fileInput.files[0];
+
+	  preview.innerHTML = ""; // Clear cũ
+
+	  if (file) {
+	    const fileURL = URL.createObjectURL(file);
+
+	    // Tạo wrapper
+	    const wrapper = document.createElement('div');
+	    wrapper.style.position = "relative";
+	    wrapper.style.display = "inline-block";
+
+	    if (file.type.startsWith('image/')) {
+	      const img = document.createElement('img');
+	      img.src = fileURL;
+	      img.style.maxWidth = "100%";
+	      img.style.maxHeight = "300px";
+	      wrapper.appendChild(img);
+	    } else if (file.type.startsWith('video/')) {
+	      const video = document.createElement('video');
+	      video.src = fileURL;
+	      video.controls = true;
+	      video.style.maxWidth = "100%";
+	      video.style.maxHeight = "300px";
+	      wrapper.appendChild(video);
+	    }
+
+	    // Tạo nút ❌
+	    const cancelBtn = document.createElement('button');
+	    cancelBtn.innerText = '❌';
+	    cancelBtn.onclick = function() {
+	      fileInput.value = "";
+	      preview.innerHTML = "";
+	    };
+	    cancelBtn.style.position = "absolute";
+	    cancelBtn.style.top = "5px";
+	    cancelBtn.style.right = "5px";
+	    cancelBtn.style.background = "rgba(0,0,0,0.5)";
+	    cancelBtn.style.color = "white";
+	    cancelBtn.style.border = "none";
+	    cancelBtn.style.borderRadius = "50%";
+	    cancelBtn.style.width = "30px";
+	    cancelBtn.style.height = "30px";
+	    cancelBtn.style.cursor = "pointer";
+	    cancelBtn.style.fontSize = "16px";
+
+	    wrapper.appendChild(cancelBtn);
+	    preview.appendChild(wrapper);
+	  }
+	}
+
 	function cancelPreview() {
 	  const preview = document.getElementById('preview');
 	  const fileInput = document.getElementById('fileInput');
@@ -1049,6 +1185,9 @@
 	
 	function triggerFileInput() {
 	  document.getElementById('fileInput').click();
+	}
+	function triggerFileInputEdit() {
+	  document.getElementById('fileInputEdit').click();
 	}
 
 	
@@ -1135,252 +1274,383 @@
 	    });
     });
 	// Xử lý nút Like
-		    document.querySelectorAll('.like-btn').forEach(button => {
-		        button.addEventListener('click', function() {
-		            const postId = this.getAttribute('data-post-id');
-		            const isLiked = this.getAttribute('data-liked') === 'true';
-		            const likeIcon = this.querySelector('.like-icon');
-		            const likeText = this.querySelector('.like-text');
+	document.querySelectorAll('.like-btn').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const isLiked = this.getAttribute('data-liked') === 'true';
+			const likeIcon = this.querySelector('.like-icon');
+			const likeText = this.querySelector('.like-text');
 
-		            // Thêm class animation
-		            likeIcon.classList.add('animating');
-		            
-		            fetch(`/posts/${postId}/like`, {
-		                method: 'POST',
-		                credentials: 'include'
-		            })
-		            .then(response => {
-		                if (!response.ok) throw new Error('Network response was not ok');
-		                return response.json();
-		            })
-		            .then(data => {
-		                // Cập nhật số lượt like
-		                const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
-		                if (likeCountElement) {
-		                    likeCountElement.textContent = `👍 ${data.likeCount}`;
-		                }
+			// Thêm class animation
+			likeIcon.classList.add('animating');
+			
+			fetch(`/posts/${postId}/like`, {
+				method: 'POST',
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) throw new Error('Network response was not ok');
+				return response.json();
+			})
+			.then(data => {
+				// Cập nhật số lượt like
+				const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
+				if (likeCountElement) {
+					likeCountElement.textContent = `👍 ${data.likeCount}`;
+				}
 
-		                // Toggle trạng thái like
-		                if (data.isLiked) {
-		                    this.classList.add('liked');
-		                    this.setAttribute('data-liked', 'true');
-		                    likeIcon.classList.remove('far');
-		                    likeIcon.classList.add('fas');
-		                } else {
-		                    this.classList.remove('liked');
-		                    this.setAttribute('data-liked', 'false');
-		                    likeIcon.classList.remove('fas');
-		                    likeIcon.classList.add('far');
-		                }
+				// Toggle trạng thái like
+				if (data.isLiked) {
+					this.classList.add('liked');
+					this.setAttribute('data-liked', 'true');
+					likeIcon.classList.remove('far');
+					likeIcon.classList.add('fas');
+				} else {
+					this.classList.remove('liked');
+					this.setAttribute('data-liked', 'false');
+					likeIcon.classList.remove('fas');
+					likeIcon.classList.add('far');
+				}
 
-		                // Xóa class animation sau khi hoàn thành
-		                setTimeout(() => {
-		                    likeIcon.classList.remove('animating');
-		                }, 400);
-		            })
-		            .catch(error => {
-		                console.error('Error:', error);
-		                showNotification('Có lỗi xảy ra khi thích bài viết', 'error');
-		            });
-		        });
-		    });
+				// Xóa class animation sau khi hoàn thành
+				setTimeout(() => {
+					likeIcon.classList.remove('animating');
+				}, 400);
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				showNotification('Có lỗi xảy ra khi thích bài viết', 'error');
+			});
+		});
+	});
 
-		    // Xử lý nút Comment
-		    document.querySelectorAll('.comment-btn').forEach(button => {
-		        button.addEventListener('click', function() {
-		            const postId = this.getAttribute('data-post-id');
-		            const commentSection = document.querySelector(`.comment-section[data-post-id="${postId}"]`);
-		            if (commentSection) {
-		                commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
-		            }
-		        });
-		    });
+	// Xử lý nút Comment
+	document.querySelectorAll('.comment-btn').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const commentSection = document.querySelector(`.comment-section[data-post-id="${postId}"]`);
+			if (commentSection) {
+				commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+			}
+		});
+	});
 
-		    // Xử lý nút xem thêm và ẩn bớt comment
-		    document.querySelectorAll('.view-more-btn, .hide-comments-btn').forEach(button => {
-		        button.addEventListener('click', function() {
-		            const postId = this.getAttribute('data-post-id');
-		            const commentsSection = this.closest('.comments-list');
-		            const hiddenComments = commentsSection.querySelector('.hidden-comments');
-		            const viewMoreBtn = commentsSection.querySelector('.view-more-btn');
-		            const hideCommentsBtn = commentsSection.querySelector('.hide-comments-btn');
+	// Xử lý nút xem thêm và ẩn bớt comment
+	document.querySelectorAll('.view-more-btn, .hide-comments-btn').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const commentsSection = this.closest('.comments-list');
+			const hiddenComments = commentsSection.querySelector('.hidden-comments');
+			const viewMoreBtn = commentsSection.querySelector('.view-more-btn');
+			const hideCommentsBtn = commentsSection.querySelector('.hide-comments-btn');
 
-		            if (this.classList.contains('view-more-btn')) {
-		                // Hiển thị comments ẩn
-		                hiddenComments.style.display = 'block';
-		                // Ẩn nút xem thêm
-		                viewMoreBtn.style.display = 'none';
-		                // Hiện nút ẩn bớt
-		                hideCommentsBtn.style.display = 'block';
-		            } else {
-		                // Ẩn comments
-		                hiddenComments.style.display = 'none';
-		                // Hiện nút xem thêm
-		                viewMoreBtn.style.display = 'block';
-		                // Ẩn nút ẩn bớt
-		                hideCommentsBtn.style.display = 'none';
-		            }
-		        });
-		    });
+			if (this.classList.contains('view-more-btn')) {
+				// Hiển thị comments ẩn
+				hiddenComments.style.display = 'block';
+				// Ẩn nút xem thêm
+				viewMoreBtn.style.display = 'none';
+				// Hiện nút ẩn bớt
+				hideCommentsBtn.style.display = 'block';
+			} else {
+				// Ẩn comments
+				hiddenComments.style.display = 'none';
+				// Hiện nút xem thêm
+				viewMoreBtn.style.display = 'block';
+				// Ẩn nút ẩn bớt
+				hideCommentsBtn.style.display = 'none';
+			}
+		});
+	});
 
-		    // Xử lý submit comment
-		    document.querySelectorAll('.submit-comment').forEach(button => {
-		        button.addEventListener('click', function() {
-		            const postId = this.getAttribute('data-post-id');
-		            const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
-		            if (!input || !input.value.trim()) return;
+	// Xử lý submit comment
+	document.querySelectorAll('.submit-comment').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
+			if (!input || !input.value.trim()) return;
 
-		            const formData = new URLSearchParams();
-		            formData.append('content', input.value.trim());
+			const formData = new URLSearchParams();
+			formData.append('content', input.value.trim());
 
-		            fetch(`/posts/${postId}/comment`, {
-		                method: 'POST',
-		                headers: {
-		                    'Content-Type': 'application/x-www-form-urlencoded',
-		                },
-		                body: formData,
-		                credentials: 'include'
-		            })
-		            .then(response => {
-		                if (!response.ok) {
-		                    throw new Error('Network response was not ok');
-		                }
-		                return response.json();
-		            })
-		            .then(data => {
-		                // Cập nhật số lượng comment
-		                const commentCountElement = document.querySelector(`.comment-count[data-post-id="${postId}"]`);
-		                if (commentCountElement) {
-		                    commentCountElement.textContent = `💬 ${data.totalComments}`;
-		                }
+			fetch(`/posts/${postId}/comment`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: formData,
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			})
+			.then(data => {
+				// Cập nhật số lượng comment
+				const commentCountElement = document.querySelector(`.comment-count[data-post-id="${postId}"]`);
+				if (commentCountElement) {
+					commentCountElement.textContent = `💬 ${data.totalComments}`;
+				}
 
-		                // Thêm comment mới vào danh sách
-		                const commentsList = document.querySelector(`.comments-list[data-post-id="${postId}"]`);
-		                if (commentsList) {
-		                    const initialComments = commentsList.querySelector('.initial-comments');
-		                    const hiddenComments = commentsList.querySelector('.hidden-comments');
-		                    
-		                    const newCommentHtml = `
-								<div class="comment-item" style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
-							        <img src="${data.user.profilePicture}" class="mini-avatar">
-							        <div class="comment-content" style="flex: 1;">
-							            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
-											<a href="/profile/${data.user.userId}" style="font-weight: bold; text-decoration: none; color: #050505;">
-							                    <strong>${data.user.firstname} ${data.user.lastname}</strong>
-							                </a>
-											
-							                <p style="margin: 0;">${data.content}</p>
-							            </div>
-										<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
-										    <span>Vừa xong</span>
-										    <button class="delete-comment-btn"
-										            th:data-comment-id="${data.interactionId}"
-										            style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; margin-right:10px">
-										        Xóa
-										    </button>
-										</div>
-							        </div>
-							    </div>
-		                    `;
+				// Thêm comment mới vào danh sách
+				const commentsList = document.querySelector(`.comments-list[data-post-id="${postId}"]`);
+				if (commentsList) {
+					const initialComments = commentsList.querySelector('.initial-comments');
+					const hiddenComments = commentsList.querySelector('.hidden-comments');
+					
+					const newCommentHtml = `
+						<div class="comment-item" style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+							<img src="${data.user.profilePicture}" class="mini-avatar">
+							<div class="comment-content" style="flex: 1;">
+								<div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+									<a href="/profile/${data.user.userId}" style="font-weight: bold; text-decoration: none; color: #050505;">
+										<strong>${data.user.firstname} ${data.user.lastname}</strong>
+									</a>
+									
+									<p style="margin: 0;">${data.content}</p>
+								</div>
+								<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+									<span>Vừa xong</span>
+									<button class="delete-comment-btn"
+											th:data-comment-id="${data.interactionId}"
+											style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; margin-right:10px">
+										Xóa
+									</button>
+								</div>
+							</div>
+						</div>
+					`;
 
-		                    // Nếu có ít hơn 3 comment, thêm vào initial-comments
-		                    if (initialComments && hiddenComments) {
-								// Chèn bình luận mới vào đầu initial-comments
-								initialComments.insertAdjacentHTML('afterbegin', newCommentHtml);
+					// Nếu có ít hơn 3 comment, thêm vào initial-comments
+					if (initialComments && hiddenComments) {
+						// Chèn bình luận mới vào đầu initial-comments
+						initialComments.insertAdjacentHTML('afterbegin', newCommentHtml);
 
-								// Nếu initial-comments đã có hơn 3 comment, đẩy comment cuối xuống hidden
-								if (initialComments.children.length > 3) {
-									const lastComment = initialComments.lastElementChild;
-									if (lastComment) {
-										// Di chuyển comment cuối xuống đầu hidden-comments
-										hiddenComments.insertBefore(lastComment, hiddenComments.firstChild);
-									}
-								}
-
-								// Hiển thị nút "Xem thêm" nếu chưa có
-								const viewMoreBtn = commentsList.querySelector('.view-more-btn');
-								if (viewMoreBtn) {
-									viewMoreBtn.style.display = 'block';
-								}
+						// Nếu initial-comments đã có hơn 3 comment, đẩy comment cuối xuống hidden
+						if (initialComments.children.length > 3) {
+							const lastComment = initialComments.lastElementChild;
+							if (lastComment) {
+								// Di chuyển comment cuối xuống đầu hidden-comments
+								hiddenComments.insertBefore(lastComment, hiddenComments.firstChild);
 							}
-		                }
+						}
 
-		                // Xóa nội dung input
-		                input.value = '';
-		                
-		                // Hiển thị thông báo thành công
-		                showNotification('Đã thêm bình luận thành công!');
-		            })
-		            .catch(error => {
-		                console.error('Error:', error);
-		                showNotification('Có lỗi xảy ra khi thêm bình luận', 'error');
-		            });
-		        });
-		    });
+						// Hiển thị nút "Xem thêm" nếu chưa có
+						const viewMoreBtn = commentsList.querySelector('.view-more-btn');
+						if (viewMoreBtn) {
+							viewMoreBtn.style.display = 'block';
+						}
+					}
+				}
 
-		    // Thêm CSS cho animation
-		    const style = document.createElement('style');
-		    style.textContent = `
-		        @keyframes slideInRight {
-		            from {
-		                transform: translateX(100%);
-		                opacity: 0;
-		            }
-		            to {
-		                transform: translateX(0);
-		                opacity: 1;
-		            }
-		        }
+				// Xóa nội dung input
+				input.value = '';
+				
+				// Hiển thị thông báo thành công
+				showNotification('Đã thêm bình luận thành công!');
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				showNotification('Có lỗi xảy ra khi thêm bình luận', 'error');
+			});
+		});
+	});
 
-		        @keyframes slideOutRight {
-		            from {
-		                transform: translateX(0);
-		                opacity: 1;
-		            }
-		            to {
-		                transform: translateX(100%);
-		                opacity: 0;
-		            }
-		        }
-		    `;
-		    document.head.appendChild(style);
+	// Thêm CSS cho animation
+	const style = document.createElement('style');
+	style.textContent = `
+		@keyframes slideInRight {
+			from {
+				transform: translateX(100%);
+				opacity: 0;
+			}
+			to {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+
+		@keyframes slideOutRight {
+			from {
+				transform: translateX(0);
+				opacity: 1;
+			}
+			to {
+				transform: translateX(100%);
+				opacity: 0;
+			}
+		}
+	`;
+	document.head.appendChild(style);
 
 		    
 			
 			
-			// Thêm hàm showNotification
-		    function showNotification(message, type = 'success') {
-		        // Xóa notification cũ nếu có
-		        const existingNotification = document.querySelector('.notification');
-		        if (existingNotification) {
-		            existingNotification.remove();
-		        }
+	// Thêm hàm showNotification
+	function showNotification(message, type = 'success') {
+		// Xóa notification cũ nếu có
+		const existingNotification = document.querySelector('.notification');
+		if (existingNotification) {
+			existingNotification.remove();
+		}
 
-		        const notification = document.createElement('div');
-		        notification.className = `notification ${type}`;
-		        notification.textContent = message;
-		        
-		        // Style cho notification
-		        Object.assign(notification.style, {
-		            position: 'fixed',
-		            bottom: '20px',
-		            right: '20px',
-		            padding: '12px 24px',
-		            borderRadius: '8px',
-		            color: 'white',
-		            zIndex: '1001',
-		            animation: 'slideInRight 0.3s ease-in-out',
-		            backgroundColor: type === 'success' ? '#4BB543' : '#ff3333'
-		        });
+		const notification = document.createElement('div');
+		notification.className = `notification ${type}`;
+		notification.textContent = message;
+		
+		// Style cho notification
+		Object.assign(notification.style, {
+			position: 'fixed',
+			bottom: '20px',
+			right: '20px',
+			padding: '12px 24px',
+			borderRadius: '8px',
+			color: 'white',
+			zIndex: '1001',
+			animation: 'slideInRight 0.3s ease-in-out',
+			backgroundColor: type === 'success' ? '#4BB543' : '#ff3333'
+		});
 
-		        document.body.appendChild(notification);
+		document.body.appendChild(notification);
 
-		        // Tự động xóa notification sau 3 giây
-		        setTimeout(() => {
-		            notification.style.animation = 'slideOutRight 0.3s ease-in-out';
-		            setTimeout(() => notification.remove(), 300);
-		        }, 3000);
-		    }
+		// Tự động xóa notification sau 3 giây
+		setTimeout(() => {
+			notification.style.animation = 'slideOutRight 0.3s ease-in-out';
+			setTimeout(() => notification.remove(), 300);
+		}, 3000);
+	}
+
+	function openEditPostModal(icon) {
+		const postId = icon.getAttribute('data-post-id');
+		const postElement = icon.closest('.post'); 
+
+		// 1. Lấy nội dung bài viết
+		const postContent = postElement.querySelector('p')?.innerText || '';
+
+		// 2. Lấy ảnh hoặc video nếu có
+		const imageElement = postElement.querySelector('.media img');
+		const videoElement = postElement.querySelector('.media video');
+		const previewContainer = document.getElementById('previewEdit');
+		previewContainer.innerHTML = ''; // Reset preview
+
+		const wrapper = document.createElement('div');
+		wrapper.style.position = "relative";
+		wrapper.style.display = "inline-block";
+
+		if (imageElement) {
+			const img = document.createElement('img');
+			img.src = imageElement.src;
+			img.style.maxWidth = "100%";
+			img.style.maxHeight = "300px";
+			wrapper.appendChild(img);
+		} else if (videoElement) {
+			const video = document.createElement('video');
+			video.src = videoElement.src;
+			video.controls = true;
+			video.style.maxWidth = "100%";
+			video.style.maxHeight = "300px";
+			wrapper.appendChild(video);
+		}
+
+		if (imageElement || videoElement) {
+			// Nút xoá media
+			const cancelBtn = document.createElement('button');
+			cancelBtn.innerText = '❌';
+			cancelBtn.onclick = function () {
+				previewContainer.innerHTML = '';
+			};
+			Object.assign(cancelBtn.style, {
+				position: "absolute",
+				top: "5px",
+				right: "5px",
+				background: "rgba(0,0,0,0.5)",
+				color: "white",
+				border: "none",
+				borderRadius: "50%",
+				width: "30px",
+				height: "30px",
+				cursor: "pointer",
+				fontSize: "16px"
+			});
+			wrapper.appendChild(cancelBtn);
+			previewContainer.appendChild(wrapper);
+		}
+
+		// 3. Gán dữ liệu vào modal
+		document.getElementById('edit-post-id').value = postId;
+		document.getElementById('edit-post-content').value = postContent;
+		document.getElementById('editPostModal').style.display = 'flex';
+	}
+
+
+	function closeEditPostModal() {
+		document.getElementById('editPostModal').style.display = 'none';
+	}
+
+	document.getElementById('editPostForm').addEventListener('submit', function(e) {
+	    e.preventDefault();
+
+	    const postId = document.getElementById('edit-post-id').value;
+	    const content = document.getElementById('edit-post-content').value;
+	    const fileInput = document.getElementById('fileInputEdit');
+	    const formData = new FormData();
+
+	    formData.append("content", content);
+
+	    if (fileInput.files.length > 0) {
+	        formData.append("file", fileInput.files[0]);
+	    }
+
+	    fetch('/posts/edit-post/' + postId, {
+	        method: 'POST',
+	        body: formData
+	    }).then(res => {
+	        if (res.ok) {
+	            location.reload();
+	        } else {
+	            alert('Lỗi khi lưu chỉnh sửa');
+	        }
+	    });
+	});
+	function toggleDropdown(icon) {
+		const dropdown = icon.nextElementSibling;
+		const isVisible = dropdown.style.display === 'block';
+
+		// Đóng tất cả dropdown khác trước
+		document.querySelectorAll('.dropdown-menu').forEach(menu => {
+			menu.style.display = 'none';
+		});
+
+		// Hiển thị hoặc ẩn menu
+		dropdown.style.display = isVisible ? 'none' : 'block';
+	}
+
+	// Gọi khi nhấn "Chỉnh sửa"
+	function openEditPostModalFromDropdown(button) {
+		const icon = button.closest('.post-options').querySelector('i');
+		openEditPostModal(icon); // ✅ truyền DOM element thật
+	}
+
+	// Gọi khi nhấn "Xóa"
+	function deletePost(button) {
+		const postId = button.closest('.post-options').querySelector('i').getAttribute('data-post-id');
+		if (confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
+			fetch('/posts/deletePost/delete/' + postId, {
+				method: 'POST'
+			}).then(res => {
+				if (res.ok) location.reload();
+				else alert("Xóa thất bại");
+			});
+		}
+	}
+
+	// Tự động ẩn dropdown nếu click ra ngoài
+	document.addEventListener('click', function (e) {
+		if (!e.target.closest('.post-options')) {
+			document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+		}
+	});
 </script>
 
 </html>

@@ -103,9 +103,13 @@
             <div class="admin-menu-item" id="menu-posts" onclick="showContent('posts', this)">
                 <i class="fas fa-newspaper"></i> Quản lý bài viết
             </div>
-            <div class="admin-menu-item" id="menu-settings" onclick="showContent('settings', this)">
-                <i class="fas fa-cog"></i> Cài đặt
-            </div>
+			<a href="/login" 
+			   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?')" 
+			   style="cursor:pointer; color:black; text-decoration: none;">
+			    <div class="admin-menu-item" id="menu-settings" style="color:white">
+			        <i class="fas fa-sign-out-alt" style="font-size: 20px; color:white;"></i> Đăng xuất
+			    </div>
+			</a>
         </div>
 
         <!-- Nội dung động -->
@@ -202,7 +206,6 @@
 	                        </td>
 	                        <td>
 	                            <a th:href="@{'/posts/' + ${post.postId}}" class="btn btn-primary">Xem</a>
-	                            <a th:href="@{'/posts/' + ${post.postId}}" class="btn btn-success">Sửa</a>
 	                            <form th:action="@{'/posts/delete/' + ${post.postId}}"
 	                                  method="post"
 	                                  th:onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này không?')"

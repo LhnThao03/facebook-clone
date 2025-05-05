@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,12 +21,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.facebook_clone.dto.PostDTO;
 import com.example.facebook_clone.model.Interaction;
 import com.example.facebook_clone.model.Post;
+import com.example.facebook_clone.model.Profile;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.service.FileStorageService;
 import com.example.facebook_clone.service.InteractionService;
 import com.example.facebook_clone.service.PostService;
+import com.example.facebook_clone.service.ProfileService;
 import com.example.facebook_clone.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -38,9 +42,12 @@ public class PostController {
     @Autowired
     private UserService userService;
     @Autowired
+	private ProfileService profileService;
+    @Autowired
     private InteractionService interactionService;
     @Autowired
     private FileStorageService fileStorageService;
+    
     @Value("${upload.path}")
 	private String uploadPath;
     
@@ -52,8 +59,9 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public String getPost(@PathVariable int id, Model model) {
-        Post post = postService.getPostById(id);
+    public String getPost(@PathVariable int id, HttpSession session, Model model) {
+    	User currentUser = (User) session.getAttribute("currentUser");
+    	PostDTO post = postService.getPostById(id,currentUser.getUserId());
         model.addAttribute("post", post);
         return "post-detail";
     }
@@ -97,6 +105,13 @@ public class PostController {
         post.setVideoUrl(videoUrl);
         postService.updatePost(id, post);
         return "redirect:/posts";
+    }
+
+    @PostMapping("/deletePost/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deletePost(@PathVariable Integer id) {
+        postService.deletePost(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/delete/{id}")
@@ -220,5 +235,33 @@ public class PostController {
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Có lỗi xảy ra khi xóa bình luận!"));
         }
+    }
+    
+    @PostMapping("/edit-post/{postId}")
+    @ResponseBody
+    public Post updatePost(@PathVariable int postId,
+                           @RequestParam("content") String content,
+                           @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        Post post = postService.getPostById(postId);
+
+        // Cập nhật nội dung
+        post.setContent(content);
+        post.setUpdatedAt(LocalDateTime.now());
+
+        // Nếu có file mới (ảnh hoặc video), xử lý lưu file
+        if (file != null && !file.isEmpty()) {
+            String newFileUrl = fileStorageService.saveFile(file, "post");
+
+            if (file.getContentType().startsWith("image/")) {
+                post.setImageUrl(newFileUrl);
+                post.setVideoUrl(null); // Nếu chọn ảnh thì xóa video cũ
+            } else if (file.getContentType().startsWith("video/")) {
+                post.setVideoUrl(newFileUrl);
+                post.setImageUrl(null); // Nếu chọn video thì xóa ảnh cũ
+            }
+        }
+
+        return postService.updatePost(postId, post);
     }
 } 
