@@ -120,7 +120,6 @@
                 <div class="stats-grid">
                     <div class="stat-card"><h3>Tổng số người dùng</h3><p th:text="${totalUsers}"></p></div>
                     <div class="stat-card"><h3>Bài viết mới hôm nay</h3><p th:text="${postsToday}">342</p></div>
-                    <div class="stat-card"><h3>Người dùng hoạt động</h3><p>1,234</p></div>
                 </div>
 				<h2>Người dùng mới nhất</h2>
 				                <table class="data-table">
@@ -199,10 +198,10 @@
 	                        <td th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}"></td>
 	                        <td th:text="${post.content}"></td>
 	                        <td>
-	                            <img th:if="${post.imageUrl}" th:src="@{'/' + ${post.imageUrl}}" alt="Hình ảnh bài viết" style="max-width: 100px;" />
+	                            <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" alt="Hình ảnh bài viết" style="max-width: 100px;" />
 	                        </td>
 	                        <td>
-	                            <video th:if="${post.videoUrl}" th:src="@{'/' + ${post.videoUrl}}" controls style="max-width: 150px;"></video>
+	                            <video th:if="${post.videoUrl}" th:src="@{ ${post.videoUrl}}" controls style="max-width: 150px;"></video>
 	                        </td>
 	                        <td>
 	                            <a th:href="@{'/posts/' + ${post.postId}}" class="btn btn-primary">Xem</a>

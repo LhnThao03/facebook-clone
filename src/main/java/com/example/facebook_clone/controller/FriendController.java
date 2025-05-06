@@ -54,7 +54,7 @@ public class FriendController {
         List<Friend> acceptedFriends = friendService.getAcceptedFriends(currentUser);
 
         model.addAttribute("requests", pendingRequests);
-        model.addAttribute("friends", acceptedFriends); // friends bây giờ là List<Friend>
+        model.addAttribute("friends", acceptedFriends);
         model.addAttribute("currentUser", currentUser);
         return "friend";
     }

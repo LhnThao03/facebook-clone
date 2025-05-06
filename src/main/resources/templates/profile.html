@@ -871,7 +871,7 @@
 				<!-- Phần tiêu đề bài viết -->
 				<div style="display: flex; align-items: center; margin-bottom: 10px;">
 				    <img th:src="${post.user.profilePicture}" class="mini-avatar">
-				    <div>
+				    <div style="margin-left: 4px">
 				        <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
 				        <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
 				    </div>

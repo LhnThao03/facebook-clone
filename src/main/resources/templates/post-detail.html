@@ -188,7 +188,7 @@
                     <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
                 </div>
 
-                <div class="post-options" style="position: relative; margin-left: auto;">
+                <div class="post-options" style="position: relative; margin-left: auto;border: none;">
                     <i class="fas fa-ellipsis-h" style="cursor: pointer; padding: 8px;" 
                     th:data-post-id="${post.postId}" 
                     onclick="toggleDropdown(this)"></i>
@@ -660,31 +660,35 @@
             document.getElementById('editPostModal').style.display = 'none';
         }
     
-        document.getElementById('editPostForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-    
-            const postId = document.getElementById('edit-post-id').value;
-            const content = document.getElementById('edit-post-content').value;
-            const fileInput = document.getElementById('fileInputEdit');
-            const formData = new FormData();
-    
-            formData.append("content", content);
-    
-            if (fileInput.files.length > 0) {
-                formData.append("file", fileInput.files[0]);
-            }
-    
-            fetch('/posts/edit-post/' + postId, {
-                method: 'POST',
-                body: formData
-            }).then(res => {
-                if (res.ok) {
-                    location.reload();
-                } else {
-                    alert('Lỗi khi lưu chỉnh sửa');
-                }
-            });
-        });
+		document.addEventListener('DOMContentLoaded', function () {
+		    const form = document.getElementById('editPostForm');
+		    if (form) {
+		        form.addEventListener('submit', function(e) {
+		            e.preventDefault();
+
+		            const postId = document.getElementById('edit-post-id').value;
+		            const content = document.getElementById('edit-post-content').value;
+		            const fileInput = document.getElementById('fileInputEdit');
+		            const formData = new FormData();
+
+		            formData.append("content", content);
+		            if (fileInput.files.length > 0) {
+		                formData.append("file", fileInput.files[0]);
+		            }
+
+		            fetch('/posts/edit-post/' + postId, {
+		                method: 'POST',
+		                body: formData
+		            }).then(res => {
+		                if (res.ok) {
+		                    location.reload();
+		                } else {
+		                    alert('Lỗi khi lưu chỉnh sửa');
+		                }
+		            });
+		        });
+		    }
+		});
         function toggleDropdown(icon) {
             const dropdown = icon.nextElementSibling;
             const isVisible = dropdown.style.display === 'block';

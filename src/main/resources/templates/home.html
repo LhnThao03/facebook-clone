@@ -342,6 +342,9 @@
 		                <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
 		            </div>
 		        </div>
+				
+				<!-- Nội dung -->
+			    <p th:text="${post.content}"></p>
 
 				<div class="media">
 			    <!-- Hình ảnh nếu có -->
