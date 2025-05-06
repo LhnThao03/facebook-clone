@@ -402,138 +402,160 @@
 		  
 		  
 		  .btn-primary {
-		              background-color: #1877f2;
-		              color: white;
-		              padding: 8px 16px;
-		              border-radius: 6px;
-		              border: none;
-		              font-weight: 600;
-		          }
+	          background-color: #1877f2;
+	          color: white;
+	          padding: 8px 16px;
+	          border-radius: 6px;
+	          border: none;
+	          font-weight: 600;
+	      }
+	
+	      .btn-primary:hover {
+	          background-color: #166fe5;
+	      }
+	
+	      .cancel-share {
+	          background-color: #e4e6eb;
+	          color: #050505;
+	          padding: 8px 16px;
+	          border-radius: 6px;
+	          border: none;
+	          font-weight: 600;
+	      }
+	
+	      .cancel-share:hover {
+	          background-color: #d8dadf;
+	      }
+	
+	      @keyframes fadeIn {
+	          from { opacity: 0; }
+	          to { opacity: 1; }
+	      }
+	
+	      @keyframes slideIn {
+	          from {
+	              opacity: 0;
+	              transform: translateY(-20px);
+	          }
+	          to {
+	              opacity: 1;
+	              transform: translateY(0);
+	          }
+	      }
+	
+	      .comment-input {
+	          background: #f0f2f5;
+	          border: none;
+	          outline: none;
+	      }
+	
+	      .comment-input:focus {
+	          background: white;
+	          border: 1px solid #1877f2;
+	      }
+	
+	      .comment-item {
+	          animation: fadeIn 0.3s ease-in-out;
+	      }
+	
+	      .comment-bubble {
+	          position: relative;
+	          word-wrap: break-word;
+	      }
+	
+	      .comment-bubble strong {
+	          display: block;
+	          margin-bottom: 2px;
+	          font-size: 13px;
+	      }
+	
+	      .comment-bubble p {
+	          font-size: 14px;
+	      }
+	
+	      .mini-avatar {
+	          width: 32px;
+	          height: 32px;
+	          border-radius: 50%;
+	          object-fit: cover;
+	      }
+	
+	      .view-more-btn,
+	      .hide-comments-btn {
+	          background: none;
+	          border: none;
+	          cursor: pointer;
+	          font-size: 14px;
+	          transition: background-color 0.2s;
+	          width: 100%;
+	      }
+	
+	      .view-more-btn:hover,
+	      .hide-comments-btn:hover {
+	          background-color: #f0f2f5;
+	          border-radius: 4px;
+	      }
+	
+	      .comment-controls {
+	          margin-top: 8px;
+	      }
+	
+	      .like-btn {
+	          display: flex;
+	          align-items: center;
+	          gap: 4px;
+	          transition: all 0.2s ease;
+	      }
+	
+	      .like-btn .like-icon {
+	          transition: transform 0.2s ease;
+	      }
+	
+	      .like-btn:hover .like-icon {
+	          transform: scale(1.2);
+	      }
+	
+	      .like-btn.liked {
+	          color: #1877f2;
+	      }
+	
+	      .like-btn.liked .like-icon {
+	          font-weight: 900; /* Solid icon when liked */
+	      }
+	
+	      @keyframes likeAnimation {
+	          0% { transform: scale(1); }
+	          50% { transform: scale(1.4); }
+	          100% { transform: scale(1); }
+	      }
+	
+	      .like-btn.animating .like-icon {
+	          animation: likeAnimation 0.4s ease;
+	      }
+		  .navbar { background: white; padding: 8px 16px; position: fixed; width: 100%; top: 0; z-index: 100; }
+	      .navbar-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+		  .media-grid {
+		      display: grid;
+		      grid-template-columns: repeat(3, 1fr); /* 3 cột */
+		      grid-template-rows: repeat(3, 1fr);    /* 3 hàng */
+		      gap: 5px;
+		      aspect-ratio: 1 / 1; /* giữ khung hình vuông tổng thể nếu cần */
+		      max-width: 100%;
+		  }
 
-		          .btn-primary:hover {
-		              background-color: #166fe5;
-		          }
+		  .media-grid > div {
+		      width: 100%;
+		      aspect-ratio: 1 / 1;
+		      overflow: hidden;
+		      position: relative;
+		  }
 
-		          .cancel-share {
-		              background-color: #e4e6eb;
-		              color: #050505;
-		              padding: 8px 16px;
-		              border-radius: 6px;
-		              border: none;
-		              font-weight: 600;
-		          }
-
-		          .cancel-share:hover {
-		              background-color: #d8dadf;
-		          }
-
-		          @keyframes fadeIn {
-		              from { opacity: 0; }
-		              to { opacity: 1; }
-		          }
-
-		          @keyframes slideIn {
-		              from {
-		                  opacity: 0;
-		                  transform: translateY(-20px);
-		              }
-		              to {
-		                  opacity: 1;
-		                  transform: translateY(0);
-		              }
-		          }
-
-		          .comment-input {
-		              background: #f0f2f5;
-		              border: none;
-		              outline: none;
-		          }
-
-		          .comment-input:focus {
-		              background: white;
-		              border: 1px solid #1877f2;
-		          }
-
-		          .comment-item {
-		              animation: fadeIn 0.3s ease-in-out;
-		          }
-
-		          .comment-bubble {
-		              position: relative;
-		              word-wrap: break-word;
-		          }
-
-		          .comment-bubble strong {
-		              display: block;
-		              margin-bottom: 2px;
-		              font-size: 13px;
-		          }
-
-		          .comment-bubble p {
-		              font-size: 14px;
-		          }
-
-		          .mini-avatar {
-		              width: 32px;
-		              height: 32px;
-		              border-radius: 50%;
-		              object-fit: cover;
-		          }
-
-		          .view-more-btn,
-		          .hide-comments-btn {
-		              background: none;
-		              border: none;
-		              cursor: pointer;
-		              font-size: 14px;
-		              transition: background-color 0.2s;
-		              width: 100%;
-		          }
-
-		          .view-more-btn:hover,
-		          .hide-comments-btn:hover {
-		              background-color: #f0f2f5;
-		              border-radius: 4px;
-		          }
-
-		          .comment-controls {
-		              margin-top: 8px;
-		          }
-
-		          .like-btn {
-		              display: flex;
-		              align-items: center;
-		              gap: 4px;
-		              transition: all 0.2s ease;
-		          }
-
-		          .like-btn .like-icon {
-		              transition: transform 0.2s ease;
-		          }
-
-		          .like-btn:hover .like-icon {
-		              transform: scale(1.2);
-		          }
-
-		          .like-btn.liked {
-		              color: #1877f2;
-		          }
-
-		          .like-btn.liked .like-icon {
-		              font-weight: 900; /* Solid icon when liked */
-		          }
-
-		          @keyframes likeAnimation {
-		              0% { transform: scale(1); }
-		              50% { transform: scale(1.4); }
-		              100% { transform: scale(1); }
-		          }
-
-		          .like-btn.animating .like-icon {
-		              animation: likeAnimation 0.4s ease;
-		          }
-				  .navbar { background: white; padding: 8px 16px; position: fixed; width: 100%; top: 0; z-index: 100; }
-		          .navbar-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+		  .media-item {
+		      width: 100%;
+		      height: 100%;
+		      object-fit: cover;
+		      display: block;
+		  }
     </style>
 </head>
 <body>
@@ -561,15 +583,75 @@
 		        <img th:src="${profile.coverPicture}" class="cover-photo" id="coverPhoto">
 		        <div class="cover-overlay"></div>
 
-		        <div class="cover-actions">
-		            <button class="cover-btn">
-		                <i class="fas fa-camera"></i> Chỉnh sửa ảnh bìa
-		            </button>
-		            <div class="cover-dropdown">
-						<div class="dropdown-item">Xem ảnh bìa</div>
-		                <div class="dropdown-item" onclick="triggerUpload()">Tải ảnh lên</div>
-		            </div>
-		        </div>
+				<div class="cover-actions" style="display: flex; gap: 10px;">
+				    <!-- Nút chỉnh sửa ảnh bìa -->
+				    <div style="position: relative;">
+				        <button class="cover-btn">
+				            <i class="fas fa-camera"></i> Chỉnh sửa ảnh bìa
+				        </button>
+				        <div class="cover-dropdown">
+				            <div class="dropdown-item">Xem ảnh bìa</div>
+				            <div class="dropdown-item" onclick="triggerUpload()">Tải ảnh lên</div>
+				        </div>
+				    </div>
+
+				    <!-- Nút chỉnh sửa trang cá nhân -->
+				    <button class="cover-btn" onclick="openEditProfileModal()">
+				        <i class="fas fa-user-edit"></i> Chỉnh sửa trang cá nhân
+				    </button>
+				</div>
+				
+				
+				<div id="editProfileModal" class="modal" style="display: none;">
+				    <div class="modal-content" style="max-width: 500px;">
+				        <div class="register-header">
+				            <h1>Chỉnh sửa thông tin</h1>
+				            <p>Bạn có thể cập nhật thông tin cá nhân tại đây.</p>
+				        </div>
+
+				        <form id="editProfileForm" onsubmit="submitEditProfile(event)">
+				            <div class="name-inputs" style="display: flex; gap: 10px;">
+				                <input type="text" class="form-control" id="editLastname" name="lastname"
+				                       placeholder="Họ" th:value="${user.lastname}" required>
+				                <input type="text" class="form-control" id="editFirstname" name="firstname"
+				                       placeholder="Tên" th:value="${user.firstname}" required>
+				            </div>
+
+				            <input type="email" class="form-control" id="editEmail" name="email"
+				                   placeholder="Email" th:value="${user.email}" required>
+
+				            <input type="text" class="form-control" id="editPhone" name="phone"
+				                   placeholder="Số điện thoại" th:value="${user.phone}">
+
+				            <input type="password" class="form-control" id="editPassword" name="password"
+				                   placeholder="Mật khẩu mới (bỏ qua nếu không đổi)">
+
+				            <div>
+				                <label style="margin: 10px 0 5px;">Giới tính</label>
+								<div class="gender-options" style="display: flex; gap: 15px;">
+								    <label class="gender-option">
+								        <input type="radio" name="gender" value="female"
+								               th:checked="${user.gender.name() == 'female'}"> Nữ
+								    </label>
+								    <label class="gender-option">
+								        <input type="radio" name="gender" value="male"
+								               th:checked="${user.gender.name() == 'male'}"> Nam
+								    </label>
+								    <label class="gender-option">
+								        <input type="radio" name="gender" value="other"
+								               th:checked="${user.gender.name() == 'other'}"> Tùy chỉnh
+								    </label>
+								</div>
+				            </div>
+
+				            <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+				                <button type="submit" class="btn btn-success">Lưu</button>
+				                <button type="button" onclick="closeEditProfileModal()" class="btn btn-secondary">Hủy</button>
+				            </div>
+				        </form>
+				    </div>
+				</div>
+
 
 		        <div class="save-cancel-bar" id="saveCancelBar" style="display: none;">
 		            <button onclick="saveCover()" class="save-btn">Lưu</button>
@@ -667,17 +749,15 @@
 				    </div>
 				</div>
 			</div>
-            <div class="info-card">
-                <h3>Ảnh</h3>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px;">
-                    <img src="https://via.placeholder.com/100" style="width: 100%;">
-                    <img src="https://via.placeholder.com/100" style="width: 100%;">
-                    <img src="https://via.placeholder.com/100" style="width: 100%;">
-                    <img src="https://via.placeholder.com/100" style="width: 100%;">
-                    <img src="https://via.placeholder.com/100" style="width: 100%;">
-                    <img src="https://via.placeholder.com/100" style="width: 100%;">
-                </div>
-            </div>
+			<div class="info-card">
+			    <h3>Ảnh</h3>
+			    <div class="media-grid">
+			        <div th:each="post : ${mediaPosts}">
+			            <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" class="media-item" />
+			            <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" class="media-item" controls></video>
+			        </div>
+			    </div>
+			</div>
         </div>
         <div class="profile-right">
             <div class="create-post">
@@ -1651,6 +1731,33 @@
 			document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
 		}
 	});
+	
+	function openEditProfileModal() {
+	    document.getElementById('editProfileModal').style.display = 'flex';
+	}
+
+	function closeEditProfileModal() {
+	    document.getElementById('editProfileModal').style.display = 'none';
+	}
+
+	function submitEditProfile(event) {
+	    event.preventDefault();
+
+	    const form = document.getElementById('editProfileForm');
+	    const formData = new FormData(form);
+
+	    fetch('/users/update', {
+	        method: 'POST',
+	        body: formData
+	    }).then(res => {
+	        if (res.ok) {
+	            alert('Cập nhật thành công');
+	            location.reload();
+	        } else {
+	            alert('Cập nhật thất bại');
+	        }
+	    });
+	}
 </script>
 
 </html>

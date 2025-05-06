@@ -248,4 +248,9 @@ public class PostService {
 
         return postRepository.save(sharedPost);
     }
+    
+    public List<Post> getLatestMediaPostsByUserId(Integer userId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return postRepository.findTop6MediaByUserId(userId, pageable);
+    }
 }

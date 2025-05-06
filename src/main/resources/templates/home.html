@@ -343,9 +343,13 @@
 		            </div>
 		        </div>
 
-		        <p th:text="${post.content}"></p>
-
-		        <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;">
+				<div class="media">
+			    <!-- Hình ảnh nếu có -->
+				    <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media">
+				    
+				    <!-- Video nếu có -->
+				    <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media"></video>
+				</div>
 
 		        <!-- Phần hiển thị số lượt tương tác và nút -->
 		        <div style="margin-bottom: 10px;">

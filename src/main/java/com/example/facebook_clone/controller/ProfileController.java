@@ -58,7 +58,9 @@ public class ProfileController {
         Profile profile = profileService.getProfileByUserId(id);
         List<PostDTO> posts = postService.getPostsByUserId(id);
         int friendCount = userService.countFriends(user);
-
+        List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
+        
+        model.addAttribute("mediaPosts", mediaPosts);
         model.addAttribute("user", user);
         model.addAttribute("profile",profile);
         model.addAttribute("posts", posts);

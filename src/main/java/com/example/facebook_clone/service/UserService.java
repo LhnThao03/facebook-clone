@@ -1,6 +1,7 @@
 package com.example.facebook_clone.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,4 +125,24 @@ public class UserService {
 	    user.setProfilePicture(imagePath);
 	    userRepository.save(user);
 	}
+	
+	public void updateUser(User updatedUser) {
+        Optional<User> optionalUser = userRepository.findById(updatedUser.getUserId());
+        if (optionalUser.isPresent()) {
+            User existingUser = optionalUser.get();
+
+            existingUser.setFirstname(updatedUser.getFirstname());
+            existingUser.setLastname(updatedUser.getLastname());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setGender(updatedUser.getGender());
+
+            // Nếu người dùng nhập mật khẩu mới
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                existingUser.setPassword(updatedUser.getPassword()); // ❗ Bạn nên mã hóa mật khẩu ở đây nếu có
+            }
+
+            userRepository.save(existingUser);
+        }
+    }
 }

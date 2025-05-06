@@ -17,6 +17,9 @@ import com.example.facebook_clone.dto.request.UserCreationRequest;
 import com.example.facebook_clone.dto.request.UserUpdateRequest;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
+
 import com.example.facebook_clone.model.User.Role;
 
 @Controller
@@ -33,7 +36,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/edit/{id}")
-	public String getUserDetail1(@PathVariable Integer id, Model model) {
+	public String getUserEdit(@PathVariable Integer id, Model model) {
 		User user = userService.getUserById(id);
 	    model.addAttribute("user", user);
 	    return "user-edit";
@@ -46,7 +49,7 @@ public class UserController {
 		@RequestParam String password, 
 		@RequestParam String phone, 
 		@RequestParam String email, 
-		@RequestParam String profilePicture, 
+		@RequestParam String profilePicture,
 		@RequestParam(defaultValue = "user") Role role,
 		Model model) {
 			UserCreationRequest request = new UserCreationRequest();
@@ -91,12 +94,17 @@ public class UserController {
 	    // Sau khi cập nhật, chuyển hướng tới trang chi tiết người dùng
 	    return "redirect:/users/" + updatedUser.getUserId();
 	}
-
-	// @DeleteMapping("/delete/{id}")
-	// public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-	// 	userService.deleteUser(id);
-	// 	return ResponseEntity.ok().build();
-	// }
+	
+	@PostMapping("/update")
+	public String updateProfile(@ModelAttribute User updatedUser, HttpSession session) {
+	    User currentUser = (User) session.getAttribute("currentUser");
+	    if (currentUser != null) {
+	        updatedUser.setUserId(currentUser.getUserId()); // giữ ID cũ
+	        userService.updateUser(updatedUser);     // cập nhật thông tin
+	        session.setAttribute("currentUser", updatedUser);
+	    }
+	    return "redirect:/profile/"+updatedUser.getUserId();
+	}
 	
 	@PostMapping("/delete/{id}")
 	public String deleteUser(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
