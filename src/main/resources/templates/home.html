@@ -336,7 +336,7 @@
 		            	<img th:src="${post.user.profilePicture}" class="mini-avatar">
 					</a>
 		            <div>
-		                <a th:href="@{'/profile/' + ${post.user.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
+		                <a th:href="@{'/profile/view/' + ${post.user.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
 							<strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
 						</a>
 		                <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>

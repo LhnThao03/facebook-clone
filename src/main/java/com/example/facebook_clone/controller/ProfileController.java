@@ -68,14 +68,18 @@ public class ProfileController {
 
         return "profile"; // trỏ tới file profile.html
     }
-
+	
 	@GetMapping("/view/{id}")
-    public String getViewUserProfile(@PathVariable Integer id, Model model) {
+    public String getUserProfileView(@PathVariable Integer id, Model model, HttpSession session) {
         User user = userService.getUserById(id);
         Profile profile = profileService.getProfileByUserId(id);
         List<PostDTO> posts = postService.getPostsByUserId(id);
         int friendCount = userService.countFriends(user);
-
+        List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
+        User currentUser = (User) session.getAttribute("currentUser");
+        
+        model.addAttribute("currentUser", currentUser);
+        model.addAttribute("mediaPosts", mediaPosts);
         model.addAttribute("user", user);
         model.addAttribute("profile",profile);
         model.addAttribute("posts", posts);
