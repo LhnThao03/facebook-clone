@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.facebook_clone.dto.PostDTO;
+import com.example.facebook_clone.model.Friend;
 import com.example.facebook_clone.model.Post;
 import com.example.facebook_clone.model.Profile;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.service.FileStorageService;
+import com.example.facebook_clone.service.FriendService;
 import com.example.facebook_clone.service.PostService;
 import com.example.facebook_clone.service.ProfileService;
 import com.example.facebook_clone.service.UserService;
@@ -47,6 +50,8 @@ public class ProfileController {
     private PostService postService;
 	@Autowired
 	private ProfileService profileService;
+	@Autowired
+	private FriendService friendService;
 	@Value("${upload.path}")
 	private String uploadPath;
 	@Autowired
@@ -70,23 +75,48 @@ public class ProfileController {
     }
 	
 	@GetMapping("/view/{id}")
-    public String getUserProfileView(@PathVariable Integer id, Model model, HttpSession session) {
-        User user = userService.getUserById(id);
-        Profile profile = profileService.getProfileByUserId(id);
-        List<PostDTO> posts = postService.getPostsByUserId(id);
-        int friendCount = userService.countFriends(user);
-        List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
-        User currentUser = (User) session.getAttribute("currentUser");
-        
-        model.addAttribute("currentUser", currentUser);
-        model.addAttribute("mediaPosts", mediaPosts);
-        model.addAttribute("user", user);
-        model.addAttribute("profile",profile);
-        model.addAttribute("posts", posts);
-        model.addAttribute("friendCount", friendCount);
+	public String getUserProfileView(@PathVariable Integer id, Model model, HttpSession session) {
+	    User user = userService.getUserById(id);
+	    Profile profile = profileService.getProfileByUserId(id);
+	    List<PostDTO> posts = postService.getPostsByUserId(id);
+	    int friendCount = userService.countFriends(user);
+	    List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
+	    User currentUser = (User) session.getAttribute("currentUser");
 
-        return "profile-view"; // trỏ tới file profile-view.html
-    }
+	    model.addAttribute("currentUser", currentUser);
+	    model.addAttribute("mediaPosts", mediaPosts);
+	    model.addAttribute("user", user);
+	    model.addAttribute("profile", profile);
+	    model.addAttribute("posts", posts);
+	    model.addAttribute("friendCount", friendCount);
+
+	    Optional<Friend> relationOpt = friendService.getFriendRelation(currentUser, user);
+	    String friendshipStatus = "none";
+	    boolean isRequestReceiver = false;
+	    Integer friendshipId = null;
+
+	    if (relationOpt.isPresent()) {
+	        Friend relation = relationOpt.get();
+	        friendshipId = relation.getFriendshipId(); // Lấy ID để dùng trong view
+
+	        if (relation.getStatus() == Friend.FriendshipStatus.accepted) {
+	            friendshipStatus = "friends";
+	        } else if (relation.getStatus() == Friend.FriendshipStatus.pending) {
+	            if (relation.getUser1().equals(currentUser)) {
+	                friendshipStatus = "pending"; // Đã gửi
+	            } else {
+	                isRequestReceiver = true; // Là người nhận
+	                friendshipStatus = "pending";
+	            }
+	        }
+	    }
+
+	    model.addAttribute("friendshipStatus", friendshipStatus);
+	    model.addAttribute("isRequestReceiver", isRequestReceiver);
+	    model.addAttribute("friendshipId", friendshipId); // ✅ Đưa vào model
+
+	    return "profile-view";
+	}
 	
 	@PostMapping("{id}")
 	@ResponseBody

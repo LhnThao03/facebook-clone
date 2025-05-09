@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang cá nhân | Facebook</title>
 	<link rel="stylesheet" th:href="@{/main.css}">
-	<link rel="stylesheet" th:href="@{/interaction.js}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .profile-header {
@@ -58,37 +57,9 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 			z-index: 2;
         }
-		
-		.avatar-dropdown {
-	        position: absolute;
-	        top: calc(100% + 90px); /* 10px cách dưới avatar */
-	        left: 50%;
-			transform: translateX(-50%);
-	        background-color: #fff;
-	        border: 1px solid #ccc;
-	        border-radius: 8px;
-	        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-	        display: none;
-	        flex-direction: column;
-	        z-index: 15;
-	    }
-			
-		.avatar-dropdown .dropdown-item {
-	        padding: 10px 15px;
-	        cursor: pointer;
-	        font-size: 14px;
-	        transition: background 0.2s;
-	    }
-		
-		.avatar-dropdown .dropdown-item:hover {
-	        background-color: #f0f0f0;
-	    }
-		
 		#avatarInput {
 	        display: none;
 	    }
-
-		
 		.cover-overlay {
 		    position: absolute;
 		    top: 0;
@@ -147,42 +118,6 @@
 		    display: block;
 		}
 
-		.dropdown-item {
-		    padding: 10px 16px;
-		    cursor: pointer;
-		    white-space: nowrap;
-		}
-
-		.dropdown-item:hover {
-		    background: #f0f0f0;
-		}
-		
-		.save-cancel-bar {
-		    position: absolute;
-		    top: 15px;
-		    right: 20px;
-		    display: flex;
-		    gap: 10px;
-		    z-index: 2;
-		}
-
-		.save-btn, .cancel-btn {
-		    padding: 8px 14px;
-		    border: none;
-		    border-radius: 6px;
-		    cursor: pointer;
-		    font-weight: bold;
-		}
-
-		.save-btn {
-		    background-color: #1877f2;
-		    color: white;
-		}
-
-		.cancel-btn {
-		    background-color: #e4e6eb;
-		}
-
         .profile-nav {
             display: flex;
             justify-content: center;
@@ -228,21 +163,7 @@
             margin-bottom: 20px;
         }
 
-        .create-post {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
 
-        .create-post-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #dadde1;
-        }
 		
 		.post{
 			background: white;
@@ -292,29 +213,65 @@
 			to { opacity: 1; transform: scale(1); }
 		}
 		
-		/*Model*/
+		/*Modal*/
 		.modal {
-		  display: none;
-		  position: fixed;
-		  z-index: 9999;
-		  left: 0;
-		  top: 0;
-		  width: 100%;
-		  height: 100%;
-		  backdrop-filter: blur(3px);
-		  background-color: rgba(0, 0, 0, 0.6);
-		  justify-content: center;
-		  align-items: center;
-		}
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
 
-		.modal-content {
-		  background-color: #242526;
-		  color: white;
-		  border-radius: 10px;
-		  width: 500px;
-		  padding: 20px;
-		  position: relative;
-		}
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-in-out;
+        }
+		
+		.modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #dadde1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            font-size: 24px;
+            color: #65676B;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .close-modal:hover {
+            color: #1B1B1B;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .modal-footer {
+            padding: 16px;
+            border-top: 1px solid #dadde1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
 
 		.close {
 		  position: absolute;
@@ -577,6 +534,7 @@
 			</div>
         </div>
     </nav>
+
     <div class="profile-header">
 		<div class="photo">
 		    <div class="cover-wrapper">
@@ -590,7 +548,54 @@
         <div class="profile-info">
 			<h1 th:text="${user.firstname + ' ' + user.lastname}" style="margin: 80px 0 0 0"></h1>
 			<p th:text="${friendCount} + ' bạn bè'"></p>
-        </div>
+
+			<div>
+				<!-- Nút Thêm bạn -->
+				<button 
+					class="add-friend-btn" 
+					th:if="${friendshipStatus == 'none'}"
+					th:attr="data-user-id=${user.userId}"
+					style="padding: 8px 16px; border: none; background-color: #1877f2; color: white; border-radius: 5px; cursor: pointer;">
+					Thêm bạn
+				</button>
+
+				<!-- Nút Đã gửi lời mời -->
+				<button 
+					class="request-sent-btn" 
+					th:if="${friendshipStatus == 'pending' and !isRequestReceiver}"
+					disabled
+					style="padding: 8px 16px; background-color: #e4e6eb; border: none; border-radius: 5px;">
+					Đã gửi lời mời
+				</button>
+
+				<!-- Nút Chấp nhận -->
+				<button 
+					th:if="${friendshipStatus == 'pending' and isRequestReceiver}" 
+					class="accept-friend-btn"
+					th:attr="data-friendship-id=${friendshipId}" 
+					style="padding: 8px 16px; background-color: #42b72a; color: white; border: none; border-radius: 5px; margin-right: 10px; cursor: pointer;">
+					Xác nhận
+				</button>
+
+				<!-- Nút Từ chối -->
+				<button 
+					th:if="${friendshipStatus == 'pending' and isRequestReceiver}"
+					class="decline-friend-btn"
+					th:attr="data-friendship-id=${friendshipId}" 
+					style="padding: 8px 16px; background-color: #BB2D3B; color: white; border: none; border-radius: 5px; cursor: pointer;">
+					Xóa
+				</button>
+
+				<!-- Nút Bạn bè -->
+				<button 
+					th:if="${friendshipStatus == 'friends'}"
+					disabled
+					style="padding: 8px 16px; background-color: #42b72a; color: white; border: none; border-radius: 5px;">
+					Bạn bè
+				</button>
+			</div>
+		</div>
+
         <div class="profile-nav">
             <div class="profile-nav-item">Bài viết</div>
             <div class="profile-nav-item">Giới thiệu</div>
@@ -629,9 +634,6 @@
 			        <i class="fas fa-birthday-cake"></i> 
 			        <span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span>
 			    </div>
-
-			    
-				<!-- Modal chỉnh sửa chi tiết -->
 				
 			</div>
 			<div class="info-card">
@@ -645,10 +647,6 @@
 			</div>
         </div>
         <div class="profile-right">
-            
-
-			
-
 			<div class="post" th:each="post : ${posts}">
 				<!-- Phần tiêu đề bài viết -->
 				<div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -689,6 +687,9 @@
 			        <button class="btn comment-btn" th:data-post-id="${post.postId}">
 			            <i class="far fa-comment"></i> Bình luận
 			        </button>
+					<button class="btn share-btn" th:data-post-id="${post.postId}">
+	                    <i class="far fa-share-square"></i> Chia sẻ
+	                </button>
 			    </div>
 
 			    <!-- Khối bình luận -->
@@ -719,11 +720,6 @@
 		                            </div>
 									<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
 									    <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
-										<button class="delete-comment-btn"
-			                                    th:data-comment-id="${comment.interactionId}"
-			                                    style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
-			                                Xóa
-			                            </button>
 									</div>
 								</div>
 							</div>
@@ -769,9 +765,31 @@
         	</div>
     	</div>
 	</div>
+	<!-- Share Dialog -->
+    <div id="shareDialog" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chia sẻ bài viết</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có muốn chia sẻ bài viết này về trang cá nhân?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn cancel-share">Hủy</button>
+                <button class="btn btn-primary confirm-share">Chia sẻ</button>
+            </div>
+        </div>
+    </div>
 </body>
 <script>
 	document.addEventListener("DOMContentLoaded", function () {
+		const shareDialog = document.getElementById("shareDialog");
+		const closeModalBtn = document.querySelector(".close-modal");
+	    const cancelShareBtn = document.querySelector(".cancel-share");
+		
+		closeModalBtn.addEventListener("click", closeShareDialog);
+		cancelShareBtn.addEventListener("click", closeShareDialog);
 		// Xử lý nút xóa bình luận
 	    document.querySelectorAll('.delete-comment-btn').forEach(btn => {
 	        btn.addEventListener('click', function() {
@@ -794,7 +812,74 @@
 	            .catch(() => showNotification('Có lỗi xảy ra khi xóa bình luận!', 'error'));
 	        });
 	    });
+		
+		document.querySelectorAll('.add-friend-btn').forEach(button => {
+			button.addEventListener('click', () => {
+				const receiverId = button.getAttribute('data-user-id');
+
+				fetch(`/friends/send-friend-request/${receiverId}`, {
+					method: 'POST',
+				})
+				.then(response => {
+					if (response.ok) {
+						button.style.display = 'none';
+						const sentButton = document.createElement('button');
+						sentButton.className = 'request-sent-btn';
+						sentButton.textContent = 'Đã gửi lời mời';
+						sentButton.disabled = true;
+						sentButton.style = "padding: 8px 16px; background-color: #e4e6eb; border: none; border-radius: 5px;";
+						button.parentNode.appendChild(sentButton);
+					} else {
+						alert("Gửi lời mời thất bại!");
+					}
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+			});
+		});
+
+		document.querySelectorAll('.accept-friend-btn').forEach(button => {
+			button.addEventListener('click', () => {
+				const friendshipId = button.getAttribute('data-friendship-id');
+
+				fetch(`/friends/accept-friend-request-ajax/${friendshipId}`, {
+					method: 'POST'
+				})
+				.then(response => {
+					if (response.ok) {
+						location.reload(); // Refresh lại trang
+					} else {
+						alert("Chấp nhận lời mời thất bại.");
+					}
+				})
+				.catch(error => {
+					console.error("Error:", error);
+				});
+			});
+		});
     });
+
+	document.querySelectorAll('.decline-friend-btn').forEach(button => {
+		button.addEventListener('click', () => {
+			const friendshipId = button.getAttribute('data-friendship-id');
+
+			fetch(`/friends/decline-friend-request-ajax/${friendshipId}`, {
+				method: 'POST'
+			})
+			.then(response => {
+				if (response.ok) {
+					location.reload();
+				} else {
+					alert("Từ chối lời mời thất bại.");
+				}
+			})
+			.catch(error => {
+				console.error("Error:", error);
+			});
+		});
+	});
+
 	// Xử lý nút Like
 	document.querySelectorAll('.like-btn').forEach(button => {
 		button.addEventListener('click', function() {
@@ -978,6 +1063,54 @@
 			});
 		});
 	});
+	
+	// Share
+	
+	
+	function closeShareDialog() {
+        shareDialog.style.display = "none";
+    }
+	// Xử lý nút chia sẻ
+	document.querySelectorAll('.share-btn').forEach(button => {
+	    button.addEventListener('click', function() {
+	        currentPostIdForShare = this.getAttribute('data-post-id');
+	        document.getElementById('shareDialog').style.display = 'flex';
+	    });
+	});
+
+	// Xử lý nút xác nhận chia sẻ
+	document.querySelector('.confirm-share').addEventListener('click', function() {
+	    if (!currentPostIdForShare) return;
+
+	    fetch(`/posts/${currentPostIdForShare}/share`, {
+	        method: 'POST',
+	        credentials: 'include'
+	    })
+	    .then(response => {
+	        if (!response.ok) {
+	            throw new Error('Network response was not ok');
+	        }
+	        return response.json();
+	    })
+	    .then(data => {
+	        // Cập nhật số lượt chia sẻ
+	        const shareCountElement = document.querySelector(`.share-count[data-post-id="${currentPostIdForShare}"]`);
+	        if (shareCountElement) {
+	            shareCountElement.textContent = `🔁 ${data.shareCount}`;
+	        }
+
+	        // Hiển thị thông báo thành công
+	        showNotification('Đã chia sẻ bài viết thành công!');
+	        
+	        // Đóng modal
+	        document.getElementById('shareDialog').style.display = 'none';
+	    })
+	    .catch(error => {
+	        console.error('Error:', error);
+	        showNotification('Có lỗi xảy ra khi chia sẻ bài viết!', 'error');
+	    });
+	});
+
 
 	// Thêm CSS cho animation
 	const style = document.createElement('style');

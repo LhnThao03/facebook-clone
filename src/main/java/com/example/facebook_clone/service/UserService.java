@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.facebook_clone.dto.request.UserCreationRequest;
 import com.example.facebook_clone.dto.request.UserUpdateRequest;
+import com.example.facebook_clone.model.Friend;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.repository.FriendRepository;
 import com.example.facebook_clone.repository.UserRepository;
@@ -93,27 +94,31 @@ public class UserService {
 	    return userRepository.count(); // Tổng số bản ghi
 	}
 	
-	//public List<User> getFriendSuggestions(User currentUserId) {
-    //    return userRepository.findFriendSuggestions(currentUserId.getUserId());
-    //}
-	
 	public List<User> getFriendSuggestions(User currentUserId) {
-		List<User> allUsers = userRepository.findAll();
+	    List<User> allUsers = userRepository.findAll();
 
-	    // Lấy danh sách người đã gửi lời mời hoặc đã là bạn
-	    List<User> excludedUsers = friendRepository.findAllRelations(currentUserId)
-	        .stream()
-	        .map(friend -> friend.getUser1().equals(currentUserId) ? friend.getUser2() : friend.getUser1())
+	    List<Friend> allRelations = friendRepository.findAllRelations(currentUserId);
+
+	    // Lọc tất cả người đã có mối quan hệ (pending hoặc accepted) với currentUser (dù là user1 hay user2)
+	    List<User> excludedUsers = allRelations.stream()
+	        .filter(friend -> 
+	            friend.getStatus() == Friend.FriendshipStatus.accepted || 
+	            friend.getStatus() == Friend.FriendshipStatus.pending
+	        )
+	        .map(friend -> 
+	            friend.getUser1().equals(currentUserId) ? friend.getUser2() : friend.getUser1()
+	        )
 	        .collect(Collectors.toList());
 
-	    // Thêm chính bản thân để loại khỏi danh sách
+	    // Thêm bản thân vào danh sách loại trừ
 	    excludedUsers.add(currentUserId);
 
-	    // Lọc những người chưa liên hệ gì
+	    // Trả về người chưa có bất kỳ mối quan hệ nào với currentUser
 	    return allUsers.stream()
-	        .filter(user -> !excludedUsers.contains(user))
+	        .filter(user -> excludedUsers.stream()
+	            .noneMatch(excluded -> excluded.getUserId() == user.getUserId()))
 	        .collect(Collectors.toList());
-    }
+	}
 	
 	public int countFriends(User user) {
         int countAsUser1 = friendRepository.countByUser1(user);

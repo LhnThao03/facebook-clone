@@ -22,13 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
     private AdminInterceptor adminInterceptor;
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        /*registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/home/**")   // chặn các đường dẫn cần đăng nhập
-                .excludePathPatterns("/login", "/register", "/css/**", "/js/**", "/images/**"); // cho phép truy cập tự do*/
     	
      // Interceptor kiểm tra đăng nhập
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/home/**", "/profile/**", "/admin/**")
+                .addPathPatterns("/home/**", "/profile/**", "/admin/**","/friends/**","/post-detail/**","/posts/**","/profile-view/**","/user-details/**","/user-edit/**")
                 .excludePathPatterns("/login", "/register", "/css/**", "/js/**");
 
         // Interceptor kiểm tra quyền admin

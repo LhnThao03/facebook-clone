@@ -335,7 +335,7 @@
 					<a th:href="@{'/profile/' + ${post.user.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
 		            	<img th:src="${post.user.profilePicture}" class="mini-avatar">
 					</a>
-		            <div>
+		            <div style="margin-left: 4px;">
 		                <a th:href="@{'/profile/view/' + ${post.user.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
 							<strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
 						</a>
@@ -466,12 +466,10 @@
         <div class="right-sidebar">
             <div class="friend-suggestion">
                 <div class="suggestion-header">Những người bạn có thể biết</div>
-
                 <div class="friend-item" th:each="user : ${suggestions}">
                     <img th:src="${user.profilePicture}" style="border-radius: 50%; width: 50px; height: 50px; object-fit: cover;">
                     <div class="friend-info">
                         <div class="friend-name" th:text="${user.firstname + ' ' + user.lastname}"></div>
-                        <div class="mutual-friends">Bạn chung: 5</div> <!-- Có thể tính sau -->
                     </div>
 					<button class="add-friend-btn" th:attr="data-user-id=${user.userId}">
 					    <i class="fas fa-user-plus"></i> Thêm bạn

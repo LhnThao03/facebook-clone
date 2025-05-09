@@ -35,13 +35,33 @@
             gap: 10px;
         }
 		.navbar { background: white; padding: 8px 16px; width: 100%; top: 0; z-index: 100; }
-		        .navbar-content { 		display: flex;
+		.navbar-content { 		
+			display: flex;
 		    justify-content: space-between;
 		    align-items: center;
 		    max-width: 1200px; /* hoặc 100% nếu .navbar có padding đủ */
 		    width: 100%;
-		    margin: 0 auto; }
+		    margin: 0 auto; 
+		}
 		        
+		.remove-friend-btn {
+		    display: block;
+		    width: 70%; /* Chiều ngang bằng ảnh nếu ảnh chiếm 100% của khung */
+		    background-color: #dc3545; /* Màu nền mặc định */
+		    color: white;
+		    text-align: center;
+		    padding: 6px 0;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 5px;
+		    text-decoration: none;
+		    transition: background-color 0.3s ease;
+		}
+
+		.remove-friend-btn:hover {
+		    background-color: #bb2d3b; /* Màu đỏ đậm khi hover */
+		    color: white;
+		}
     </style>
 </head>
 <body>
@@ -73,9 +93,11 @@
             <h4>Lời mời kết bạn</h4>
             <div th:if="${requests.size() == 0}">Không có lời mời nào.</div>
             <div th:each="request : ${requests}" class="d-flex align-items-center mb-3 p-2 border rounded">
-                <img th:src="${request.user1.profilePicture}" class="rounded-circle mr-2" style="width: 50px; height: 50px; object-fit: cover;">
-                <div>
-                    <div th:text="${request.user1.firstname + ' ' + request.user1.lastname}"></div>
+				<a th:href="@{/profile/{id}(id=${request.user1.userId})}" style="text-decoration: none; color: black;">
+	                <img th:src="${request.user1.profilePicture}" class="rounded-circle mr-2" style="width: 50px; height: 50px; object-fit: cover;">
+					<div th:text="${request.user1.firstname + ' ' + request.user1.lastname}"></div>
+				</a>
+				<div>
                     <div class="d-flex mt-1">
                         <form th:action="@{/friends/accept-friend-request/{id}(id=${request.friendshipId})}" method="post" class="mr-2">
                             <button type="submit" class="btn btn-success btn-sm">Chấp nhận</button>
@@ -93,13 +115,15 @@
             <h4>Danh sách bạn bè</h4>
             <div th:if="${friends.size() == 0}">Chưa có bạn bè nào.</div>
             <div class="friend-list">
-                <div th:each="friend : ${friends}" class="friend-card">
-                    <a th:href="@{/profile/{id}(id=${friend.user1.userId == currentUser.userId ? friend.user2.userId : friend.user1.userId})}">
-                        <img th:src="${friend.user1.userId == currentUser.userId ? friend.user2.profilePicture : friend.user1.profilePicture}">
-                        <div th:text="${friend.user1.userId == currentUser.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}"></div>
-                    </a>
-                    <a th:href="@{/friends/remove-friend/{id}(id=${friend.friendshipId})}" class="btn btn-danger btn-sm mt-2">Hủy kết bạn</a>
-                </div>
+				<div th:each="friend : ${friends}" class="friend-card" style="text-align: center;">
+				    <a th:href="@{/profile/{id}(id=${friend.user1.userId == currentUser.userId ? friend.user2.userId : friend.user1.userId})}">
+				        <img th:src="${friend.user1.userId == currentUser.userId ? friend.user2.profilePicture : friend.user1.profilePicture}" style="display: block; margin: 0 auto;">
+				        <div class="friend-name" 
+				             th:text="${friend.user1.userId == currentUser.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}">
+				        </div>
+				    </a>
+					<a th:href="@{/friends/remove-friend/{id}(id=${friend.friendshipId})}" class="remove-friend-btn mt-2">Hủy</a>
+				</div>
             </div>
         </div>
     </div>

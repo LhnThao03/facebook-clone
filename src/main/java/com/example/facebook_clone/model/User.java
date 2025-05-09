@@ -1,6 +1,8 @@
 package com.example.facebook_clone.model;
 
 import java.util.Date;
+import java.util.Objects;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -163,5 +165,17 @@ public class User {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return this.userId == user.userId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
     }
 }

@@ -65,10 +65,32 @@ public class FriendController {
         return "redirect:/friends/friend-requests";
     }
 
+    @PostMapping("/accept-friend-request-ajax/{id}")
+    @ResponseBody
+    public ResponseEntity<?> acceptRequestAJAX(@PathVariable int id) {
+        try {
+            friendService.acceptRequest(id);
+            return ResponseEntity.ok().build(); // Trả về 200 OK
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/decline-friend-request/{id}")
     public String declineRequest(@PathVariable int id) {
         friendService.declineRequest(id);
         return "redirect:/friends/friend-requests";
+    }
+    
+    @PostMapping("/decline-friend-request-ajax/{id}")
+    @ResponseBody
+    public ResponseEntity<?> declineRequestAjax(@PathVariable int id) {
+        try {
+            friendService.declineRequest(id);
+            return ResponseEntity.ok().build(); // Trả về 200 OK
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi: " + e.getMessage());
+        }
     }
     
     @GetMapping("/remove-friend/{id}")

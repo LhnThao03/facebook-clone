@@ -69,14 +69,12 @@ public class FriendService {
 	    // Tìm mối quan hệ kết bạn theo friendshipId
 	    Friend friend = friendRepository.findById(friendshipId)
 	        .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kết bạn"));
-
-	    // Kiểm tra nếu người dùng hiện tại là một trong hai người trong mối quan hệ
-	    //if (friend.getUser1().equals(currentUser) || friend.getUser2().equals(currentUser)) {
+	    
 	        // Xóa kết bạn
 	        friendRepository.delete(friend);
-	    //} else {
-	        // Nếu người dùng không phải là một trong hai người trong mối quan hệ
-	    //    throw new IllegalStateException("Không thể xóa kết bạn này");
-	    //}
+	}
+	
+	public Optional<Friend> getFriendRelation(User user1, User user2) {
+	    return friendRepository.findByUsers(user1, user2);
 	}
 }
