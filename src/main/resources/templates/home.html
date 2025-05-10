@@ -488,21 +488,35 @@
 		</div>
 
 
-        <!-- Gợi ý bạn bè -->
         <div class="right-sidebar">
+            <!-- Danh sách bạn bè hiện tại -->
+            <div class="friend-suggestion">
+                <div class="suggestion-header">Bạn bè</div>
+                <div class="friend-item" th:each="friend : ${friends}">
+
+                    <a th:href="@{/profile/{id}(id=${friend.user1.userId == currentUser.userId ? friend.user2.userId : friend.user1.userId})}" style="display: flex; align-items: center; text-decoration: none; color: inherit; flex: 1;">
+		                <img th:src="${friend.user1.userId == currentUser.userId ? friend.user2.profilePicture : friend.user1.profilePicture}" style="border-radius: 50%; width: 50px; height: 50px; object-fit: cover; margin-right: 8px;">
+		                <div class="friend-info">
+		                    <div class="friend-name" th:text="${friend.user1.userId == currentUser.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}">
+                            </div>
+		                </div>
+		            </a>
+                </div>
+            </div>
+            <!-- Gợi ý bạn bè -->
             <div class="friend-suggestion">
                 <div class="suggestion-header">Những người bạn có thể biết</div>
-                <div class="friend-item" th:each="user : ${suggestions}">
-		            <a th:href="@{/profile/view/{id}(id=${user.userId})}" 
+                <div class="friend-item" th:each="friend : ${suggestions}">
+		            <a th:href="@{/profile/view/{id}(id=${friend.userId})}" 
 		               style="display: flex; align-items: center; text-decoration: none; color: inherit; flex: 1;">
-		                <img th:src="${user.profilePicture}" 
+		                <img th:src="${friend.profilePicture}" 
 		                     style="border-radius: 50%; width: 50px; height: 50px; object-fit: cover; margin-right: 8px;">
 		                <div class="friend-info">
 		                    <div class="friend-name" 
-		                         th:text="${user.firstname + ' ' + user.lastname}"></div>
+		                         th:text="${friend.firstname + ' ' + friend.lastname}"></div>
 		                </div>
 		            </a>
-					<button class="add-friend-btn" th:attr="data-user-id=${user.userId}" style="max-height: 29px; min-width: 110px">
+					<button class="add-friend-btn" th:attr="data-user-id=${friend.userId}" style="max-height: 29px; min-width: 110px">
 					    <i class="fas fa-user-plus"></i> Thêm bạn
 					</button>
 					<span class="request-sent-message" style="display:none; color: green;">Đã gửi lời mời</span>

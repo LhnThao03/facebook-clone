@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.facebook_clone.dto.PostDTO;
 import com.example.facebook_clone.model.User;
+import com.example.facebook_clone.service.FriendService;
 import com.example.facebook_clone.service.PostService;
 import com.example.facebook_clone.service.UserService;
 
@@ -21,6 +22,8 @@ public class HomeController {
 	private PostService postService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private FriendService friendService;
 
 	@GetMapping
 	public String home(HttpSession session, Model model) {
@@ -28,7 +31,7 @@ public class HomeController {
 	    List<User> suggestions = userService.getFriendSuggestions(currentUser);
 	    List<PostDTO> postsWithInteraction = postService.getAllPostsWithInteractions(currentUser.getUserId());
 	    model.addAttribute("postsWithInteraction", postsWithInteraction);
-
+	    model.addAttribute("friends", friendService.getAcceptedFriends(currentUser));
 	    model.addAttribute("posts", postService.getLatestPosts());
 	    model.addAttribute("suggestions", suggestions);
 	    model.addAttribute("currentUser", currentUser);
