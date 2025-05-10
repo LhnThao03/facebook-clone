@@ -1,5 +1,9 @@
 package com.example.facebook_clone.controller;
 
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,37 +30,48 @@ public class AuthController {
 
 	@PostMapping
 	public String createUser(
-		@RequestParam String firstname,
-		@RequestParam String lastname,
-		@RequestParam String password, 
-		@RequestParam String phone, 
-		@RequestParam String email, 
-		@RequestParam(defaultValue = "other") Gender gender,
-		@RequestParam(defaultValue = "user") Role role,
-		Model model) {
-			UserCreationRequest request = new UserCreationRequest();
-			request.setFirstname(firstname);
-			request.setLastname(lastname);
-			request.setPassword(password);
-			request.setPhone(phone);
-			request.setEmail(email);
-			request.setGender(gender);
-			request.setRole(role);
-			
-			
-			// Tạo user
-		    User user = userService.createUser(request);
-			// Tạo Profile cho user vừa tạo
-		    Profile profile = new Profile();
-		    profile.setUser(user);  // Liên kết profile với user
-		    profile.setBio(""); // Hoặc bạn có thể để trống hoặc thêm thông tin mặc định
-		    profile.setLocation(""); // Thêm location mặc định nếu cần
-		    profile.setBirthdate(null); // Hoặc gán giá trị ngày sinh mặc định
-		    profile.setCoverPicture(""); // Thêm ảnh bìa mặc định nếu cần
-		    // Lưu profile vào database
-		    profileService.createProfile(profile); // Giả sử bạn có một service để lưu Profile
-			model.addAttribute("users", userService.getUsers());
-			return "redirect:/login";
+	    @RequestParam String firstname,
+	    @RequestParam String lastname,
+	    @RequestParam String password,
+	    @RequestParam String phone,
+	    @RequestParam String email,
+	    @RequestParam(defaultValue = "other") Gender gender,
+	    @RequestParam(defaultValue = "user") Role role,
+	    @RequestParam int birthDay,
+	    @RequestParam int birthMonth,
+	    @RequestParam int birthYear,
+	    Model model
+	) {
+	    // Kiểm tra ngày sinh trước
+	    LocalDateTime birthdate;
+	    try {
+	        birthdate = LocalDate.of(birthYear, birthMonth, birthDay).atStartOfDay();
+	    } catch (DateTimeException e) {
+	        model.addAttribute("error", "Ngày sinh không hợp lệ. Vui lòng chọn lại.");
+	        return "register";  // Trả về form đăng ký
+	    }
+
+	    // Sau khi hợp lệ mới tiếp tục tạo user
+	    UserCreationRequest request = new UserCreationRequest();
+	    request.setFirstname(firstname);
+	    request.setLastname(lastname);
+	    request.setPassword(password);
+	    request.setPhone(phone);
+	    request.setEmail(email);
+	    request.setGender(gender);
+	    request.setRole(role);
+
+	    User user = userService.createUser(request);
+
+	    Profile profile = new Profile();
+	    profile.setUser(user);
+	    profile.setBio("");
+	    profile.setLocation("");
+	    profile.setBirthdate(birthdate);
+	    profile.setCoverPicture("");
+
+	    profileService.createProfile(profile);
+	    return "redirect:/login";
 	}
 	
 	@GetMapping

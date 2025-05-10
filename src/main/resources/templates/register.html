@@ -72,7 +72,7 @@
             <h1>Đăng ký</h1>
             <p>Nhanh chóng và dễ dàng.</p>
         </div>
-
+		
         <form th:action="@{/register}" method="post" onsubmit="return validatePasswords()">
             <div class="name-inputs">
                 <input type="text" class="form-control" name="lastname" placeholder="Họ" required>
@@ -86,29 +86,29 @@
             <input type="text" class="form-control" name="phone" placeholder="Số điện thoại">
 
             <div>
-                <label>Ngày sinh</label>
-                <div style="display: flex; gap: 10px;">
-                    <select class="form-control" name="day">
-                        <option>Ngày</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <!-- thêm các giá trị khác -->
-                    </select>
-                    <select class="form-control" name="month">
-                        <option>Tháng</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <!-- thêm các giá trị khác -->
-                    </select>
-                    <select class="form-control" name="year">
-                        <option>Năm</option>
-                        <option value="2000">2000</option>
-                        <option value="2001">2001</option>
-                        <!-- thêm các giá trị khác -->
-                    </select>
-                </div>
+				<label>Ngày sinh</label>
+				<div style="display: flex; gap: 10px;">
+				    <select class="form-control" name="birthDay" required>
+				        <option value="">Ngày</option>
+				        <th:block th:each="d : ${#numbers.sequence(1,31)}">
+				            <option th:value="${d}" th:text="${d}"></option>
+				        </th:block>
+				    </select>
+				    <select class="form-control" name="birthMonth" required>
+				        <option value="">Tháng</option>
+				        <th:block th:each="m : ${#numbers.sequence(1,12)}">
+				            <option th:value="${m}" th:text="${m}"></option>
+				        </th:block>
+				    </select>
+				    <select class="form-control" name="birthYear" required>
+				        <option value="">Năm</option>
+				        <th:block th:each="y : ${#numbers.sequence(1950, 2024)}">
+				            <option th:value="${y}" th:text="${y}"></option>
+				        </th:block>
+				    </select>
+				</div>
             </div>
-
+			<div th:if="${error}" style="color: red; margin-bottom: 10px;" th:text="${error}"></div>
             <div>
                 <label>Giới tính</label>
                 <div class="gender-options">
