@@ -99,4 +99,18 @@ public class FriendController {
         friendService.removeFriend(currentUser, friendshipId);
         return "redirect:/friends/friend-requests";
     }
+    
+    @GetMapping("/remove-friend-profile/{id}")
+    public String removeFriendProfile(@PathVariable("id") int friendshipId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        friendService.removeFriend(currentUser, friendshipId);
+        return "redirect:/profile/" + currentUser.getUserId() + "?tab=friends";
+    }
+    @GetMapping("/remove-friend-profile-view/{id}")
+    public String removeFriendProfileView(@PathVariable("id") int friendshipId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        friendService.removeFriend(currentUser, friendshipId);
+        return "redirect:/profile/" + currentUser.getUserId() + "?tab=friends";
+    }
+
 }

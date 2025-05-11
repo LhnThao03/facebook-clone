@@ -554,27 +554,122 @@
 		      object-fit: cover;
 		      display: block;
 		  }
+
+
+
+
+
+
+
+		  .profile-nav-item {
+				display: inline-block;
+				padding: 10px 20px;
+				cursor: pointer;
+				color: #555;
+				text-decoration: none;
+			}
+			.profile-nav-item.active {
+				border-bottom: 2px solid #1877f2;
+				font-weight: bold;
+				color: #1877f2;
+			}
+	
+			.friend-list {
+	            display: grid;
+	            grid-template-columns: repeat(5, 1fr);
+	            gap: 10px;
+	        }
+			.friend-card {
+	            width: 100%;
+	            height: 260px;
+	            margin-bottom: 15px;
+	            display: flex;
+	            flex-direction: column;
+	            justify-content: center;
+	            align-items: center;
+	            border: 1px solid #ddd;
+	            border-radius: 8px;
+	            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				justify-content: space-around;
+	        }
+	        .friend-card img {
+	            width: 80px;
+	            height: 80px;
+	            object-fit: cover;
+	            border-radius: 50%;
+	        }
+	        .friend-card a {
+	            text-decoration: none;
+	            color: #000;
+	        }
+			.remove-friend-btn {
+			    display: block;
+			    width: 70%; /* Chiều ngang bằng ảnh nếu ảnh chiếm 100% của khung */
+			    background-color: #dc3545; /* Màu nền mặc định */
+			    color: white;
+			    text-align: center;
+			    padding: 6px 0;
+			    font-size: 14px;
+			    border: none;
+			    border-radius: 5px;
+			    text-decoration: none;
+			    transition: background-color 0.3s ease;
+			}
+	
+			.remove-friend-btn:hover {
+			    background-color: #bb2d3b; /* Màu đỏ đậm khi hover */
+			    color: white;
+			}
+			.personal-info-title {
+			    font-size: 1.75rem;
+			    font-weight: 600;
+			    padding-bottom: 10px;
+			    margin-bottom: 20px;
+			}
+	
+			.personal-info-list {
+			    background-color: #f9f9f9;
+			    border-radius: 8px;
+			    padding: 20px;
+			    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+	
+			.personal-info-item {
+			    font-size: 1.1rem;
+			    margin-bottom: 15px;
+			}
+	
+			.personal-info-item strong {
+			    color: #333;
+			    font-weight: 500;
+			}
+	
+			.personal-info-item span {
+			    color: #555;
+			}
+	
+			.personal-info-item span[th:text="Chưa cập nhật"] {
+			    color: #f44336; /* Màu đỏ cho phần chưa cập nhật */
+			    font-weight: 600;
+			}
+	
+			.personal-info-list li:last-child {
+			    margin-bottom: 0;
+			}
+	
+			@media (max-width: 768px) {
+			    .personal-info-title {
+			        font-size: 1.5rem;
+			    }
+	
+			    .personal-info-list {
+			        padding: 15px;
+			    }
+			}
+
     </style>
 </head>
 <body>
-	<nav class="navbar">
-        <div class="navbar-content">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <a href="/home"><img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" style="width: 40px;"></a>
-                <input type="text" placeholder="Tìm kiếm trên Facebook" style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5;">
-            </div>
-			<div style="display: flex; gap: 20px; align-items: center;">
-			    <a th:href="@{'/profile/' + ${user.userId}}">
-			        <i class="fas fa-user" style="cursor: pointer; color: black; font-size: 20px;"></i>
-			    </a>
-			    <i class="fas fa-comment" style="font-size: 20px;"></i>
-			    <i class="fas fa-bell" style="font-size: 20px;"></i>
-			    <a href="/login" style="cursor:pointer; color:black">
-			        <i class="fas fa-sign-out-alt" style="font-size: 20px;"></i>
-			    </a>
-			</div>
-        </div>
-    </nav>
     <div class="profile-header">
 		<div class="photo">
 		    <div class="cover-wrapper">
@@ -677,325 +772,373 @@
 			<h1 th:text="${user.firstname + ' ' + user.lastname}" style="margin: 80px 0 0 0"></h1>
 			<p th:text="${friendCount} + ' bạn bè'"></p>
         </div>
-        <div class="profile-nav">
-            <div class="profile-nav-item">Bài viết</div>
-            <div class="profile-nav-item">Giới thiệu</div>
-            <div class="profile-nav-item">Bạn bè</div>
-            <div class="profile-nav-item">Ảnh</div>
-            <div class="profile-nav-item">Video</div>
-        </div>
+		<!-- Thanh điều hướng -->
+		<div class="profile-nav">
+		    <a th:href="@{'/profile/' + ${profile.user.userId} + '?tab=posts'}" 
+		       th:classappend="${activeTab == 'posts'} ? ' active' : ''" 
+		       class="profile-nav-item">Bài viết</a>
+		    <a th:href="@{'/profile/' + ${profile.user.userId} + '?tab=about'}" 
+		       th:classappend="${activeTab == 'about'} ? ' active' : ''" 
+		       class="profile-nav-item">Giới thiệu</a>
+		    <a th:href="@{'/profile/' + ${profile.user.userId} + '?tab=friends'}" 
+		       th:classappend="${activeTab == 'friends'} ? ' active' : ''" 
+		       class="profile-nav-item">Bạn bè</a>
+		</div>
     </div>
+	<div th:if="${activeTab == 'posts'}">
+		<div class="profile-content">
+			<div class="profile-left">
+				<div class="info-card">
+					<h3>Giới thiệu</h3>
+					<!-- Nút thêm tiểu sử -->
+						<button id="add-bio-btn" onclick="showBioInput()"
+							style="margin: 5px 0; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
+							Thêm tiểu sử
+						</button>
 
-    <div class="profile-content">
-        <div class="profile-left">
-			<div class="info-card">
-			    <h3>Giới thiệu</h3>
-				<!-- Nút thêm tiểu sử -->
-				    <button id="add-bio-btn" onclick="showBioInput()"
-				        style="margin: 5px 0; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
-				        Thêm tiểu sử
-				    </button>
+						<!-- Ô input và các nút điều khiển -->
+						<div id="bio-input-section" style="display: none; margin-top: 10px;">
+							<input type="text" id="bio-input" placeholder="Nhập tiểu sử..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
 
-				    <!-- Ô input và các nút điều khiển -->
-				    <div id="bio-input-section" style="display: none; margin-top: 10px;">
-				        <input type="text" id="bio-input" placeholder="Nhập tiểu sử..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+							<div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
+								<button onclick="hideBioInput()" style="padding: 5px 10px; border: none; background-color: #ccc; border-radius: 5px; cursor: pointer;">Hủy</button>
+								<button onclick="saveBio()" style="padding: 5px 10px; border: none; background-color: #1877f2; color: white; border-radius: 5px; cursor: pointer;">Lưu</button>
+							</div>
+						</div>
 
-				        <div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
-				            <button onclick="hideBioInput()" style="padding: 5px 10px; border: none; background-color: #ccc; border-radius: 5px; cursor: pointer;">Hủy</button>
-				            <button onclick="saveBio()" style="padding: 5px 10px; border: none; background-color: #1877f2; color: white; border-radius: 5px; cursor: pointer;">Lưu</button>
-				        </div>
-				    </div>
+					<!-- Hiển thị bio -->
+					<p id="bio-display" th:text="${profile.bio}">Thông tin giới thiệu về bản thân...</p>
 
-			    <!-- Hiển thị bio -->
-			    <p id="bio-display" th:text="${profile.bio}">Thông tin giới thiệu về bản thân...</p>
+					<!-- Hiển thị location -->
+					<div style="margin: 10px 0;">
+						<i class="fas fa-home"></i> 
+						<span th:text="'Sống tại ' + ${profile.location}"></span>
+					</div>
 
-			    <!-- Hiển thị location -->
-			    <div style="margin: 10px 0;">
-			        <i class="fas fa-home"></i> 
-			        <span th:text="'Sống tại ' + ${profile.location}"></span>
-			    </div>
+					<!-- Hiển thị birthdate -->
+					<div style="margin: 10px 0;">
+						<i class="fas fa-birthday-cake"></i> 
+						<span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span>
+					</div>
 
-			    <!-- Hiển thị birthdate -->
-			    <div style="margin: 10px 0;">
-			        <i class="fas fa-birthday-cake"></i> 
-			        <span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span>
-			    </div>
+					<button onclick="openDetailModal()" style="margin-top: 15px; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
+						Chỉnh sửa chi tiết
+					</button>
+					<!-- Modal chỉnh sửa chi tiết -->
+					<div id="detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+						background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; font-family: Arial, sans-serif;">
+						
+						<div style="background: #fff; padding: 24px 28px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-in-out;">
+							
+							<h3 style="margin-bottom: 16px; font-size: 20px; color: #1c1e21;">Chỉnh sửa chi tiết</h3>
+							
+							<form id="detail-form">
+								<label for="location" style="font-weight: 500; color: #333;">Nơi sống:</label>
+								<input type="text" id="location" name="location" style="width: 100%; padding: 10px; margin: 6px 0 16px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
 
-			    <button onclick="openDetailModal()" style="margin-top: 15px; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
-			        Chỉnh sửa chi tiết
-			    </button>
-				<!-- Modal chỉnh sửa chi tiết -->
-				<div id="detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-				    background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; font-family: Arial, sans-serif;">
-				    
-				    <div style="background: #fff; padding: 24px 28px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-in-out;">
-				        
-				        <h3 style="margin-bottom: 16px; font-size: 20px; color: #1c1e21;">Chỉnh sửa chi tiết</h3>
-				        
-				        <form id="detail-form">
-				            <label for="location" style="font-weight: 500; color: #333;">Nơi sống:</label>
-				            <input type="text" id="location" name="location" style="width: 100%; padding: 10px; margin: 6px 0 16px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+								<label for="birthdate" style="font-weight: 500; color: #333;">Ngày sinh:</label>
+								<input type="date" id="birthdate" name="birthdate" style="width: 100%; padding: 10px; margin: 6px 0 20px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
 
-				            <label for="birthdate" style="font-weight: 500; color: #333;">Ngày sinh:</label>
-				            <input type="date" id="birthdate" name="birthdate" style="width: 100%; padding: 10px; margin: 6px 0 20px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
-
-				            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-				                <button type="button" onclick="closeDetailModal()" style="padding: 8px 16px; background: #e4e6eb; border: none; border-radius: 6px; cursor: pointer; color: #050505;">Hủy</button>
-				                <button type="submit" style="padding: 8px 16px; background: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer;">Lưu</button>
-				            </div>
-				        </form>
-				    </div>
+								<div style="display: flex; justify-content: flex-end; gap: 10px;">
+									<button type="button" onclick="closeDetailModal()" style="padding: 8px 16px; background: #e4e6eb; border: none; border-radius: 6px; cursor: pointer; color: #050505;">Hủy</button>
+									<button type="submit" style="padding: 8px 16px; background: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer;">Lưu</button>
+								</div>
+							</form>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div class="info-card">
-			    <h3>Ảnh</h3>
-			    <div class="media-grid">
-			        <div th:each="post : ${mediaPosts}">
-			            <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" class="media-item" />
-			            <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" class="media-item" controls></video>
-			        </div>
-			    </div>
-			</div>
-        </div>
-        <div class="profile-right">
-            <div class="create-post">
-                <div class="create-post-header">
-					<!-- Phần input -->
-                    <img th:src="${user.profilePicture}" class="mini-avatar">
-                    <input type="text" class="post-input" placeholder="Bạn đang nghĩ gì?" onclick="openModal()">
-					
-					<!-- Modal -->
-					<div id="postModal" class="modal">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h2>Tạo bài viết</h2>
-								<span class="close" onclick="closeModal()">&times;</span>
-							</div>
-							<div class="modal-body">
-								<div class="user-info">
-									<div class="user-details" style="display: flex; align-items: center;">
-										<img th:src="${user.profilePicture}" class="mini-avatar"/>
-										<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px;margin-bottom: 12px;font-size: 16px;">Nhat Thao</strong>
-									</div>
-								</div>
-								<textarea placeholder="Bạn đang nghĩ gì?"></textarea>
-								
-								<div id="preview" style="position: relative; margin-top: 10px;">
-									<!-- Preview ảnh/video sẽ nằm ở đây -->
-								</div>
-								<!-- Các icon chức năng -->
-								<div class="post-options">
-									<button onclick="triggerFileInput()">📷</button>
-									<button>🏷️</button>
-									<button>😊</button>
-									<button>📍</button>
-									<button>GIF</button>
-								</div>
-							<!-- input file ẩn đi -->
-								<input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" onchange="previewFile()">
-							</div>
-							<div class="modal-footer">
-								<button class="post-btn" onclick="createPost()">Đăng</button>
-							</div>
+				<div class="info-card">
+					<h3>Ảnh</h3>
+					<div class="media-grid">
+						<div th:each="post : ${mediaPosts}">
+							<img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" class="media-item" />
+							<video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" class="media-item" controls></video>
 						</div>
-					</div>
-					
-                </div>
-				
-                <div class="post-actions">
-                    <button class="post-action-btn">
-                        <i class="fas fa-video" style="color: #F3425F;"></i>
-                        Video trực tiếp
-                    </button>
-                    <button class="post-action-btn">
-                        <i class="fas fa-images" style="color: #45BD62;"></i>
-                        Ảnh/video
-                    </button>
-                    <button class="post-action-btn">
-                        <i class="far fa-smile" style="color: #F7B928;"></i>
-                        Cảm xúc
-                    </button>
-                </div>
-            </div>
-
-			<!-- Modal Chỉnh sửa Bài viết -->
-			<div id="editPostModal" class="modal" style="display: none;">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h2>Chỉnh sửa bài viết</h2>
-						<span class="close" onclick="closeEditPostModal()">&times;</span>
-					</div>
-					<div class="modal-body">
-						<div class="user-info">
-							<div class="user-details" style="display: flex; align-items: center;">
-								<img th:src="${user.profilePicture}" class="mini-avatar" />
-								<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px; margin-bottom: 12px; font-size: 16px;">Tên người dùng</strong>
-							</div>
-						</div>
-
-						<!-- textarea gán nội dung bài viết -->
-						<textarea id="edit-post-content" placeholder="Bạn đang nghĩ gì?" rows="5" style="width: 100%; padding: 10px; margin-top: 10px;"></textarea>
-
-						<!-- Preview ảnh (chưa xử lý image edit trong JS) -->
-						<div id="previewEdit" style="position: relative; margin-top: 10px;">
-							<!-- Preview ảnh/video nếu có -->
-						</div>
-
-						<!-- Các icon -->
-						<div class="post-options">
-							<button onclick="triggerFileInputEdit()">📷</button>
-							<button>🏷️</button>
-							<button>😊</button>
-							<button>📍</button>
-							<button>GIF</button>
-						</div>
-
-						<!-- Input file -->
-						<input type="file" id="fileInputEdit" style="display: none;" accept="image/*,video/*" onchange="previewFileEdit()">
-
-						<!-- Hidden input lưu postId -->
-						<input type="hidden" id="edit-post-id" name="postId" />
-					</div>
-
-					<div class="modal-footer">
-						<form id="editPostForm" style="width: 100%;">
-							<button type="submit" class="post-btn" style="width: 100%;">Lưu chỉnh sửa</button>
-						</form>
 					</div>
 				</div>
 			</div>
-
-			<div class="post" th:each="post : ${posts}">
-				<!-- Phần tiêu đề bài viết -->
-				<div style="display: flex; align-items: center; margin-bottom: 10px;">
-				    <img th:src="${post.user.profilePicture}" class="mini-avatar">
-				    <div style="margin-left: 4px">
-				        <strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
-				        <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
-				    </div>
-
-					<div class="post-options" style="position: relative; margin-left: auto; border: none;">
-						<i class="fas fa-ellipsis-h" style="cursor: pointer; padding: 8px;" 
-						   th:data-post-id="${post.postId}" 
-						   onclick="toggleDropdown(this)"></i>
-					
-						<!-- Dropdown Menu -->
-						<div class="dropdown-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;">
-							<button onclick="openEditPostModalFromDropdown(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">✏️ Chỉnh sửa</button>
-							<button onclick="deletePost(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">🗑️ Xóa</button>
-						</div>
-					</div>
-				</div>
-
-			    <!-- Nội dung -->
-			    <p th:text="${post.content}"></p>
-
-				<div class="media">
-			    <!-- Hình ảnh nếu có -->
-				    <img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media">
-				    
-				    <!-- Video nếu có -->
-				    <video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media"></video>
-				</div>
-
-			    <!-- Thống kê lượt tương tác -->
-				<div style="display: flex; justify-content: flex-end; font-size: 14px; color: #65676B; margin-bottom: 5px;">
-	                <div style="display: flex; gap: 10px;">
-	                    <span class="like-count" th:data-post-id="${post.postId}" th:text="|👍 ${post.likes}|"></span>
-	                    <span class="comment-count" th:data-post-id="${post.postId}" th:text="|💬 ${post.comments}|"></span>
-	                    <span class="share-count" th:data-post-id="${post.postId}" th:text="|🔁 ${post.shares}|"></span>
-	                </div>
-	        	</div>
-
-			    <!-- Các nút tương tác -->
-			    <div style="display: flex; justify-content: space-evenly; padding: 10px 0; border-top: 1px solid #dadde1;">
-			        <button class="btn like-btn" th:data-post-id="${post.postId}" 
-			                th:classappend="${post.isLiked ? 'liked' : ''}"
-			                th:data-liked="${post.isLiked}">
-			            <i class="far fa-thumbs-up like-icon"></i> Thích
-			        </button>
-			        <button class="btn comment-btn" th:data-post-id="${post.postId}">
-			            <i class="far fa-comment"></i> Bình luận
-			        </button>
-			    </div>
-
-			    <!-- Khối bình luận -->
-			    <div class="comment-section" th:data-post-id="${post.postId}" style="margin-top: 10px;">
-			        <!-- Nhập bình luận -->
-			        <div class="comment-input-container" style="display: flex; gap: 10px; margin-bottom: 10px;">
-			            <img th:src="${post.user.profilePicture}" class="mini-avatar">
-			            <input type="text" class="comment-input" th:data-post-id="${post.postId}"
-			                   placeholder="Viết bình luận..." 
-			                   style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc;">
-			            <button class="btn submit-comment" th:data-post-id="${post.postId}">Gửi</button>
-			        </div>
-
-			        <!-- Danh sách bình luận -->
-			        <div class="comments-list" th:data-post-id="${post.postId}">
-		                <!-- Container for initial comments (3 comments) -->
-		                <div class="initial-comments">
-		                    <div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
-		                         th:if="${commentStat.index < 3}"
-		                         style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
-		                        <img th:src="${comment.user.profilePicture}" class="mini-avatar">
-		                        <div class="comment-content" style="flex: 1;">
-		                            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
-										<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
-		                                	<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
-										</a>
-		                                <p th:text="${comment.content}" style="margin: 0;"></p>
-		                            </div>
-									<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
-									    <span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
-										<button class="delete-comment-btn"
-			                                    th:data-comment-id="${comment.interactionId}"
-			                                    style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
-			                                Xóa
-			                            </button>
+			<div class="profile-right">
+				<div class="create-post">
+					<div class="create-post-header">
+						<!-- Phần input -->
+						<img th:src="${user.profilePicture}" class="mini-avatar">
+						<input type="text" class="post-input" placeholder="Bạn đang nghĩ gì?" onclick="openModal()">
+						
+						<!-- Modal -->
+						<div id="postModal" class="modal">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h2>Tạo bài viết</h2>
+									<span class="close" onclick="closeModal()">&times;</span>
+								</div>
+								<div class="modal-body">
+									<div class="user-info">
+										<div class="user-details" style="display: flex; align-items: center;">
+											<img th:src="${user.profilePicture}" class="mini-avatar"/>
+											<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px;margin-bottom: 12px;font-size: 16px;">Nhat Thao</strong>
+										</div>
 									</div>
+									<textarea placeholder="Bạn đang nghĩ gì?"></textarea>
+									
+									<div id="preview" style="position: relative; margin-top: 10px;">
+										<!-- Preview ảnh/video sẽ nằm ở đây -->
+									</div>
+									<!-- Các icon chức năng -->
+									<div class="post-options">
+										<button onclick="triggerFileInput()">📷</button>
+										<button>🏷️</button>
+										<button>😊</button>
+										<button>📍</button>
+										<button>GIF</button>
+									</div>
+								<!-- input file ẩn đi -->
+									<input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" onchange="previewFile()">
+								</div>
+								<div class="modal-footer">
+									<button class="post-btn" onclick="createPost()">Đăng</button>
 								</div>
 							</div>
 						</div>
-						<!-- Container for hidden comments -->
-		                <div class="hidden-comments" style="display: none;">
-		                    <div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
-		                         th:if="${commentStat.index >= 3}"
-		                         style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
-		                        <img th:src="${comment.user.profilePicture}" class="mini-avatar">
-		                        <div class="comment-content" style="flex: 1;">
-		                            <div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
-										<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
-		                                	<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
-										</a>
-		                                <p th:text="${comment.content}" style="margin: 0;"></p>
-		                            </div>
-									<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
-										<span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
-										<button class="delete-comment-btn" 
-			                                    th:data-comment-id="${comment.interactionId}"
-			                                    style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
-			                                Xóa
-			                            </button>
-									</div>
-		                        </div>
-		                    </div>
-		                </div>
-
-		                <!-- Comment control buttons -->
-		                <div class="comment-controls" th:if="${post.commentList.size() > 3}">
-		                    <button class="btn view-more-btn" th:data-post-id="${post.postId}"
-		                            style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left;">
-		                        Xem thêm bình luận...
-		                    </button>
-		                    <button class="btn hide-comments-btn" th:data-post-id="${post.postId}"
-		                            style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left; display: none;">
-		                        Ẩn bớt bình luận
-		                    </button>
-		                </div>
+						
+					</div>
+					
+					<div class="post-actions">
+						<button class="post-action-btn">
+							<i class="fas fa-video" style="color: #F3425F;"></i>
+							Video trực tiếp
+						</button>
+						<button class="post-action-btn">
+							<i class="fas fa-images" style="color: #45BD62;"></i>
+							Ảnh/video
+						</button>
+						<button class="post-action-btn">
+							<i class="far fa-smile" style="color: #F7B928;"></i>
+							Cảm xúc
+						</button>
 					</div>
 				</div>
-        	</div>
-    	</div>
+
+				<!-- Modal Chỉnh sửa Bài viết -->
+				<div id="editPostModal" class="modal" style="display: none;">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h2>Chỉnh sửa bài viết</h2>
+							<span class="close" onclick="closeEditPostModal()">&times;</span>
+						</div>
+						<div class="modal-body">
+							<div class="user-info">
+								<div class="user-details" style="display: flex; align-items: center;">
+									<img th:src="${user.profilePicture}" class="mini-avatar" />
+									<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px; margin-bottom: 12px; font-size: 16px;">Tên người dùng</strong>
+								</div>
+							</div>
+
+							<!-- textarea gán nội dung bài viết -->
+							<textarea id="edit-post-content" placeholder="Bạn đang nghĩ gì?" rows="5" style="width: 100%; padding: 10px; margin-top: 10px;"></textarea>
+
+							<!-- Preview ảnh (chưa xử lý image edit trong JS) -->
+							<div id="previewEdit" style="position: relative; margin-top: 10px;">
+								<!-- Preview ảnh/video nếu có -->
+							</div>
+
+							<!-- Các icon -->
+							<div class="post-options">
+								<button onclick="triggerFileInputEdit()">📷</button>
+								<button>🏷️</button>
+								<button>😊</button>
+								<button>📍</button>
+								<button>GIF</button>
+							</div>
+
+							<!-- Input file -->
+							<input type="file" id="fileInputEdit" style="display: none;" accept="image/*,video/*" onchange="previewFileEdit()">
+
+							<!-- Hidden input lưu postId -->
+							<input type="hidden" id="edit-post-id" name="postId" />
+						</div>
+
+						<div class="modal-footer">
+							<form id="editPostForm" style="width: 100%;">
+								<button type="submit" class="post-btn" style="width: 100%;">Lưu chỉnh sửa</button>
+							</form>
+						</div>
+					</div>
+				</div>
+
+				<div class="post" th:each="post : ${posts}">
+					<!-- Phần tiêu đề bài viết -->
+					<div style="display: flex; align-items: center; margin-bottom: 10px;">
+						<img th:src="${post.user.profilePicture}" class="mini-avatar">
+						<div style="margin-left: 4px">
+							<strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
+							<div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+						</div>
+
+						<div class="post-options" style="position: relative; margin-left: auto; border: none;">
+							<i class="fas fa-ellipsis-h" style="cursor: pointer; padding: 8px;" 
+							th:data-post-id="${post.postId}" 
+							onclick="toggleDropdown(this)"></i>
+						
+							<!-- Dropdown Menu -->
+							<div class="dropdown-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;">
+								<button onclick="openEditPostModalFromDropdown(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">✏️ Chỉnh sửa</button>
+								<button onclick="deletePost(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">🗑️ Xóa</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Nội dung -->
+					<p th:text="${post.content}"></p>
+
+					<div class="media">
+					<!-- Hình ảnh nếu có -->
+						<img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media">
+						
+						<!-- Video nếu có -->
+						<video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media"></video>
+					</div>
+
+					<!-- Thống kê lượt tương tác -->
+					<div style="display: flex; justify-content: flex-end; font-size: 14px; color: #65676B; margin-bottom: 5px;">
+						<div style="display: flex; gap: 10px;">
+							<span class="like-count" th:data-post-id="${post.postId}" th:text="|👍 ${post.likes}|"></span>
+							<span class="comment-count" th:data-post-id="${post.postId}" th:text="|💬 ${post.comments}|"></span>
+							<span class="share-count" th:data-post-id="${post.postId}" th:text="|🔁 ${post.shares}|"></span>
+						</div>
+					</div>
+
+					<!-- Các nút tương tác -->
+					<div style="display: flex; justify-content: space-evenly; padding: 10px 0; border-top: 1px solid #dadde1;">
+						<button class="btn like-btn" th:data-post-id="${post.postId}" 
+								th:classappend="${post.isLiked ? 'liked' : ''}"
+								th:data-liked="${post.isLiked}">
+							<i class="far fa-thumbs-up like-icon"></i> Thích
+						</button>
+						<button class="btn comment-btn" th:data-post-id="${post.postId}">
+							<i class="far fa-comment"></i> Bình luận
+						</button>
+					</div>
+
+					<!-- Khối bình luận -->
+					<div class="comment-section" th:data-post-id="${post.postId}" style="margin-top: 10px;">
+						<!-- Nhập bình luận -->
+						<div class="comment-input-container" style="display: flex; gap: 10px; margin-bottom: 10px;">
+							<img th:src="${post.user.profilePicture}" class="mini-avatar">
+							<input type="text" class="comment-input" th:data-post-id="${post.postId}"
+								placeholder="Viết bình luận..." 
+								style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc;">
+							<button class="btn submit-comment" th:data-post-id="${post.postId}">Gửi</button>
+						</div>
+
+						<!-- Danh sách bình luận -->
+						<div class="comments-list" th:data-post-id="${post.postId}">
+							<!-- Container for initial comments (3 comments) -->
+							<div class="initial-comments">
+								<div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
+									th:if="${commentStat.index < 3}"
+									style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+									<img th:src="${comment.user.profilePicture}" class="mini-avatar">
+									<div class="comment-content" style="flex: 1;">
+										<div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+											<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
+												<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+											</a>
+											<p th:text="${comment.content}" style="margin: 0;"></p>
+										</div>
+										<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+											<span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+											<button class="delete-comment-btn"
+													th:data-comment-id="${comment.interactionId}"
+													style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
+												Xóa
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Container for hidden comments -->
+							<div class="hidden-comments" style="display: none;">
+								<div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
+									th:if="${commentStat.index >= 3}"
+									style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+									<img th:src="${comment.user.profilePicture}" class="mini-avatar">
+									<div class="comment-content" style="flex: 1;">
+										<div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+											<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
+												<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+											</a>
+											<p th:text="${comment.content}" style="margin: 0;"></p>
+										</div>
+										<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+											<span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+											<button class="delete-comment-btn" 
+													th:data-comment-id="${comment.interactionId}"
+													style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
+												Xóa
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Comment control buttons -->
+							<div class="comment-controls" th:if="${post.commentList.size() > 3}">
+								<button class="btn view-more-btn" th:data-post-id="${post.postId}"
+										style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left;">
+									Xem thêm bình luận...
+								</button>
+								<button class="btn hide-comments-btn" th:data-post-id="${post.postId}"
+										style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left; display: none;">
+									Ẩn bớt bình luận
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:if="${activeTab == 'about'}" class="container mt-4">
+	    <h4 class="mb-4 personal-info-title" style="text-align: center;">Thông tin cá nhân</h4>
+	    <ul class="list-unstyled personal-info-list" style="list-style-type: none;">
+	        <li class="personal-info-item">
+	            <strong>Email:</strong> 
+	            <span th:text="${user.email}"></span>
+	        </li>
+	        <li class="personal-info-item">
+	            <strong>Số điện thoại:</strong> 
+	            <span th:text="${user.phone}"></span>
+	        </li>
+	        <li class="personal-info-item">
+	            <strong>Giới tính:</strong> 
+	            <span th:text="${user.gender == 'male' ? 'Nam' : user.gender == 'female' ? 'Nữ' : 'Khác'}"></span>
+	        </li>
+	        <li class="personal-info-item">
+	           <p><strong>Ngày sinh:</strong> <span th:text="${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span></p>
+	        </li>
+	    </ul>
+	</div>
+	<div th:if="${activeTab == 'friends'}">
+		<!-- Danh sách bạn bè -->
+		<div class="row">
+			<div class="col-md-12">
+				<h4 style="text-align: center; margin-bottom: 20px; font-size: 1.75rem;
+				font-weight: 600;
+				padding-bottom: 10px;">Danh sách bạn bè</h4>
+				<div th:if="${friends.size() == 0}" style="text-align: center;">Chưa có bạn bè nào.</div>
+				<div class="friend-list" style="margin: 0 80px">
+					<div th:each="friend : ${friends}" class="friend-card" style="text-align: center;">
+						<a th:href="@{/profile/{id}(id=${friend.user1.userId == user.userId ? friend.user2.userId : friend.user1.userId})}">
+							<img th:src="${friend.user1.userId == user.userId ? friend.user2.profilePicture : friend.user1.profilePicture}" style="display: block; margin: 0 auto;">
+							<div class="friend-name" 
+								 th:text="${friend.user1.userId == user.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}">
+							</div>
+						</a>
+						<a th:href="@{/friends/remove-friend-profile/{id}(id=${friend.friendshipId})}" class="remove-friend-btn mt-2">Hủy</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 <script>

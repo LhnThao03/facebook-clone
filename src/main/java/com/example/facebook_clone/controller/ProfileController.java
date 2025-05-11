@@ -57,44 +57,70 @@ public class ProfileController {
 	@Autowired
 	private FileStorageService fileStorageService;
 	
+	// @GetMapping("{id}")
+    // public String getUserProfile(@PathVariable Integer id, Model model) {
+    //     User user = userService.getUserById(id);
+    //     Profile profile = profileService.getProfileByUserId(id);
+    //     List<PostDTO> posts = postService.getPostsByUserId(id);
+    //     int friendCount = userService.countFriends(user);
+    //     List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
+        
+    //     model.addAttribute("mediaPosts", mediaPosts);
+    //     model.addAttribute("user", user);
+    //     model.addAttribute("profile",profile);
+    //     model.addAttribute("posts", posts);
+    //     model.addAttribute("friendCount", friendCount);
+
+    //     return "profile"; // trỏ tới file profile.html
+    // }
+	
 	@GetMapping("{id}")
-    public String getUserProfile(@PathVariable Integer id, Model model) {
-        User user = userService.getUserById(id);
-        Profile profile = profileService.getProfileByUserId(id);
-        List<PostDTO> posts = postService.getPostsByUserId(id);
+	public String viewProfile(@PathVariable int id,
+	                          @RequestParam(defaultValue = "posts") String tab,
+	                          Model model) {
+	    User user = userService.getUserById(id);
+	    Profile profile = profileService.getProfileByUserId(id);
+	    List<Friend> friends = friendService.getAcceptedFriends(user);
+	    List<PostDTO> posts = postService.getPostsByUserId(id);
         int friendCount = userService.countFriends(user);
         List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
         
         model.addAttribute("mediaPosts", mediaPosts);
         model.addAttribute("user", user);
         model.addAttribute("profile",profile);
-        model.addAttribute("posts", posts);
         model.addAttribute("friendCount", friendCount);
+	    model.addAttribute("activeTab", tab);
 
-        return "profile"; // trỏ tới file profile.html
-    }
+	    if (tab.equals("posts")) {
+	        model.addAttribute("posts", posts);
+	    } else if (tab.equals("friends")) {
+	        model.addAttribute("friends", friends);
+	    }
+
+	    return "profile"; // Tên template
+	}
 	
 	@GetMapping("/view/{id}")
-	public String getUserProfileView(@PathVariable Integer id, Model model, HttpSession session) {
+	public String getUserProfileView(@PathVariable Integer id,@RequestParam(defaultValue = "posts") String tab, Model model, HttpSession session) {
 	    User user = userService.getUserById(id);
 	    Profile profile = profileService.getProfileByUserId(id);
+		List<Friend> friends = friendService.getAcceptedFriends(user);
 	    List<PostDTO> posts = postService.getPostsByUserId(id);
 	    int friendCount = userService.countFriends(user);
 	    List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
 	    User currentUser = (User) session.getAttribute("currentUser");
-
-	    model.addAttribute("currentUser", currentUser);
-	    model.addAttribute("mediaPosts", mediaPosts);
-	    model.addAttribute("user", user);
-	    model.addAttribute("profile", profile);
-	    model.addAttribute("posts", posts);
-	    model.addAttribute("friendCount", friendCount);
-
 	    Optional<Friend> relationOpt = friendService.getFriendRelation(currentUser, user);
 	    String friendshipStatus = "none";
 	    boolean isRequestReceiver = false;
 	    Integer friendshipId = null;
-
+	    
+	    
+	    if (tab.equals("posts")) {
+	        model.addAttribute("posts", posts);
+	    } else if (tab.equals("friends")) {
+	        model.addAttribute("friends", friends);
+	    }
+	    
 	    if (relationOpt.isPresent()) {
 	        Friend relation = relationOpt.get();
 	        friendshipId = relation.getFriendshipId(); // Lấy ID để dùng trong view
@@ -110,10 +136,17 @@ public class ProfileController {
 	            }
 	        }
 	    }
-
+		
 	    model.addAttribute("friendshipStatus", friendshipStatus);
 	    model.addAttribute("isRequestReceiver", isRequestReceiver);
-	    model.addAttribute("friendshipId", friendshipId); // ✅ Đưa vào model
+	    model.addAttribute("friendshipId", friendshipId);
+	    model.addAttribute("activeTab", tab);
+	    model.addAttribute("currentUser", currentUser);
+	    model.addAttribute("mediaPosts", mediaPosts);
+	    model.addAttribute("user", user);
+	    model.addAttribute("profile", profile);
+	    model.addAttribute("posts", posts);
+	    model.addAttribute("friendCount", friendCount);
 
 	    return "profile-view";
 	}

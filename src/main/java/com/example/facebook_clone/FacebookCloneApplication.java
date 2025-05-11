@@ -12,5 +12,4 @@ public class FacebookCloneApplication {
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
 		SpringApplication.run(FacebookCloneApplication.class, args);
 	}
-
 }
