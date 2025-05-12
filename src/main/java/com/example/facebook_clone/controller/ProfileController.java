@@ -57,23 +57,6 @@ public class ProfileController {
 	@Autowired
 	private FileStorageService fileStorageService;
 	
-	// @GetMapping("{id}")
-    // public String getUserProfile(@PathVariable Integer id, Model model) {
-    //     User user = userService.getUserById(id);
-    //     Profile profile = profileService.getProfileByUserId(id);
-    //     List<PostDTO> posts = postService.getPostsByUserId(id);
-    //     int friendCount = userService.countFriends(user);
-    //     List<Post> mediaPosts = postService.getLatestMediaPostsByUserId(id, 9);
-        
-    //     model.addAttribute("mediaPosts", mediaPosts);
-    //     model.addAttribute("user", user);
-    //     model.addAttribute("profile",profile);
-    //     model.addAttribute("posts", posts);
-    //     model.addAttribute("friendCount", friendCount);
-
-    //     return "profile"; // trỏ tới file profile.html
-    // }
-	
 	@GetMapping("{id}")
 	public String viewProfile(@PathVariable int id,
 	                          @RequestParam(defaultValue = "posts") String tab,

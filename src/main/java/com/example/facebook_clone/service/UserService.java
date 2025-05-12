@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.example.facebook_clone.dto.request.UserCreationRequest;
 import com.example.facebook_clone.dto.request.UserUpdateRequest;
 import com.example.facebook_clone.model.Friend;
+import com.example.facebook_clone.model.Friend.FriendshipStatus;
 import com.example.facebook_clone.model.User;
 import com.example.facebook_clone.repository.FriendRepository;
 import com.example.facebook_clone.repository.UserRepository;
@@ -121,9 +122,9 @@ public class UserService {
 	}
 	
 	public int countFriends(User user) {
-        int countAsUser1 = friendRepository.countByUser1(user);
-        int countAsUser2 = friendRepository.countByUser2(user);
-        return countAsUser1 + countAsUser2;
+		int countAsUser1 = friendRepository.countByUser1AndStatus(user, FriendshipStatus.accepted);
+	    int countAsUser2 = friendRepository.countByUser2AndStatus(user, FriendshipStatus.accepted);
+	    return countAsUser1 + countAsUser2;
     }
 	
 	public void updateProfilePicture(User user, String imagePath) {

@@ -301,7 +301,14 @@
 		    margin-left: 10px;
 		    color: green;
 		}
-
+		.post-media{
+			max-width: 600px;
+			max-height: 600px;
+			width: auto;
+		    height: auto;
+		    object-fit: contain; /* Với ảnh/video trong thẻ <img> hoặc <video> */
+		    display: block;
+		}
     </style>
 </head>
 <body>
@@ -344,18 +351,6 @@
         <!-- Feed -->
 		<div class="feed">
 		    <div class="post" th:each="post : ${postsWithInteraction}">
-				
-		        <!--<div style="display: flex; align-items: center; margin-bottom: 10px;">
-					<a th:href="@{'/profile/' + ${post.user.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
-		            	<img th:src="${post.user.profilePicture}" class="mini-avatar">
-					</a>
-		            <div style="margin-left: 4px;">
-		                <a th:href="@{'/profile/view/' + ${post.user.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
-							<strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
-						</a>
-		                <div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
-		            </div>
-		        </div>-->
 				
 				<div style="display: flex; align-items: center; margin-bottom: 10px;">
 				    <a th:href="@{${post.user.userId == currentUser.userId} ? '/profile/' + ${post.user.userId} : '/profile/view/' + ${post.user.userId}}" 
@@ -493,7 +488,7 @@
             <div class="friend-suggestion">
                 <div class="suggestion-header">Bạn bè</div>
                 <div class="friend-item" th:each="friend : ${friends}">
-                    <a th:href="@{/profile/{id}(id=${friend.user1.userId == currentUser.userId ? friend.user2.userId : friend.user1.userId})}" style="display: flex; align-items: center; text-decoration: none; color: inherit; flex: 1;">
+                    <a th:href="@{/profile/view/{id}(id=${friend.user1.userId == currentUser.userId ? friend.user2.userId : friend.user1.userId})}" style="display: flex; align-items: center; text-decoration: none; color: inherit; flex: 1;">
 		                <img th:src="${friend.user1.userId == currentUser.userId ? friend.user2.profilePicture : friend.user1.profilePicture}" style="border-radius: 50%; width: 50px; height: 50px; object-fit: cover; margin-right: 8px;">
 		                <div class="friend-info">
 		                    <div class="friend-name" th:text="${friend.user1.userId == currentUser.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}">
