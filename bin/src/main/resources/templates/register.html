@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng ký Facebook</title>
+	<link rel="stylesheet" th:href="@{/main.css}">
+    <style>
+        .register-container {
+            max-width: 432px;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .name-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .gender-option {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        .btn-success {
+            background-color: #42b72a;
+            border: none;
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .btn-success:hover {
+            background-color: #36a420;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: -8px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Đăng ký</h1>
+            <p>Nhanh chóng và dễ dàng.</p>
+        </div>
+		
+        <form th:action="@{/register}" method="post" onsubmit="return validatePasswords()">
+            <div class="name-inputs">
+                <input type="text" class="form-control" name="lastname" placeholder="Họ" required>
+                <input type="text" class="form-control" name="firstname" placeholder="Tên" required>
+            </div>
+            <input type="email" class="form-control" name="email" placeholder="Email" required>
+            <input type="password" class="form-control" name="password" placeholder="Mật khẩu mới" id="password" required pattern="(?=.*[A-Z]).{6,}" title="Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ cái viết hoa">
+            <input type="password" class="form-control" name="confirmPassword" placeholder="Nhập lại mật khẩu" id="confirmPassword" required>
+            <div id="passwordError" class="error-message" style="display: none;">Mật khẩu không khớp.</div>
+
+            <input type="text" class="form-control" name="phone" placeholder="Số điện thoại" pattern="^[0-9]{9,11}$" title="Số điện thoại phải từ 9 đến 11 chữ số">
+
+            <div>
+				<label>Ngày sinh</label>
+				<div style="display: flex; gap: 10px;">
+				    <select class="form-control" name="birthDay" required>
+				        <option value="">Ngày</option>
+				        <th:block th:each="d : ${#numbers.sequence(1,31)}">
+				            <option th:value="${d}" th:text="${d}"></option>
+				        </th:block>
+				    </select>
+				    <select class="form-control" name="birthMonth" required>
+				        <option value="">Tháng</option>
+				        <th:block th:each="m : ${#numbers.sequence(1,12)}">
+				            <option th:value="${m}" th:text="${m}"></option>
+				        </th:block>
+				    </select>
+				    <select class="form-control" name="birthYear" required>
+				        <option value="">Năm</option>
+				        <th:block th:each="y : ${#numbers.sequence(1950, 2024)}">
+				            <option th:value="${y}" th:text="${y}"></option>
+				        </th:block>
+				    </select>
+				</div>
+            </div>
+			<div th:if="${error}" style="color: red; margin-bottom: 10px;" th:text="${error}"></div>
+            <div>
+                <label>Giới tính</label>
+                <div class="gender-options">
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="female" required> Nữ
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="male"> Nam
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="other"> Tùy chỉnh
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Đăng ký
+            </button>
+        </form>
+    </div>
+
+    <script>
+        function validatePasswords() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const errorMessage = document.getElementById("passwordError");
+
+            if (password !== confirmPassword) {
+                errorMessage.style.display = "block";
+                return false;
+            } else {
+                errorMessage.style.display = "none";
+                return true;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa thông tin người dùng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <style>
+        .edit-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .edit-header h2 {
+            margin-bottom: 5px;
+        }
+
+        .edit-header p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+        }
+
+        .name-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .birth-date-selects {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="edit-container">
+    <div class="edit-header text-center">
+        <h2>Sửa thông tin người dùng</h2>
+        <p>Bạn có thể chỉnh sửa các thông tin cá nhân tại đây.</p>
+    </div>
+
+    <form th:action="@{'/users/edit/' + ${user.userId}}" method="post">
+
+        <label>Họ và tên</label>
+        <div class="name-inputs">
+            <input type="text" id="lastname" name="lastname" class="form-control" th:value="${user.lastname}" placeholder="Họ" required>
+            <input type="text" id="firstname" name="firstname" class="form-control" th:value="${user.firstname}" placeholder="Tên" required>
+        </div>
+
+        <label for="phone">Số điện thoại</label>
+        <input type="text" id="phone" name="phone" class="form-control" th:value="${user.phone}">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" class="form-control" th:value="${user.email}" required>
+
+        <label>Ngày sinh</label>
+        <!-- <div class="birth-date-selects">
+            <select name="day" class="form-control" required>
+                <option value="">Ngày</option>
+                <th:block th:each="d : ${#numbers.sequence(1,31)}">
+                    <option th:value="${d}" th:text="${d}" th:selected="${user.dayOfBirth == d}"></option>
+                </th:block>
+            </select>
+            <select name="month" class="form-control" required>
+                <option value="">Tháng</option>
+                <th:block th:each="m : ${#numbers.sequence(1,12)}">
+                    <option th:value="${m}" th:text="${m}" th:selected="${user.monthOfBirth == m}"></option>
+                </th:block>
+            </select>
+            <select name="year" class="form-control" required>
+                <option value="">Năm</option>
+                <th:block th:each="y : ${#numbers.sequence(1950, 2025)}">
+                    <option th:value="${y}" th:text="${y}" th:selected="${user.yearOfBirth == y}"></option>
+                </th:block>
+            </select>
+        </div> -->
+		
+		<div class="birth-date-selects">
+		    <select name="day" class="form-control" required>
+		        <option value="">Ngày</option>
+		        <th:block th:each="d : ${#numbers.sequence(1,31)}">
+		            <option th:value="${d}" th:text="${d}"></option>
+		        </th:block>
+		    </select>
+		    <select name="month" class="form-control" required>
+		        <option value="">Tháng</option>
+		        <th:block th:each="m : ${#numbers.sequence(1,12)}">
+		            <option th:value="${m}" th:text="${m}"></option>
+		        </th:block>
+		    </select>
+		    <select name="year" class="form-control" required>
+		        <option value="">Năm</option>
+		        <th:block th:each="y : ${#numbers.sequence(1950, 2025)}">
+		            <option th:value="${y}" th:text="${y}"></option>
+		        </th:block>
+		    </select>
+		</div>
+
+        <label>Giới tính</label>
+        <div class="gender-options">
+            <label>
+                <input type="radio" name="gender" value="female" th:checked="${user.gender == 'female'}"> Nữ
+            </label>
+            <label>
+                <input type="radio" name="gender" value="male" th:checked="${user.gender == 'male'}"> Nam
+            </label>
+            <label>
+                <input type="radio" name="gender" value="other" th:checked="${user.gender == 'other'}"> Tùy chỉnh
+            </label>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success">Cập nhật</button>
+            <a th:href="@{/admin?section=users}" class="btn btn-secondary">Quay lại</a>
+        </div>
+
+    </form>
+</div>
+
+</body>
+</html>

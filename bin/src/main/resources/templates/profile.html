@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang cá nhân | Facebook</title>
+	<link rel="stylesheet" th:href="@{/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-header {
+            background: white;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+		.photo {
+            position: relative;
+            height: 350px;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+			margin-top: 60px;
+        }
+
+        /* Bọc ảnh bìa trong wrapper để dễ canh giữa và giới hạn chiều rộng */
+		.cover-wrapper {
+		    position: relative;
+		    width: 80%;
+		    margin: 0 auto;
+		    height: 350px;
+		    overflow: hidden;
+		    border-radius: 8px;
+		}
+
+		.cover-photo {
+		    width: 100%;
+		    height: 100%;
+		    object-fit: cover;
+		    display: block;
+		    transition: 0.3s ease;
+		}
+
+        /* Avatar */
+        .profile-photo {
+            width: 168px;
+            height: 168px;
+            border-radius: 50%;
+            border: 4px solid white;
+            position: absolute;
+            bottom: -84px;
+            left: 50%;
+            transform: translateX(-50%);
+            object-fit: cover;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+			z-index: 2;
+        }
+		
+		.avatar-dropdown {
+	        position: absolute;
+	        top: calc(100% + 90px); /* 10px cách dưới avatar */
+	        left: 50%;
+			transform: translateX(-50%);
+	        background-color: #fff;
+	        border: 1px solid #ccc;
+	        border-radius: 8px;
+	        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+	        display: none;
+	        flex-direction: column;
+	        z-index: 15;
+	    }
+			
+		.avatar-dropdown .dropdown-item {
+	        padding: 10px 15px;
+	        cursor: pointer;
+	        font-size: 14px;
+	        transition: background 0.2s;
+	    }
+		
+		.avatar-dropdown .dropdown-item:hover {
+	        background-color: #f0f0f0;
+	    }
+		
+		#avatarInput {
+	        display: none;
+	    }
+
+		
+		.cover-overlay {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: rgba(0, 0, 0, 0);
+		    transition: background 0.3s ease;
+		    pointer-events: none;
+		    z-index: 1;
+		}
+		
+		.cover-wrapper:hover .cover-overlay {
+		    background: rgba(0, 0, 0, 0.2); /* Lớp phủ đậm khi hover */
+		}
+		
+		.cover-actions {
+			position: absolute;
+		    bottom: 16px;
+		    right: 16px;
+		    z-index: 2;
+		}
+
+		.cover-btn {
+			background: white;
+		    border: none;
+		    border-radius: 6px;
+		    padding: 8px 12px;
+		    font-weight: 600;
+		    cursor: pointer;
+		    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    transition: background 0.2s;
+		}
+
+		.cover-btn:hover {
+		    background: #f0f0f0;
+		}
+
+		.cover-dropdown {
+			display: none;
+		    position: absolute;
+		    bottom: 100%;
+		    right: 0;
+		    margin-bottom: 8px;
+		    background: white;
+		    border-radius: 6px;
+		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		    overflow: hidden;
+		    z-index: 3;
+		}
+
+		.cover-actions.show .cover-dropdown {
+		    display: block;
+		}
+
+		.dropdown-item {
+		    padding: 10px 16px;
+		    cursor: pointer;
+		    white-space: nowrap;
+		}
+
+		.dropdown-item:hover {
+		    background: #f0f0f0;
+		}
+		
+		.save-cancel-bar {
+		    position: absolute;
+		    top: 15px;
+		    right: 20px;
+		    display: flex;
+		    gap: 10px;
+		    z-index: 2;
+		}
+
+		.save-btn, .cancel-btn {
+		    padding: 8px 14px;
+		    border: none;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    font-weight: bold;
+		}
+
+		.save-btn {
+		    background-color: #1877f2;
+		    color: white;
+		}
+
+		.cancel-btn {
+		    background-color: #e4e6eb;
+		}
+
+        .profile-nav {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            border-top: 1px solid #dadde1;
+        }
+
+        .profile-nav-item {
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .profile-nav-item:hover {
+            background: var(--bg-gray);
+        }
+
+        .profile-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .profile-content {
+            display: flex;
+            max-width: 1000px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        .profile-left {
+            width: 360px;
+        }
+
+        .profile-right {
+            flex: 1;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .create-post {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .create-post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #dadde1;
+        }
+		
+		.post{
+			background: white;
+		    border-radius: 8px;
+		    padding: 16px;
+		    margin-bottom: 20px;
+		    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+		}
+
+        .post-input {
+            flex: 1;
+            background: var(--bg-gray);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 12px;
+        }
+
+        .post-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #65676B;
+            font-weight: 600;
+        }
+
+        .post-action-btn:hover {
+            background: var(--bg-gray);
+        }
+
+        .post-action-btn i {
+            font-size: 20px;
+        }
+		@keyframes fadeIn {
+			from { opacity: 0; transform: scale(0.95); }
+			to { opacity: 1; transform: scale(1); }
+		}
+		
+		/*Model*/
+		.modal {
+		  display: none;
+		  position: fixed;
+		  z-index: 9999;
+		  left: 0;
+		  top: 0;
+		  width: 100%;
+		  height: 100%;
+		  backdrop-filter: blur(3px);
+		  background-color: rgba(0, 0, 0, 0.6);
+		  justify-content: center;
+		  align-items: center;
+		}
+
+		.modal-content {
+		  background-color: #242526;
+		  color: white;
+		  border-radius: 10px;
+		  width: 500px;
+		  padding: 20px;
+		  position: relative;
+		}
+
+		.close {
+		  position: absolute;
+		  right: 15px;
+		  top: 15px;
+		  font-size: 24px;
+		  cursor: pointer;
+		}
+
+		textarea {
+		  width: 100%;
+		  height: 100px;
+		  background: transparent;
+		  border: none;
+		  color: white;
+		  font-size: 20px;
+		  resize: none;
+		  outline: none;
+		  margin-top: 10px;
+		}
+
+		.post-options {
+		  display: flex;
+		  gap: 12px;
+		  margin: 12px 0;
+		  justify-content: space-around;
+		  border: 1px solid;
+		  border-top-left-radius: 8px;
+		  border-top-right-radius: 8px;
+		  border-bottom-left-radius: 8px;
+		  border-bottom-right-radius: 8px;
+		}
+
+		.post-options button {
+		  font-size: 22px; /* Icon to hơn */
+		  background: none;
+		  border: none;
+		  cursor: pointer;
+		  padding: 8px;
+		  border-radius: 8px;
+		  transition: background-color 0.3s;
+		}
+
+		.post-options button:hover {
+		  background-color: #f0f0f0; /* Hover nhẹ nhàng */
+		}
+
+		.post-btn {
+		  background-color: #3a3b3c;
+		  border: none;
+		  color: white;
+		  padding: 10px;
+		  width: 100%;
+		  border-radius: 8px;
+		  cursor: pointer;
+		}
+		
+		.mini-avatar{
+			width: 40px; 
+			height: 40px; 
+			object-fit: cover; 
+			border-radius: 50%;
+		}
+		
+		#cancelBtn {
+		    position: absolute;
+		    top: 5px;
+		    right: 5px;
+		    background: rgba(0, 0, 0, 0.5);
+		    border: none;
+		    color: white;
+		    font-size: 18px;
+		    border-radius: 50%;
+		    width: 30px;
+		    height: 30px;
+		    cursor: pointer;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		  }
+
+		  #cancelBtn:hover {
+		    background: rgba(255, 0, 0, 0.7);
+		  }
+		  
+		  
+		  .btn-primary {
+	          background-color: #1877f2;
+	          color: white;
+	          padding: 8px 16px;
+	          border-radius: 6px;
+	          border: none;
+	          font-weight: 600;
+	      }
+	
+	      .btn-primary:hover {
+	          background-color: #166fe5;
+	      }
+	
+	      .cancel-share {
+	          background-color: #e4e6eb;
+	          color: #050505;
+	          padding: 8px 16px;
+	          border-radius: 6px;
+	          border: none;
+	          font-weight: 600;
+	      }
+	
+	      .cancel-share:hover {
+	          background-color: #d8dadf;
+	      }
+	
+	      @keyframes fadeIn {
+	          from { opacity: 0; }
+	          to { opacity: 1; }
+	      }
+	
+	      @keyframes slideIn {
+	          from {
+	              opacity: 0;
+	              transform: translateY(-20px);
+	          }
+	          to {
+	              opacity: 1;
+	              transform: translateY(0);
+	          }
+	      }
+	
+	      .comment-input {
+	          background: #f0f2f5;
+	          border: none;
+	          outline: none;
+	      }
+	
+	      .comment-input:focus {
+	          background: white;
+	          border: 1px solid #1877f2;
+	      }
+	
+	      .comment-item {
+	          animation: fadeIn 0.3s ease-in-out;
+	      }
+	
+	      .comment-bubble {
+	          position: relative;
+	          word-wrap: break-word;
+	      }
+	
+	      .comment-bubble strong {
+	          display: block;
+	          margin-bottom: 2px;
+	          font-size: 13px;
+	      }
+	
+	      .comment-bubble p {
+	          font-size: 14px;
+	      }
+	
+	      .mini-avatar {
+	          width: 32px;
+	          height: 32px;
+	          border-radius: 50%;
+	          object-fit: cover;
+	      }
+	
+	      .view-more-btn,
+	      .hide-comments-btn {
+	          background: none;
+	          border: none;
+	          cursor: pointer;
+	          font-size: 14px;
+	          transition: background-color 0.2s;
+	          width: 100%;
+	      }
+	
+	      .view-more-btn:hover,
+	      .hide-comments-btn:hover {
+	          background-color: #f0f2f5;
+	          border-radius: 4px;
+	      }
+	
+	      .comment-controls {
+	          margin-top: 8px;
+	      }
+	
+	      .like-btn {
+	          display: flex;
+	          align-items: center;
+	          gap: 4px;
+	          transition: all 0.2s ease;
+	      }
+	
+	      .like-btn .like-icon {
+	          transition: transform 0.2s ease;
+	      }
+	
+	      .like-btn:hover .like-icon {
+	          transform: scale(1.2);
+	      }
+	
+	      .like-btn.liked {
+	          color: #1877f2;
+	      }
+	
+	      .like-btn.liked .like-icon {
+	          font-weight: 900; /* Solid icon when liked */
+	      }
+	
+	      @keyframes likeAnimation {
+	          0% { transform: scale(1); }
+	          50% { transform: scale(1.4); }
+	          100% { transform: scale(1); }
+	      }
+	
+	      .like-btn.animating .like-icon {
+	          animation: likeAnimation 0.4s ease;
+	      }
+		  .navbar { background: white; padding: 8px 16px; position: fixed; width: 100%; top: 0; z-index: 100; }
+	      .navbar-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+		  .media-grid {
+		      display: grid;
+		      grid-template-columns: repeat(3, 1fr); /* 3 cột */
+		      grid-template-rows: repeat(3, 1fr);    /* 3 hàng */
+		      gap: 5px;
+		      aspect-ratio: 1 / 1; /* giữ khung hình vuông tổng thể nếu cần */
+		      max-width: 100%;
+		  }
+
+		  .media-grid > div {
+		      width: 100%;
+		      aspect-ratio: 1 / 1;
+		      overflow: hidden;
+		      position: relative;
+		  }
+
+		  .media-item {
+		      width: 100%;
+		      height: 100%;
+		      object-fit: cover;
+		      display: block;
+		  }
+
+
+
+
+
+
+
+		  .profile-nav-item {
+				display: inline-block;
+				padding: 10px 20px;
+				cursor: pointer;
+				color: #555;
+				text-decoration: none;
+			}
+			.profile-nav-item.active {
+				border-bottom: 2px solid #1877f2;
+				font-weight: bold;
+				color: #1877f2;
+			}
+	
+			.friend-list {
+	            display: grid;
+	            grid-template-columns: repeat(5, 1fr);
+	            gap: 10px;
+	        }
+			.friend-card {
+	            width: 100%;
+	            height: 260px;
+	            margin-bottom: 15px;
+	            display: flex;
+	            flex-direction: column;
+	            justify-content: center;
+	            align-items: center;
+	            border: 1px solid #ddd;
+	            border-radius: 8px;
+	            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				justify-content: space-around;
+	        }
+	        .friend-card img {
+	            width: 80px;
+	            height: 80px;
+	            object-fit: cover;
+	            border-radius: 50%;
+	        }
+	        .friend-card a {
+	            text-decoration: none;
+	            color: #000;
+	        }
+			.remove-friend-btn {
+			    display: block;
+			    width: 70%; /* Chiều ngang bằng ảnh nếu ảnh chiếm 100% của khung */
+			    background-color: #dc3545; /* Màu nền mặc định */
+			    color: white;
+			    text-align: center;
+			    padding: 6px 0;
+			    font-size: 14px;
+			    border: none;
+			    border-radius: 5px;
+			    text-decoration: none;
+			    transition: background-color 0.3s ease;
+			}
+	
+			.remove-friend-btn:hover {
+			    background-color: #bb2d3b; /* Màu đỏ đậm khi hover */
+			    color: white;
+			}
+			.personal-info-title {
+			    font-size: 1.75rem;
+			    font-weight: 600;
+			    padding-bottom: 10px;
+			    margin-bottom: 20px;
+			}
+	
+			.personal-info-list {
+			    background-color: #f9f9f9;
+			    border-radius: 8px;
+			    padding: 20px;
+			    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+	
+			.personal-info-item {
+			    font-size: 1.1rem;
+			    margin-bottom: 15px;
+			}
+	
+			.personal-info-item strong {
+			    color: #333;
+			    font-weight: 500;
+			}
+	
+			.personal-info-item span {
+			    color: #555;
+			}
+	
+			.personal-info-item span[th:text="Chưa cập nhật"] {
+			    color: #f44336; /* Màu đỏ cho phần chưa cập nhật */
+			    font-weight: 600;
+			}
+	
+			.personal-info-list li:last-child {
+			    margin-bottom: 0;
+			}
+	
+			@media (max-width: 768px) {
+			    .personal-info-title {
+			        font-size: 1.5rem;
+			    }
+	
+			    .personal-info-list {
+			        padding: 15px;
+			    }
+			}
+			.post-media{
+				max-width: 600px;
+				max-height: 600px;
+				width: auto;
+			    height: auto;
+			    object-fit: contain; /* Với ảnh/video trong thẻ <img> hoặc <video> */
+			    display: block;
+			}
+    </style>
+</head>
+<body>
+	<nav class="navbar">
+        <div class="navbar-content">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="/home"><img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" style="width: 40px;"></a>
+                <div style="position: relative;">
+				    <input type="text" id="search-input" placeholder="Tìm kiếm trên Facebook"
+				           style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5; width: 250px;">
+				    <div id="search-results" style="position: absolute; top: 40px; left: 0; width: 100%; background: white;
+				         border: 1px solid #ccc; border-radius: 5px; display: none; max-height: 300px; overflow-y: auto; z-index: 9999;">
+				    </div>
+				</div>
+            </div>
+			<div style="display: flex; gap: 20px; align-items: center;">
+			    <a href="#">
+			        <i class="fas fa-user" style="cursor: pointer; color: black; font-size: 20px;"></i>
+			    </a>
+			    <i class="fas fa-comment" style="font-size: 20px;"></i>
+			    <i class="fas fa-bell" style="font-size: 20px;"></i>
+			    <a href="/login" style="cursor:pointer; color:black">
+			        <i class="fas fa-sign-out-alt" style="font-size: 20px;"></i>
+			    </a>
+			</div>
+        </div>
+    </nav>
+    <div class="profile-header">
+		<div class="photo">
+		    <div class="cover-wrapper">
+		        <img th:src="${profile.coverPicture}" class="cover-photo" id="coverPhoto">
+		        <div class="cover-overlay"></div>
+
+				<div class="cover-actions" style="display: flex; gap: 10px;">
+				    <!-- Nút chỉnh sửa ảnh bìa -->
+				    <div style="position: relative;">
+				        <button class="cover-btn">
+				            <i class="fas fa-camera"></i> Chỉnh sửa ảnh bìa
+				        </button>
+				        <div class="cover-dropdown">
+				            <div class="dropdown-item">Xem ảnh bìa</div>
+				            <div class="dropdown-item" onclick="triggerUpload()">Tải ảnh lên</div>
+				        </div>
+				    </div>
+
+				    <!-- Nút chỉnh sửa trang cá nhân -->
+				    <button class="cover-btn" onclick="openEditProfileModal()">
+				        <i class="fas fa-user-edit"></i> Chỉnh sửa trang cá nhân
+				    </button>
+				</div>
+				
+				
+				<div id="editProfileModal" class="modal" style="display: none;">
+				    <div class="modal-content" style="max-width: 500px;">
+				        <div class="register-header">
+				            <h1>Chỉnh sửa thông tin</h1>
+				            <p>Bạn có thể cập nhật thông tin cá nhân tại đây.</p>
+				        </div>
+
+				        <form id="editProfileForm" onsubmit="submitEditProfile(event)">
+				            <div class="name-inputs" style="display: flex; gap: 10px;">
+				                <input type="text" class="form-control" id="editLastname" name="lastname"
+				                       placeholder="Họ" th:value="${user.lastname}" required>
+				                <input type="text" class="form-control" id="editFirstname" name="firstname"
+				                       placeholder="Tên" th:value="${user.firstname}" required>
+				            </div>
+
+				            <input type="email" class="form-control" id="editEmail" name="email"
+				                   placeholder="Email" th:value="${user.email}" required>
+
+				            <input type="text" class="form-control" id="editPhone" name="phone"
+				                   placeholder="Số điện thoại" th:value="${user.phone}">
+
+				            <input type="password" class="form-control" id="editPassword" name="password"
+				                   placeholder="Mật khẩu mới (bỏ qua nếu không đổi)">
+
+				            <div>
+				                <label style="margin: 10px 0 5px;">Giới tính</label>
+								<div class="gender-options" style="display: flex; gap: 15px;">
+								    <label class="gender-option">
+								        <input type="radio" name="gender" value="female"
+								               th:checked="${user.gender.name() == 'female'}"> Nữ
+								    </label>
+								    <label class="gender-option">
+								        <input type="radio" name="gender" value="male"
+								               th:checked="${user.gender.name() == 'male'}"> Nam
+								    </label>
+								    <label class="gender-option">
+								        <input type="radio" name="gender" value="other"
+								               th:checked="${user.gender.name() == 'other'}"> Tùy chỉnh
+								    </label>
+								</div>
+				            </div>
+
+				            <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+				                <button type="submit" class="btn btn-success">Lưu</button>
+				                <button type="button" onclick="closeEditProfileModal()" class="btn btn-secondary">Hủy</button>
+				            </div>
+				        </form>
+				    </div>
+				</div>
+
+
+		        <div class="save-cancel-bar" id="saveCancelBar" style="display: none;">
+		            <button onclick="saveCover()" class="save-btn">Lưu</button>
+		            <button onclick="cancelCover()" class="cancel-btn">Hủy</button>
+		        </div>
+
+		        <input type="file" id="coverInput" style="display: none;" accept="image/*" onchange="previewCover(this)">
+		    </div>
+
+			<!-- Ảnh đại diện -->
+			    <img th:src="${user.profilePicture}" class="profile-photo" onclick="toggleAvatarDropdown()">
+
+			    <!-- Dropdown khi click vào avatar -->
+			    <div class="avatar-dropdown" id="avatarDropdown">
+			        <div class="dropdown-item" onclick="viewAvatar()">Xem ảnh</div>
+			        <div class="dropdown-item" onclick="document.getElementById('avatarInput').click()">Cập nhật ảnh đại diện</div>
+			    </div>
+
+			    <!-- Form upload ảnh -->
+			    <form id="upload-avatar-form" method="post" enctype="multipart/form-data" action="/profile/upload-avatar">
+			        <input type="file" id="avatarInput" name="avatarImage" accept="image/*" onchange="document.getElementById('upload-avatar-form').submit()">
+			    </form>
+		</div>
+        <div class="profile-info">
+			<h1 th:text="${user.firstname + ' ' + user.lastname}" style="margin: 80px 0 0 0"></h1>
+			<p th:text="${friendCount} + ' bạn bè'"></p>
+        </div>
+		<!-- Thanh điều hướng -->
+		<div class="profile-nav">
+		    <a th:href="@{'/profile/' + ${profile.user.userId} + '?tab=posts'}" 
+		       th:classappend="${activeTab == 'posts'} ? ' active' : ''" 
+		       class="profile-nav-item">Bài viết</a>
+		    <a th:href="@{'/profile/' + ${profile.user.userId} + '?tab=about'}" 
+		       th:classappend="${activeTab == 'about'} ? ' active' : ''" 
+		       class="profile-nav-item">Giới thiệu</a>
+		    <a th:href="@{'/profile/' + ${profile.user.userId} + '?tab=friends'}" 
+		       th:classappend="${activeTab == 'friends'} ? ' active' : ''" 
+		       class="profile-nav-item">Bạn bè</a>
+		</div>
+    </div>
+	<div th:if="${activeTab == 'posts'}">
+		<div class="profile-content">
+			<div class="profile-left">
+				<div class="info-card">
+					<h3>Giới thiệu</h3>
+					<!-- Nút thêm tiểu sử -->
+						<button id="add-bio-btn" onclick="showBioInput()"
+							style="margin: 5px 0; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
+							Thêm tiểu sử
+						</button>
+
+						<!-- Ô input và các nút điều khiển -->
+						<div id="bio-input-section" style="display: none; margin-top: 10px;">
+							<input type="text" id="bio-input" placeholder="Nhập tiểu sử..." style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+
+							<div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
+								<button onclick="hideBioInput()" style="padding: 5px 10px; border: none; background-color: #ccc; border-radius: 5px; cursor: pointer;">Hủy</button>
+								<button onclick="saveBio()" style="padding: 5px 10px; border: none; background-color: #1877f2; color: white; border-radius: 5px; cursor: pointer;">Lưu</button>
+							</div>
+						</div>
+
+					<!-- Hiển thị bio -->
+					<p id="bio-display" th:text="${profile.bio}">Thông tin giới thiệu về bản thân...</p>
+
+					<!-- Hiển thị location -->
+					<div style="margin: 10px 0;">
+						<i class="fas fa-home"></i> 
+						<span th:text="'Sống tại ' + ${profile.location}"></span>
+					</div>
+
+					<!-- Hiển thị birthdate -->
+					<div style="margin: 10px 0;">
+						<i class="fas fa-birthday-cake"></i> 
+						<span th:text="'Sinh ngày: ' + ${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span>
+					</div>
+
+					<button onclick="openDetailModal()" style="margin-top: 15px; padding: 5px 10px; background-color: #e4e6eb; border: none; border-radius: 5px; cursor: pointer; width: 100%">
+						Chỉnh sửa chi tiết
+					</button>
+					<!-- Modal chỉnh sửa chi tiết -->
+					<div id="detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+						background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; font-family: Arial, sans-serif;">
+						
+						<div style="background: #fff; padding: 24px 28px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-in-out;">
+							
+							<h3 style="margin-bottom: 16px; font-size: 20px; color: #1c1e21;">Chỉnh sửa chi tiết</h3>
+							
+							<form id="detail-form">
+								<label for="location" style="font-weight: 500; color: #333;">Nơi sống:</label>
+								<input type="text" id="location" name="location" style="width: 100%; padding: 10px; margin: 6px 0 16px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+
+								<label for="birthdate" style="font-weight: 500; color: #333;">Ngày sinh:</label>
+								<input type="date" id="birthdate" name="birthdate" style="width: 100%; padding: 10px; margin: 6px 0 20px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+
+								<div style="display: flex; justify-content: flex-end; gap: 10px;">
+									<button type="button" onclick="closeDetailModal()" style="padding: 8px 16px; background: #e4e6eb; border: none; border-radius: 6px; cursor: pointer; color: #050505;">Hủy</button>
+									<button type="submit" style="padding: 8px 16px; background: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer;">Lưu</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="info-card">
+					<h3>Ảnh</h3>
+					<div class="media-grid">
+						<div th:each="post : ${mediaPosts}">
+							<img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" class="media-item" />
+							<video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" class="media-item" controls></video>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="profile-right">
+				<div class="create-post">
+					<div class="create-post-header">
+						<!-- Phần input -->
+						<img th:src="${user.profilePicture}" class="mini-avatar">
+						<input type="text" class="post-input" placeholder="Bạn đang nghĩ gì?" onclick="openModal()">
+						
+						<!-- Modal -->
+						<div id="postModal" class="modal">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h2>Tạo bài viết</h2>
+									<span class="close" onclick="closeModal()">&times;</span>
+								</div>
+								<div class="modal-body">
+									<div class="user-info">
+										<div class="user-details" style="display: flex; align-items: center;">
+											<img th:src="${user.profilePicture}" class="mini-avatar"/>
+											<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px;margin-bottom: 12px;font-size: 16px;">Nhat Thao</strong>
+										</div>
+									</div>
+									<textarea placeholder="Bạn đang nghĩ gì?"></textarea>
+									
+									<div id="preview" style="position: relative; margin-top: 10px;">
+										<!-- Preview ảnh/video sẽ nằm ở đây -->
+									</div>
+									<!-- Các icon chức năng -->
+									<div class="post-options">
+										<button onclick="triggerFileInput()">📷</button>
+										<button>🏷️</button>
+										<button>😊</button>
+										<button>📍</button>
+										<button>GIF</button>
+									</div>
+								<!-- input file ẩn đi -->
+									<input type="file" id="fileInput" style="display: none;" accept="image/*,video/*" onchange="previewFile()">
+								</div>
+								<div class="modal-footer">
+									<button class="post-btn" onclick="createPost()">Đăng</button>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					
+					<div class="post-actions">
+						<button class="post-action-btn">
+							<i class="fas fa-video" style="color: #F3425F;"></i>
+							Video trực tiếp
+						</button>
+						<button class="post-action-btn">
+							<i class="fas fa-images" style="color: #45BD62;"></i>
+							Ảnh/video
+						</button>
+						<button class="post-action-btn">
+							<i class="far fa-smile" style="color: #F7B928;"></i>
+							Cảm xúc
+						</button>
+					</div>
+				</div>
+
+				<!-- Modal Chỉnh sửa Bài viết -->
+				<div id="editPostModal" class="modal" style="display: none;">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h2>Chỉnh sửa bài viết</h2>
+							<span class="close" onclick="closeEditPostModal()">&times;</span>
+						</div>
+						<div class="modal-body">
+							<div class="user-info">
+								<div class="user-details" style="display: flex; align-items: center;">
+									<img th:src="${user.profilePicture}" class="mini-avatar" />
+									<strong th:text="${user.firstname + ' ' + user.lastname}" style="margin-left: 10px; margin-bottom: 12px; font-size: 16px;">Tên người dùng</strong>
+								</div>
+							</div>
+
+							<!-- textarea gán nội dung bài viết -->
+							<textarea id="edit-post-content" placeholder="Bạn đang nghĩ gì?" rows="5" style="width: 100%; padding: 10px; margin-top: 10px;"></textarea>
+
+							<!-- Preview ảnh (chưa xử lý image edit trong JS) -->
+							<div id="previewEdit" style="position: relative; margin-top: 10px;">
+								<!-- Preview ảnh/video nếu có -->
+							</div>
+
+							<!-- Các icon -->
+							<div class="post-options">
+								<button onclick="triggerFileInputEdit()">📷</button>
+								<button>🏷️</button>
+								<button>😊</button>
+								<button>📍</button>
+								<button>GIF</button>
+							</div>
+
+							<!-- Input file -->
+							<input type="file" id="fileInputEdit" style="display: none;" accept="image/*,video/*" onchange="previewFileEdit()">
+
+							<!-- Hidden input lưu postId -->
+							<input type="hidden" id="edit-post-id" name="postId" />
+						</div>
+
+						<div class="modal-footer">
+							<form id="editPostForm" style="width: 100%;">
+								<button type="submit" class="post-btn" style="width: 100%;">Lưu chỉnh sửa</button>
+							</form>
+						</div>
+					</div>
+				</div>
+
+				<div class="post" th:each="post : ${posts}">
+					<!-- Phần tiêu đề bài viết -->
+					<div style="display: flex; align-items: center; margin-bottom: 10px;">
+						<img th:src="${post.user.profilePicture}" class="mini-avatar">
+						<div style="margin-left: 4px">
+							<strong th:text="${post.user.firstname + ' ' + post.user.lastname}"></strong>
+							<div style="font-size: 12px; color: #65676B;" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+						</div>
+
+						<div class="post-options" style="position: relative; margin-left: auto; border: none;">
+							<i class="fas fa-ellipsis-h" style="cursor: pointer; padding: 8px;" 
+							th:data-post-id="${post.postId}" 
+							onclick="toggleDropdown(this)"></i>
+						
+							<!-- Dropdown Menu -->
+							<div class="dropdown-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;">
+								<button onclick="openEditPostModalFromDropdown(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">✏️ Chỉnh sửa</button>
+								<button onclick="deletePost(this)" style="padding: 10px 20px; border: none; background: none; width: 100%; text-align: left;">🗑️ Xóa</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Nội dung -->
+					<p th:text="${post.content}"></p>
+
+					<div class="media">
+					<!-- Hình ảnh nếu có -->
+						<img th:if="${post.imageUrl}" th:src="@{${post.imageUrl}}" style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media">
+						
+						<!-- Video nếu có -->
+						<video th:if="${post.videoUrl}" th:src="@{${post.videoUrl}}" controls style="width: 100%; border-radius: 8px; margin: 10px 0;" class="post-media"></video>
+					</div>
+
+					<!-- Thống kê lượt tương tác -->
+					<div style="display: flex; justify-content: flex-end; font-size: 14px; color: #65676B; margin-bottom: 5px;">
+						<div style="display: flex; gap: 10px;">
+							<span class="like-count" th:data-post-id="${post.postId}" th:text="|👍 ${post.likes}|"></span>
+							<span class="comment-count" th:data-post-id="${post.postId}" th:text="|💬 ${post.comments}|"></span>
+							<span class="share-count" th:data-post-id="${post.postId}" th:text="|🔁 ${post.shares}|"></span>
+						</div>
+					</div>
+
+					<!-- Các nút tương tác -->
+					<div style="display: flex; justify-content: space-evenly; padding: 10px 0; border-top: 1px solid #dadde1;">
+						<button class="btn like-btn" th:data-post-id="${post.postId}" 
+								th:classappend="${post.isLiked ? 'liked' : ''}"
+								th:data-liked="${post.isLiked}">
+							<i class="far fa-thumbs-up like-icon"></i> Thích
+						</button>
+						<button class="btn comment-btn" th:data-post-id="${post.postId}">
+							<i class="far fa-comment"></i> Bình luận
+						</button>
+					</div>
+
+					<!-- Khối bình luận -->
+					<div class="comment-section" th:data-post-id="${post.postId}" style="margin-top: 10px;">
+						<!-- Nhập bình luận -->
+						<div class="comment-input-container" style="display: flex; gap: 10px; margin-bottom: 10px;">
+							<img th:src="${post.user.profilePicture}" class="mini-avatar">
+							<input type="text" class="comment-input" th:data-post-id="${post.postId}"
+								placeholder="Viết bình luận..." 
+								style="flex: 1; padding: 8px; border-radius: 20px; border: 1px solid #ccc;">
+							<button class="btn submit-comment" th:data-post-id="${post.postId}">Gửi</button>
+						</div>
+
+						<!-- Danh sách bình luận -->
+						<div class="comments-list" th:data-post-id="${post.postId}">
+							<!-- Container for initial comments (3 comments) -->
+							<div class="initial-comments">
+								<div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
+									th:if="${commentStat.index < 3}"
+									style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+									<img th:src="${comment.user.profilePicture}" class="mini-avatar">
+									<div class="comment-content" style="flex: 1;">
+										<div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+											<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
+												<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+											</a>
+											<p th:text="${comment.content}" style="margin: 0;"></p>
+										</div>
+										<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+											<span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+											<button class="delete-comment-btn"
+													th:data-comment-id="${comment.interactionId}"
+													style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
+												Xóa
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Container for hidden comments -->
+							<div class="hidden-comments" style="display: none;">
+								<div class="comment-item" th:each="comment, commentStat : ${post.commentList}" 
+									th:if="${commentStat.index >= 3}"
+									style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+									<img th:src="${comment.user.profilePicture}" class="mini-avatar">
+									<div class="comment-content" style="flex: 1;">
+										<div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+											<a th:href="@{/profile/{id}(id=${comment.user.userId})}" style="font-weight: bold; text-decoration: none; color: #050505;">
+												<strong th:text="${comment.user.firstname + ' ' + comment.user.lastname}"></strong>
+											</a>
+											<p th:text="${comment.content}" style="margin: 0;"></p>
+										</div>
+										<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+											<span th:text="${#temporals.format(comment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+											<button class="delete-comment-btn" 
+													th:data-comment-id="${comment.interactionId}"
+													style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;margin-right:8px;">
+												Xóa
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Comment control buttons -->
+							<div class="comment-controls" th:if="${post.commentList.size() > 3}">
+								<button class="btn view-more-btn" th:data-post-id="${post.postId}"
+										style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left;">
+									Xem thêm bình luận...
+								</button>
+								<button class="btn hide-comments-btn" th:data-post-id="${post.postId}"
+										style="color: #65676B; font-weight: 600; padding: 8px 16px; text-align: left; display: none;">
+									Ẩn bớt bình luận
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:if="${activeTab == 'about'}" class="container mt-4">
+	    <h4 class="mb-4 personal-info-title" style="text-align: center;">Thông tin cá nhân</h4>
+	    <ul class="list-unstyled personal-info-list" style="list-style-type: none;">
+	        <li class="personal-info-item">
+	            <strong>Email:</strong> 
+	            <span th:text="${user.email}"></span>
+	        </li>
+	        <li class="personal-info-item">
+	            <strong>Số điện thoại:</strong> 
+	            <span th:text="${user.phone}"></span>
+	        </li>
+	        <li class="personal-info-item">
+	            <strong>Giới tính:</strong> 
+	            <span th:text="${user.gender == 'male' ? 'Nam' : user.gender == 'female' ? 'Nữ' : 'Khác'}"></span>
+	        </li>
+	        <li class="personal-info-item">
+	           <p><strong>Ngày sinh:</strong> <span th:text="${#temporals.format(profile.birthdate, 'dd/MM/yyyy')}"></span></p>
+	        </li>
+	    </ul>
+	</div>
+	<div th:if="${activeTab == 'friends'}">
+		<!-- Danh sách bạn bè -->
+		<div class="row">
+			<div class="col-md-12">
+				<h4 style="text-align: center; margin-bottom: 20px; font-size: 1.75rem;
+				font-weight: 600;
+				padding-bottom: 10px;">Danh sách bạn bè</h4>
+				<div th:if="${friends.size() == 0}" style="text-align: center;">Chưa có bạn bè nào.</div>
+				<div class="friend-list" style="margin: 0 80px">
+					<div th:each="friend : ${friends}" class="friend-card" style="text-align: center;">
+						<a th:href="@{/profile/{id}(id=${friend.user1.userId == user.userId ? friend.user2.userId : friend.user1.userId})}">
+							<img th:src="${friend.user1.userId == user.userId ? friend.user2.profilePicture : friend.user1.profilePicture}" style="display: block; margin: 0 auto;">
+							<div class="friend-name" 
+								 th:text="${friend.user1.userId == user.userId ? friend.user2.firstname + ' ' + friend.user2.lastname : friend.user1.firstname + ' ' + friend.user1.lastname}">
+							</div>
+						</a>
+						<a th:href="@{/friends/remove-friend-profile/{id}(id=${friend.friendshipId})}" class="remove-friend-btn mt-2">Hủy</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+	const userId = [[${user.userId}]];
+	let tempCoverFile = null;
+    function showBioInput() {
+        document.getElementById("add-bio-btn").style.display = "none";
+        document.getElementById("bio-input-section").style.display = "block";
+    }
+
+    function hideBioInput() {
+        document.getElementById("bio-input-section").style.display = "none";
+        document.getElementById("add-bio-btn").style.display = "block";
+    }
+
+    function saveBio() {
+		const bioText = document.getElementById("bio-input").value;
+        fetch("/profile/" + userId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "bio=" + encodeURIComponent(bioText)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to save bio");
+            return response.text();
+        })
+        .then(result => {
+            const display = document.getElementById("bio-display");
+            if (display) display.textContent = bioText || "Thông tin giới thiệu về bản thân...";
+            hideBioInput();
+        })
+        .catch(error => {
+            alert("Có lỗi xảy ra khi lưu tiểu sử: " + error.message);
+        });
+    }
+	
+	function openDetailModal() {
+		const currentLocation = '[[${profile.location}]]';
+	    const currentBirthdate = '[[${#temporals.format(profile.birthdate, 'yyyy-MM-dd')}]]';
+
+	    // Gán giá trị vào ô input
+	    document.getElementById("location").value = currentLocation;
+	    document.getElementById("birthdate").value = currentBirthdate;
+
+	    // Hiện modal
+	    document.getElementById("detail-modal").style.display = "flex";
+    }
+
+    function closeDetailModal() {
+        document.getElementById("detail-modal").style.display = "none";
+    }
+	
+	function triggerUpload() {
+	    document.getElementById('coverInput').click();
+	}
+	
+	function previewCover(input) {
+	    const file = input.files[0];
+	    if (file) {
+	        tempCoverFile = file;
+	        const reader = new FileReader();
+	        reader.onload = function(e) {
+	            document.getElementById('coverPhoto').src = e.target.result;
+	            document.getElementById('saveCancelBar').style.display = 'flex';
+	        };
+	        reader.readAsDataURL(file);
+	    }
+	}
+	
+	function cancelCover() {
+	    // Reload trang để khôi phục lại ảnh cũ
+	    location.reload();
+	}
+	
+	function saveCover() {
+	    const formData = new FormData();
+	    formData.append("coverImage", tempCoverFile);
+
+	    fetch("upload-cover", {
+	        method: "POST",
+	        body: formData,
+			credentials: 'include'
+	    })
+	    .then(res => {
+	        if (res.ok) {
+	            location.reload(); // reload để cập nhật ảnh mới
+	        } else {
+	            alert("Lỗi khi lưu ảnh bìa!");
+	        }
+	    });
+	}
+	
+	function toggleAvatarOptions() {
+	    var options = document.getElementById("avatar-options");
+	    options.style.display = options.style.display === "none" ? "block" : "none";
+	}
+	
+	function toggleAvatarDropdown() {
+        const dropdown = document.getElementById('avatarDropdown');
+        dropdown.style.display = (dropdown.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+	function viewAvatar() {
+        const imgSrc = document.querySelector('.profile-photo').src;
+        window.open(imgSrc, '_blank');
+    }
+	
+	// Model
+	function openModal() {
+	  document.getElementById('postModal').style.display = 'flex';
+	}
+
+	function closeModal() {
+	  document.getElementById('postModal').style.display = 'none';
+	}
+	
+	// Tạo bài viết
+	function createPost() {
+		const content = document.querySelector('textarea').value;
+		const fileInput = document.getElementById('fileInput');
+		const file = fileInput.files[0]; // Lấy file thực sự từ input
+		const formData = new FormData();
+
+		formData.append("userId", userId);
+		formData.append("content", content);
+
+		if (file) {
+			formData.append("file", file); // Gửi file (có thể là ảnh hoặc video)
+		}
+
+		fetch("/posts", {
+			method: "POST",
+			body: formData,
+			credentials: "include"
+		})
+		.then(res => {
+			if (res.ok) {
+				location.reload();
+				alert("Đăng bài thành công!");
+			} else {
+				alert("Lỗi khi đăng bài!");
+			}
+		});
+	}
+	
+	function previewFile() {
+	  const fileInput = document.getElementById('fileInput');
+	  const preview = document.getElementById('preview');
+	  const file = fileInput.files[0];
+
+	  preview.innerHTML = ""; // Clear cũ
+
+	  if (file) {
+	    const fileURL = URL.createObjectURL(file);
+
+	    // Tạo wrapper
+	    const wrapper = document.createElement('div');
+	    wrapper.style.position = "relative";
+	    wrapper.style.display = "inline-block";
+
+	    if (file.type.startsWith('image/')) {
+	      const img = document.createElement('img');
+	      img.src = fileURL;
+	      img.style.maxWidth = "100%";
+	      img.style.maxHeight = "300px";
+	      wrapper.appendChild(img);
+	    } else if (file.type.startsWith('video/')) {
+	      const video = document.createElement('video');
+	      video.src = fileURL;
+	      video.controls = true;
+	      video.style.maxWidth = "100%";
+	      video.style.maxHeight = "300px";
+	      wrapper.appendChild(video);
+	    }
+
+	    // Tạo nút ❌
+	    const cancelBtn = document.createElement('button');
+	    cancelBtn.innerText = '❌';
+	    cancelBtn.onclick = function() {
+	      fileInput.value = "";
+	      preview.innerHTML = "";
+	    };
+	    cancelBtn.style.position = "absolute";
+	    cancelBtn.style.top = "5px";
+	    cancelBtn.style.right = "5px";
+	    cancelBtn.style.background = "rgba(0,0,0,0.5)";
+	    cancelBtn.style.color = "white";
+	    cancelBtn.style.border = "none";
+	    cancelBtn.style.borderRadius = "50%";
+	    cancelBtn.style.width = "30px";
+	    cancelBtn.style.height = "30px";
+	    cancelBtn.style.cursor = "pointer";
+	    cancelBtn.style.fontSize = "16px";
+
+	    wrapper.appendChild(cancelBtn);
+	    preview.appendChild(wrapper);
+	  }
+	}
+
+	function previewFileEdit() {
+	  const fileInput = document.getElementById('fileInputEdit');
+	  const preview = document.getElementById('previewEdit');
+	  const file = fileInput.files[0];
+
+	  preview.innerHTML = ""; // Clear cũ
+
+	  if (file) {
+	    const fileURL = URL.createObjectURL(file);
+
+	    // Tạo wrapper
+	    const wrapper = document.createElement('div');
+	    wrapper.style.position = "relative";
+	    wrapper.style.display = "inline-block";
+
+	    if (file.type.startsWith('image/')) {
+	      const img = document.createElement('img');
+	      img.src = fileURL;
+	      img.style.maxWidth = "100%";
+	      img.style.maxHeight = "300px";
+	      wrapper.appendChild(img);
+	    } else if (file.type.startsWith('video/')) {
+	      const video = document.createElement('video');
+	      video.src = fileURL;
+	      video.controls = true;
+	      video.style.maxWidth = "100%";
+	      video.style.maxHeight = "300px";
+	      wrapper.appendChild(video);
+	    }
+
+	    // Tạo nút ❌
+	    const cancelBtn = document.createElement('button');
+	    cancelBtn.innerText = '❌';
+	    cancelBtn.onclick = function() {
+	      fileInput.value = "";
+	      preview.innerHTML = "";
+	    };
+	    cancelBtn.style.position = "absolute";
+	    cancelBtn.style.top = "5px";
+	    cancelBtn.style.right = "5px";
+	    cancelBtn.style.background = "rgba(0,0,0,0.5)";
+	    cancelBtn.style.color = "white";
+	    cancelBtn.style.border = "none";
+	    cancelBtn.style.borderRadius = "50%";
+	    cancelBtn.style.width = "30px";
+	    cancelBtn.style.height = "30px";
+	    cancelBtn.style.cursor = "pointer";
+	    cancelBtn.style.fontSize = "16px";
+
+	    wrapper.appendChild(cancelBtn);
+	    preview.appendChild(wrapper);
+	  }
+	}
+
+	function cancelPreview() {
+	  const preview = document.getElementById('preview');
+	  const fileInput = document.getElementById('fileInput');
+	  const cancelBtn = document.getElementById('cancelBtn');
+
+	  preview.innerHTML = ""; // Clear preview
+	  fileInput.value = ""; // Reset file
+	  cancelBtn.style.display = "none"; // Ẩn nút ❌
+	}
+	
+	function triggerFileInput() {
+	  document.getElementById('fileInput').click();
+	}
+	function triggerFileInputEdit() {
+	  document.getElementById('fileInputEdit').click();
+	}
+
+	
+	document.getElementById("detail-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const locationValue = document.getElementById("location").value;
+        const birthdateValue = document.getElementById("birthdate").value;
+
+        // Không dùng new Date(), gửi đúng yyyy-MM-dd như input date
+        const formData = new URLSearchParams();
+        formData.append("location", locationValue);
+        formData.append("birthdate", birthdateValue);
+
+        fetch("/profile/" + userId + "/update-details", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData.toString()
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Cập nhật thất bại");
+            return response.text();
+        })
+        .then(() => {
+            alert("Đã cập nhật thông tin!");
+            closeDetailModal();
+            window.location.href = "/profile/" + userId; // Tránh reload nếu route bị cache
+        })
+        .catch(error => alert("Lỗi: " + error.message));
+    });
+		
+	document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.querySelector(".cover-btn");
+        const actionBox = document.querySelector(".cover-actions");
+
+        btn.addEventListener("click", () => {
+            actionBox.classList.toggle("show");
+        });
+
+		// Ấn dropdown khi ấn ra ngoài
+		document.addEventListener('click', function(event) {
+		    const actionBox = document.querySelector('.cover-dropdown');
+		    const coverBtn = document.querySelector('.cover-btn');
+
+		    const avatarDropdown = document.getElementById('avatarDropdown');
+		    const avatar = document.querySelector('.profile-photo');
+
+		    // Ẩn dropdown ảnh bìa nếu click ra ngoài
+		    if (actionBox && coverBtn &&
+		        !actionBox.contains(event.target) && !coverBtn.contains(event.target)) {
+		        actionBox.classList.remove("show");
+		    }
+
+		    // Ẩn dropdown ảnh đại diện nếu click ra ngoài
+		    if (avatarDropdown && avatar &&
+		        !avatarDropdown.contains(event.target) && !avatar.contains(event.target)) {
+		        avatarDropdown.style.display = 'none';
+		    }
+		});
+		
+		// Xử lý nút xóa bình luận
+	    document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+	        btn.addEventListener('click', function() {
+	            if (!confirm('Bạn có chắc muốn xóa bình luận này?')) return;
+	            const commentId = this.getAttribute('data-comment-id');
+	            fetch(`/posts/comment/${commentId}`, {
+	                method: 'DELETE',
+	                credentials: 'include'
+	            })
+	            .then(response => response.json())
+	            .then(data => {
+	                if (data.success) {
+	                    // Xóa comment khỏi DOM
+	                    this.closest('.comment-item').remove();
+	                    showNotification('Đã xóa bình luận!');
+	                } else {
+	                    showNotification(data.error || 'Không thể xóa bình luận!', 'error');
+	                }
+	            })
+	            .catch(() => showNotification('Có lỗi xảy ra khi xóa bình luận!', 'error'));
+	        });
+	    });
+
+		const input = document.getElementById("search-input");
+		const resultsBox = document.getElementById("search-results");
+
+		input.addEventListener("input", function () {
+			const keyword = input.value.trim();
+			if (keyword.length === 0) {
+				resultsBox.style.display = "none";
+				resultsBox.innerHTML = "";
+				return;
+			}
+
+			fetch(`/users/search-users?keyword=${encodeURIComponent(keyword)}`)
+				.then(response => response.json())
+				.then(users => {
+					resultsBox.innerHTML = "";
+					if (users.length === 0) {
+						resultsBox.innerHTML = "<div style='padding: 10px;'>Không tìm thấy kết quả</div>";
+					} else {
+						users.forEach(user => {
+							const item = document.createElement("a");
+							item.href = `/profile/${user.userId}`;
+							item.style.cssText = "display: flex; align-items: center; padding: 8px; text-decoration: none; color: black; gap: 10px;";
+							item.innerHTML = `
+								<img src="${user.profilePicture}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+								<span>${user.firstname} ${user.lastname}</span>
+							`;
+							resultsBox.appendChild(item);
+						});
+					}
+					resultsBox.style.display = "block";
+				})
+				.catch(err => {
+					resultsBox.innerHTML = "<div style='padding: 10px;'>Lỗi tìm kiếm</div>";
+					resultsBox.style.display = "block";
+				});
+		});
+
+		// Ẩn dropdown khi click ra ngoài
+		document.addEventListener("click", function (event) {
+			if (!event.target.closest("#search-input") && !event.target.closest("#search-results")) {
+				resultsBox.style.display = "none";
+			}
+		});
+    });
+	// Xử lý nút Like
+	document.querySelectorAll('.like-btn').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const isLiked = this.getAttribute('data-liked') === 'true';
+			const likeIcon = this.querySelector('.like-icon');
+			const likeText = this.querySelector('.like-text');
+
+			// Thêm class animation
+			likeIcon.classList.add('animating');
+			
+			fetch(`/posts/${postId}/like`, {
+				method: 'POST',
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) throw new Error('Network response was not ok');
+				return response.json();
+			})
+			.then(data => {
+				// Cập nhật số lượt like
+				const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
+				if (likeCountElement) {
+					likeCountElement.textContent = `👍 ${data.likeCount}`;
+				}
+
+				// Toggle trạng thái like
+				if (data.isLiked) {
+					this.classList.add('liked');
+					this.setAttribute('data-liked', 'true');
+					likeIcon.classList.remove('far');
+					likeIcon.classList.add('fas');
+				} else {
+					this.classList.remove('liked');
+					this.setAttribute('data-liked', 'false');
+					likeIcon.classList.remove('fas');
+					likeIcon.classList.add('far');
+				}
+
+				// Xóa class animation sau khi hoàn thành
+				setTimeout(() => {
+					likeIcon.classList.remove('animating');
+				}, 400);
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				showNotification('Có lỗi xảy ra khi thích bài viết', 'error');
+			});
+		});
+	});
+
+	// Xử lý nút Comment
+	document.querySelectorAll('.comment-btn').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const commentSection = document.querySelector(`.comment-section[data-post-id="${postId}"]`);
+			if (commentSection) {
+				commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+			}
+		});
+	});
+
+	// Xử lý nút xem thêm và ẩn bớt comment
+	document.querySelectorAll('.view-more-btn, .hide-comments-btn').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const commentsSection = this.closest('.comments-list');
+			const hiddenComments = commentsSection.querySelector('.hidden-comments');
+			const viewMoreBtn = commentsSection.querySelector('.view-more-btn');
+			const hideCommentsBtn = commentsSection.querySelector('.hide-comments-btn');
+
+			if (this.classList.contains('view-more-btn')) {
+				// Hiển thị comments ẩn
+				hiddenComments.style.display = 'block';
+				// Ẩn nút xem thêm
+				viewMoreBtn.style.display = 'none';
+				// Hiện nút ẩn bớt
+				hideCommentsBtn.style.display = 'block';
+			} else {
+				// Ẩn comments
+				hiddenComments.style.display = 'none';
+				// Hiện nút xem thêm
+				viewMoreBtn.style.display = 'block';
+				// Ẩn nút ẩn bớt
+				hideCommentsBtn.style.display = 'none';
+			}
+		});
+	});
+
+	// Xử lý submit comment
+	document.querySelectorAll('.submit-comment').forEach(button => {
+		button.addEventListener('click', function() {
+			const postId = this.getAttribute('data-post-id');
+			const input = document.querySelector(`.comment-input[data-post-id="${postId}"]`);
+			if (!input || !input.value.trim()) return;
+
+			const formData = new URLSearchParams();
+			formData.append('content', input.value.trim());
+
+			fetch(`/posts/${postId}/comment`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: formData,
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			})
+			.then(data => {
+				// Cập nhật số lượng comment
+				const commentCountElement = document.querySelector(`.comment-count[data-post-id="${postId}"]`);
+				if (commentCountElement) {
+					commentCountElement.textContent = `💬 ${data.totalComments}`;
+				}
+
+				// Thêm comment mới vào danh sách
+				const commentsList = document.querySelector(`.comments-list[data-post-id="${postId}"]`);
+				if (commentsList) {
+					const initialComments = commentsList.querySelector('.initial-comments');
+					const hiddenComments = commentsList.querySelector('.hidden-comments');
+					
+					const newCommentHtml = `
+						<div class="comment-item" style="display: flex; gap: 10px; margin-bottom: 10px; padding: 8px;">
+							<img src="${data.user.profilePicture}" class="mini-avatar">
+							<div class="comment-content" style="flex: 1;">
+								<div class="comment-bubble" style="background: #f0f2f5; padding: 8px 12px; border-radius: 18px;">
+									<a href="/profile/${data.user.userId}" style="font-weight: bold; text-decoration: none; color: #050505;">
+										<strong>${data.user.firstname} ${data.user.lastname}</strong>
+									</a>
+									
+									<p style="margin: 0;">${data.content}</p>
+								</div>
+								<div class="comment-meta" style="font-size: 12px; color: #65676B; margin-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+									<span>Vừa xong</span>
+									<button class="delete-comment-btn"
+											th:data-comment-id="${data.interactionId}"
+											style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; margin-right:10px">
+										Xóa
+									</button>
+								</div>
+							</div>
+						</div>
+					`;
+
+					// Nếu có ít hơn 3 comment, thêm vào initial-comments
+					if (initialComments && hiddenComments) {
+						// Chèn bình luận mới vào đầu initial-comments
+						initialComments.insertAdjacentHTML('afterbegin', newCommentHtml);
+
+						// Nếu initial-comments đã có hơn 3 comment, đẩy comment cuối xuống hidden
+						if (initialComments.children.length > 3) {
+							const lastComment = initialComments.lastElementChild;
+							if (lastComment) {
+								// Di chuyển comment cuối xuống đầu hidden-comments
+								hiddenComments.insertBefore(lastComment, hiddenComments.firstChild);
+							}
+						}
+
+						// Hiển thị nút "Xem thêm" nếu chưa có
+						const viewMoreBtn = commentsList.querySelector('.view-more-btn');
+						if (viewMoreBtn) {
+							viewMoreBtn.style.display = 'block';
+						}
+					}
+				}
+
+				// Xóa nội dung input
+				input.value = '';
+				
+				// Hiển thị thông báo thành công
+				showNotification('Đã thêm bình luận thành công!');
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				showNotification('Có lỗi xảy ra khi thêm bình luận', 'error');
+			});
+		});
+	});
+
+	// Thêm CSS cho animation
+	const style = document.createElement('style');
+	style.textContent = `
+		@keyframes slideInRight {
+			from {
+				transform: translateX(100%);
+				opacity: 0;
+			}
+			to {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+
+		@keyframes slideOutRight {
+			from {
+				transform: translateX(0);
+				opacity: 1;
+			}
+			to {
+				transform: translateX(100%);
+				opacity: 0;
+			}
+		}
+	`;
+	document.head.appendChild(style);
+
+		    
+			
+			
+	// Thêm hàm showNotification
+	function showNotification(message, type = 'success') {
+		// Xóa notification cũ nếu có
+		const existingNotification = document.querySelector('.notification');
+		if (existingNotification) {
+			existingNotification.remove();
+		}
+
+		const notification = document.createElement('div');
+		notification.className = `notification ${type}`;
+		notification.textContent = message;
+		
+		// Style cho notification
+		Object.assign(notification.style, {
+			position: 'fixed',
+			bottom: '20px',
+			right: '20px',
+			padding: '12px 24px',
+			borderRadius: '8px',
+			color: 'white',
+			zIndex: '1001',
+			animation: 'slideInRight 0.3s ease-in-out',
+			backgroundColor: type === 'success' ? '#4BB543' : '#ff3333'
+		});
+
+		document.body.appendChild(notification);
+
+		// Tự động xóa notification sau 3 giây
+		setTimeout(() => {
+			notification.style.animation = 'slideOutRight 0.3s ease-in-out';
+			setTimeout(() => notification.remove(), 300);
+		}, 3000);
+	}
+
+	function openEditPostModal(icon) {
+		const postId = icon.getAttribute('data-post-id');
+		const postElement = icon.closest('.post'); 
+
+		// 1. Lấy nội dung bài viết
+		const postContent = postElement.querySelector('p')?.innerText || '';
+
+		// 2. Lấy ảnh hoặc video nếu có
+		const imageElement = postElement.querySelector('.media img');
+		const videoElement = postElement.querySelector('.media video');
+		const previewContainer = document.getElementById('previewEdit');
+		previewContainer.innerHTML = ''; // Reset preview
+
+		const wrapper = document.createElement('div');
+		wrapper.style.position = "relative";
+		wrapper.style.display = "inline-block";
+
+		if (imageElement) {
+			const img = document.createElement('img');
+			img.src = imageElement.src;
+			img.style.maxWidth = "100%";
+			img.style.maxHeight = "300px";
+			wrapper.appendChild(img);
+		} else if (videoElement) {
+			const video = document.createElement('video');
+			video.src = videoElement.src;
+			video.controls = true;
+			video.style.maxWidth = "100%";
+			video.style.maxHeight = "300px";
+			wrapper.appendChild(video);
+		}
+
+		if (imageElement || videoElement) {
+			// Nút xoá media
+			const cancelBtn = document.createElement('button');
+			cancelBtn.innerText = '❌';
+			cancelBtn.onclick = function () {
+				previewContainer.innerHTML = '';
+			};
+			Object.assign(cancelBtn.style, {
+				position: "absolute",
+				top: "5px",
+				right: "5px",
+				background: "rgba(0,0,0,0.5)",
+				color: "white",
+				border: "none",
+				borderRadius: "50%",
+				width: "30px",
+				height: "30px",
+				cursor: "pointer",
+				fontSize: "16px"
+			});
+			wrapper.appendChild(cancelBtn);
+			previewContainer.appendChild(wrapper);
+		}
+
+		// 3. Gán dữ liệu vào modal
+		document.getElementById('edit-post-id').value = postId;
+		document.getElementById('edit-post-content').value = postContent;
+		document.getElementById('editPostModal').style.display = 'flex';
+	}
+
+
+	function closeEditPostModal() {
+		document.getElementById('editPostModal').style.display = 'none';
+	}
+
+	document.getElementById('editPostForm').addEventListener('submit', function(e) {
+	    e.preventDefault();
+
+	    const postId = document.getElementById('edit-post-id').value;
+	    const content = document.getElementById('edit-post-content').value;
+	    const fileInput = document.getElementById('fileInputEdit');
+	    const formData = new FormData();
+
+	    formData.append("content", content);
+
+	    if (fileInput.files.length > 0) {
+	        formData.append("file", fileInput.files[0]);
+	    }
+
+	    fetch('/posts/edit-post/' + postId, {
+	        method: 'POST',
+	        body: formData
+	    }).then(res => {
+	        if (res.ok) {
+	            location.reload();
+	        } else {
+	            alert('Lỗi khi lưu chỉnh sửa');
+	        }
+	    });
+	});
+	function toggleDropdown(icon) {
+		const dropdown = icon.nextElementSibling;
+		const isVisible = dropdown.style.display === 'block';
+
+		// Đóng tất cả dropdown khác trước
+		document.querySelectorAll('.dropdown-menu').forEach(menu => {
+			menu.style.display = 'none';
+		});
+
+		// Hiển thị hoặc ẩn menu
+		dropdown.style.display = isVisible ? 'none' : 'block';
+	}
+
+	// Gọi khi nhấn "Chỉnh sửa"
+	function openEditPostModalFromDropdown(button) {
+		const icon = button.closest('.post-options').querySelector('i');
+		openEditPostModal(icon); // ✅ truyền DOM element thật
+	}
+
+	// Gọi khi nhấn "Xóa"
+	function deletePost(button) {
+		const postId = button.closest('.post-options').querySelector('i').getAttribute('data-post-id');
+		if (confirm("Bạn có chắc chắn muốn xóa bài viết này không?")) {
+			fetch('/posts/deletePost/delete/' + postId, {
+				method: 'POST'
+			}).then(res => {
+				if (res.ok) location.reload();
+				else alert("Xóa thất bại");
+			});
+		}
+	}
+
+	// Tự động ẩn dropdown nếu click ra ngoài
+	document.addEventListener('click', function (e) {
+		if (!e.target.closest('.post-options')) {
+			document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+		}
+	});
+	
+	function openEditProfileModal() {
+	    document.getElementById('editProfileModal').style.display = 'flex';
+	}
+
+	function closeEditProfileModal() {
+	    document.getElementById('editProfileModal').style.display = 'none';
+	}
+
+	function submitEditProfile(event) {
+	    event.preventDefault();
+
+	    const form = document.getElementById('editProfileForm');
+	    const formData = new FormData(form);
+
+	    fetch('/users/update', {
+	        method: 'POST',
+	        body: formData
+	    }).then(res => {
+	        if (res.ok) {
+	            alert('Cập nhật thành công');
+	            location.reload();
+	        } else {
+	            alert('Cập nhật thất bại');
+	        }
+	    });
+	}
+</script>
+
+</html>

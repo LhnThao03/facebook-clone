@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Facebook</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+	
+    <style>
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .login-left {
+            flex: 1;
+            padding-right: 32px;
+        }
+
+        .login-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+
+        .login-logo {
+            color: var(--fb-blue);
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .divider {
+            border-bottom: 1px solid #dadde1;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-content">
+            <div class="login-left">
+                <h1 class="login-logo">facebook</h1>
+                <h2>Facebook giúp bạn kết nối và chia sẻ với mọi người trong cuộc sống của bạn.</h2>
+            </div>
+            <div class="login-form">
+				<form th:action="@{/login}" method="post">
+				    <input type="text" class="form-control" name="email" placeholder="Email hoặc số điện thoại" required>
+				    <input type="password" class="form-control" name="password" placeholder="Mật khẩu" required>
+				    
+				    <button type="submit" class="btn btn-primary" style="width: 100%;">Đăng nhập</button>
+
+				    <!-- Hiển thị lỗi nếu có -->
+				    <p th:if="${error}" th:text="${error}" style="color: red; margin-top: 10px;"></p>
+
+				    <div class="divider"></div>
+				    <div style="text-align: center;">
+				        <a href="register" class="btn btn-success">Tạo tài khoản mới</a>
+				    </div>
+				</form>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

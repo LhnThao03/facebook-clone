@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết người dùng</title>
+    <link rel="stylesheet" th:href="@{/main.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        .card .info-group {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-back {
+            background: #007bff;
+            color: white;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div style="text-align: center;">
+        <img th:src="@{${user.profilePicture != null ? '/images/' + user.profilePicture : '/images/default.png'}}"
+             alt="Ảnh đại diện"
+             class="profile-img">
+        <h2 th:text="|${user.firstname} ${user.lastname}|"></h2>
+    </div>
+
+    <div class="info-group">
+        <span class="info-label">Email:</span>
+        <span th:text="${user.email}"></span>
+    </div>
+
+    <div class="info-group">
+        <span class="info-label">Số điện thoại:</span>
+        <span th:text="${user.phone}"></span>
+    </div>
+
+    <div class="info-group">
+        <span class="info-label">Vai trò:</span>
+        <span th:text="${user.role}"></span>
+    </div>
+
+    <div class="info-group">
+        <span class="info-label">Ngày tạo:</span>
+        <span th:text="${#dates.format(user.createdAt, 'dd/MM/yyyy')}"></span>
+    </div>
+
+    <a th:href="@{/admin}" class="btn btn-back"><i class="fas fa-arrow-left"></i> Quay lại</a>
+</div>
+
+</body>
+</html>
