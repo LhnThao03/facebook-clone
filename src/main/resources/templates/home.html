@@ -337,7 +337,7 @@
             <div class="sidebar-item">
                 <a th:href="@{'/profile/' + ${currentUser.userId}}" style="cursor: pointer; text-decoration: none; color: black;">
                     <i class="fas fa-user"></i>
-                    <span th:text="${currentUser.lastname} + ' ' + ${currentUser.firstname}"></span>
+                    <span th:text="${currentUser.firstname} + ' ' + ${currentUser.lastname}"></span>
                 </a>
             </div>
             <div class="sidebar-item">
