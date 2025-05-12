@@ -677,6 +677,24 @@
     </style>
 </head>
 <body>
+	<nav class="navbar">
+        <div class="navbar-content">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="/home"><img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" style="width: 40px;"></a>
+                <input type="text" placeholder="Tìm kiếm trên Facebook" style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5;">
+            </div>
+			<div style="display: flex; gap: 20px; align-items: center;">
+			    <a th:href="@{'/profile/' + ${currentUser.userId}}">
+			        <i class="fas fa-user" style="cursor: pointer; color: black; font-size: 20px;"></i>
+			    </a>
+			    <i class="fas fa-comment" style="font-size: 20px;"></i>
+			    <i class="fas fa-bell" style="font-size: 20px;"></i>
+			    <a href="/login" style="cursor:pointer; color:black">
+			        <i class="fas fa-sign-out-alt" style="font-size: 20px;"></i>
+			    </a>
+			</div>
+        </div>
+    </nav>
     <div class="profile-header">
 		<div class="photo">
 		    <div class="cover-wrapper">
