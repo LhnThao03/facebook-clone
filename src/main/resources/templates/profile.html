@@ -681,7 +681,13 @@
         <div class="navbar-content">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <a href="/home"><img src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook" style="width: 40px;"></a>
-                <input type="text" placeholder="Tìm kiếm trên Facebook" style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5;">
+                <div style="position: relative;">
+				    <input type="text" id="search-input" placeholder="Tìm kiếm trên Facebook"
+				           style="padding: 8px; border-radius: 20px; border: none; background: #f0f2f5; width: 250px;">
+				    <div id="search-results" style="position: absolute; top: 40px; left: 0; width: 100%; background: white;
+				         border: 1px solid #ccc; border-radius: 5px; display: none; max-height: 300px; overflow-y: auto; z-index: 9999;">
+				    </div>
+				</div>
             </div>
 			<div style="display: flex; gap: 20px; align-items: center;">
 			    <a href="#">
@@ -1518,6 +1524,50 @@
 	            .catch(() => showNotification('Có lỗi xảy ra khi xóa bình luận!', 'error'));
 	        });
 	    });
+
+		const input = document.getElementById("search-input");
+		const resultsBox = document.getElementById("search-results");
+
+		input.addEventListener("input", function () {
+			const keyword = input.value.trim();
+			if (keyword.length === 0) {
+				resultsBox.style.display = "none";
+				resultsBox.innerHTML = "";
+				return;
+			}
+
+			fetch(`/users/search-users?keyword=${encodeURIComponent(keyword)}`)
+				.then(response => response.json())
+				.then(users => {
+					resultsBox.innerHTML = "";
+					if (users.length === 0) {
+						resultsBox.innerHTML = "<div style='padding: 10px;'>Không tìm thấy kết quả</div>";
+					} else {
+						users.forEach(user => {
+							const item = document.createElement("a");
+							item.href = `/profile/${user.userId}`;
+							item.style.cssText = "display: flex; align-items: center; padding: 8px; text-decoration: none; color: black; gap: 10px;";
+							item.innerHTML = `
+								<img src="${user.profilePicture}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+								<span>${user.firstname} ${user.lastname}</span>
+							`;
+							resultsBox.appendChild(item);
+						});
+					}
+					resultsBox.style.display = "block";
+				})
+				.catch(err => {
+					resultsBox.innerHTML = "<div style='padding: 10px;'>Lỗi tìm kiếm</div>";
+					resultsBox.style.display = "block";
+				});
+		});
+
+		// Ẩn dropdown khi click ra ngoài
+		document.addEventListener("click", function (event) {
+			if (!event.target.closest("#search-input") && !event.target.closest("#search-results")) {
+				resultsBox.style.display = "none";
+			}
+		});
     });
 	// Xử lý nút Like
 	document.querySelectorAll('.like-btn').forEach(button => {

@@ -1,5 +1,6 @@
 package com.example.facebook_clone.service;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -151,4 +152,26 @@ public class UserService {
             userRepository.save(existingUser);
         }
     }
+	
+	private String normalize(String input) {
+	    String normalized = Normalizer.normalize(input, Normalizer.Form.NFD)
+	                                   .replaceAll("\\p{M}", "")
+	                                   .toLowerCase();
+	    return normalized;
+	}
+	
+	public List<User> searchUsersByKeyword(String keyword) {
+	    String normalizedKeyword = normalize(keyword);
+
+	    List<User> allUsers = userRepository.findAll(); // hoặc dùng paging nếu lớn
+	    return allUsers.stream()
+	        .filter(user -> {
+	            String fullName = normalize(user.getFirstname() + " " + user.getLastname());
+	            String email = normalize(user.getEmail());
+
+	            return fullName.contains(normalizedKeyword) || email.contains(normalizedKeyword);
+	        })
+	        .limit(20) // Giới hạn kết quả
+	        .collect(Collectors.toList());
+	}
 }

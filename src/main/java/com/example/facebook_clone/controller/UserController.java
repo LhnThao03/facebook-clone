@@ -3,7 +3,10 @@ package com.example.facebook_clone.controller;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -111,5 +114,19 @@ public class UserController {
 	    userService.deleteUser(id);
 	    redirectAttributes.addFlashAttribute("successMessage", "Xóa người dùng thành công!");
 	    return "redirect:/admin?section=users"; // Chuyển hướng lại trang danh sách người dùng
+	}
+	
+	@GetMapping("/search-users")
+	@ResponseBody
+	public List<Map<String, Object>> searchUsersApi(@RequestParam("keyword") String keyword) {
+	    List<User> users = userService.searchUsersByKeyword(keyword);
+	    return users.stream().map(user -> {
+	        Map<String, Object> map = new HashMap<>();
+	        map.put("userId", user.getUserId());
+	        map.put("firstname", user.getFirstname());
+	        map.put("lastname", user.getLastname());
+	        map.put("profilePicture", user.getProfilePicture());
+	        return map;
+	    }).collect(Collectors.toList());
 	}
 }

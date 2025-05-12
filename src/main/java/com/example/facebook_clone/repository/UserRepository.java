@@ -25,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findByEmail(String email); // Spring tự tạo query theo tên hàm
     
     Page<User> findAll(Pageable pageable);
+    
+    List<User> findByFirstnameContainingIgnoreCaseOrLastnameContainingIgnoreCaseOrEmailContainingIgnoreCase(String first, String last, String email);
 }
